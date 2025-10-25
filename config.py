@@ -1,6 +1,11 @@
+# Window settings
 WIDTH = 800
 HEIGHT = 600
+BG_COLOR = (61, 108, 115)
+FPS = 60
+
+# Player settings
 PLAYER_SPEED = 5
-ENEMY_SPEED = 2
+
+# Enemy settings
 NUM_ENEMIES = 5
-BG_COLOR = (30, 30, 30)

@@ -1,6 +1,6 @@
 import pygame
 from config import WIDTH, HEIGHT, BG_COLOR, FPS
-from src import Camera, Player
+from src import Camera, Player, EnemySpawner
 
 class Game:
     def __init__(self):
@@ -11,11 +11,14 @@ class Game:
         self.running = True
         
         # Load assets
-        player_sprites = pygame.image.load("src/assets/playerSpriteSheet.png").convert_alpha()        
+        spawning_sprites = pygame.image.load("src/assets/spawn_animation_sheet.png").convert_alpha()
+        player_sprites = pygame.image.load("src/assets/playerSpriteSheet.png").convert_alpha()  
+        slime_sprites = pygame.image.load("src/assets/slime-Sheet.png").convert_alpha()      
         
         # Load objects
         self.player = Player(player_sprites, WIDTH // 2, HEIGHT // 2)
         self.camera = Camera(HEIGHT, WIDTH)
+        self.spawner = EnemySpawner(slime_sprites, spawning_sprites)
 
 
     def handle_events(self) -> None:
@@ -30,10 +33,12 @@ class Game:
         
         self.player.update(dt,keys)
         self.camera.follow(self.player)
+        self.spawner.update(dt, self.player.position)
 
 
     def render(self) -> None:
         self.window.fill(BG_COLOR)
+        self.spawner.draw(self.window, self.camera)
         self.player.draw(self.window, self.camera)
 
         pygame.display.update()

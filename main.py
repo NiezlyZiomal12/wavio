@@ -33,7 +33,7 @@ class Game:
         
         self.player.update(dt,keys)
         self.camera.follow(self.player)
-        self.spawner.update(dt, self.player.position)
+        self.spawner.update(dt, self.player)
 
 
     def render(self) -> None:

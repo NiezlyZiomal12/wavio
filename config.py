@@ -6,6 +6,7 @@ FPS = 60
 
 # Player settings
 PLAYER_SPEED = 5
+STARTING_HEALTH = 100
 
 # Enemy settings
 SPAWN_TIMER = 5.0
@@ -15,4 +16,4 @@ SPAWN_ANIMATION_DURATION = 0.3
 #Slime
 SLIME_SPEED = 1
 SLIME_HP = 10
-SLIME_DMG = 1
+SLIME_DMG = 10

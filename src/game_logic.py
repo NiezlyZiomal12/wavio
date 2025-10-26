@@ -11,14 +11,14 @@ class EnemySpawner:
         self.timer = 0.0
 
 
-    def update(self,dt, player_pos: pygame.math.Vector2) -> None:
+    def update(self,dt, player: object) -> None:
         self.timer += dt
         if self.timer >= SPAWN_TIMER:
             self.spawn_slime()
             self.timer = 0.0
         
         for enemy in self.enemies:
-            enemy.update(dt, player_pos, self.enemies)
+            enemy.update(dt, player, self.enemies)
 
 
     def draw(self, surface: pygame.Surface, camera: object) -> None:

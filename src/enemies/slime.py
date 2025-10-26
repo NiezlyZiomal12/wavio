@@ -1,6 +1,6 @@
 import pygame
 from ..utils.Animation import Animation
-from config import SLIME_SPEED, SPAWN_ANIMATION_DURATION
+from config import SLIME_SPEED, SPAWN_ANIMATION_DURATION, SLIME_DMG
 
 class Slime(pygame.sprite.Sprite):
     def __init__(self, spriteSheet:pygame.Surface, start_x:int, start_y:int, spawnSheet:pygame.Surface) -> None:
@@ -57,10 +57,13 @@ class Slime(pygame.sprite.Sprite):
 
 
 
-    def update(self, dt: float, player_pos: pygame.math.Vector2, other_enemies: list) -> None:
+    def update(self, dt: float, player: object, other_enemies: list) -> None:
         if not self.spawning:
-            self.move(player_pos, other_enemies)
+            self.move(player.position, other_enemies)
         self.update_animation(dt)
+
+        if self.rect.colliderect(player.rect):
+            player.take_damage(SLIME_DMG, self.position)
 
 
     def draw(self, surface:pygame.Surface, camera: object):

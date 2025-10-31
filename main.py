@@ -1,6 +1,6 @@
 import pygame
 from config import WIDTH, HEIGHT, BG_COLOR, FPS
-from src import Camera, Player, EnemySpawner
+from src import Camera, Player, EnemySpawner, Fireball
 
 class Game:
     def __init__(self):
@@ -13,13 +13,16 @@ class Game:
         # Load assets
         spawning_sprites = pygame.image.load("src/assets/spawn_animation_sheet.png").convert_alpha()
         player_sprites = pygame.image.load("src/assets/playerSpriteSheet.png").convert_alpha()  
-        slime_sprites = pygame.image.load("src/assets/slime-Sheet.png").convert_alpha()      
+        slime_sprites = pygame.image.load("src/assets/slime-Sheet.png").convert_alpha()
+        self.fireball_sprites = pygame.image.load("src/assets/fireball.png").convert_alpha()    
         
         # Load objects
         self.player = Player(player_sprites, WIDTH // 2, HEIGHT // 2)
         self.camera = Camera(HEIGHT, WIDTH)
         self.spawner = EnemySpawner(slime_sprites, spawning_sprites)
-
+        
+        #weapons
+        self.fireballs = pygame.sprite.Group()
 
     def handle_events(self) -> None:
         for event in pygame.event.get():
@@ -33,12 +36,20 @@ class Game:
         
         self.player.update(dt,keys)
         self.camera.follow(self.player)
-        self.spawner.update(dt, self.player)
+        self.player.shoot(dt, self.fireballs, self.fireball_sprites, self.spawner.enemies)
+        
+        self.spawner.update(dt, self.player, self.fireballs)
+        self.fireballs.update(dt)
+
 
 
     def render(self) -> None:
         self.window.fill(BG_COLOR)
         self.spawner.draw(self.window, self.camera)
+
+        for fireball in self.fireballs:
+            fireball.draw(self.window, self.camera)
+        
         self.player.draw(self.window, self.camera)
 
         pygame.display.update()

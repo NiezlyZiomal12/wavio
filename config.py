@@ -7,6 +7,7 @@ FPS = 60
 # Player settings
 PLAYER_SPEED = 5
 STARTING_HEALTH = 100
+SHOOT_COOLDOWN = 2.0
 
 # Enemy settings
 SPAWN_TIMER = 5.0

@@ -1,6 +1,7 @@
 import pygame
-from config import PLAYER_SPEED, STARTING_HEALTH
+from config import PLAYER_SPEED, STARTING_HEALTH, SHOOT_COOLDOWN
 from ..utils.Animation import Animation
+from ..weapons.fireball import Fireball
 
 
 class Player(pygame.sprite.Sprite):
@@ -30,6 +31,9 @@ class Player(pygame.sprite.Sprite):
         self.knockback_velocity = pygame.Vector2(0, 0)
         self.knockback_decay = 0.9
 
+        #Shooting
+        self.shoot_timer = 0.0
+        self.shoot_cooldown = SHOOT_COOLDOWN
 
 
     def move(self, keys: pygame.key.ScancodeWrapper) -> None:
@@ -77,6 +81,14 @@ class Player(pygame.sprite.Sprite):
                 direction = direction.normalize()
             self.knockback_velocity = direction * 10
 
+
+    def shoot(self,dt: float, fireball_group: pygame.sprite.Group, spriteSheet: pygame.Surface, enemies: list) -> None:
+        self.shoot_timer += dt
+        if self.shoot_timer >= self.shoot_cooldown and enemies:
+            nearest_enemy = min(enemies, key=lambda e: (e.position -self.position).length())
+            fireball = Fireball(spriteSheet, self.position, nearest_enemy.position)
+            fireball_group.add(fireball)
+            self.shoot_timer = 0.0
 
 
     def update_animation(self, dt: float) -> None:

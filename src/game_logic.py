@@ -11,14 +11,16 @@ class EnemySpawner:
         self.timer = 0.0
 
 
-    def update(self,dt, player: object) -> None:
+    def update(self,dt, player: object, fireball_group: pygame.sprite.Group= None) -> None:
         self.timer += dt
         if self.timer >= SPAWN_TIMER:
             self.spawn_slime()
             self.timer = 0.0
         
         for enemy in self.enemies:
-            enemy.update(dt, player, self.enemies)
+            enemy.update(dt, player, self.enemies, fireball_group)
+        
+        self.enemies = [enemy for enemy in self.enemies if not enemy.killed]
 
 
     def draw(self, surface: pygame.Surface, camera: object) -> None:

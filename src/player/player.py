@@ -1,7 +1,7 @@
 import pygame
 from config import PLAYER_SPEED, STARTING_HEALTH, SHOOT_COOLDOWN, XP_TO_LVL_UP
-from ..utils.Animation import Animation
-from ..weapons.fireball import Fireball
+from src.utils import Animation
+from src.weapons import Fireball
 
 
 class Player(pygame.sprite.Sprite):

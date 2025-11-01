@@ -1,8 +1,8 @@
 import pygame
-from ..utils.Animation import Animation
-from ..utils.Flash import Flash
+from src.utils import Animation
+from src.utils import Flash
 from config import SLIME_SPEED, SPAWN_ANIMATION_DURATION, SLIME_DMG, SLIME_HP, SLIME_XP
-from ..xp.xp import Xp
+from src.xp import Xp
 
 class Slime(pygame.sprite.Sprite):
     def __init__(self, spriteSheet:pygame.Surface, start_x:int, start_y:int, spawnSheet:pygame.Surface) -> None:

@@ -1,7 +1,18 @@
-from .camera.camera import Camera
-from .player.player import Player
+from .camera import Camera
+from .player import Player
 from .utils import Animation, Flash
-from .enemies.slime import Slime
+from .enemies import Slime
 from .game_logic import EnemySpawner
-from .weapons.fireball import Fireball
-from .xp.xp import Xp
+from .weapons import Fireball
+from .xp import Xp
+
+__all__ = [
+	"Camera",
+	"Player",
+	"Animation",
+	"Flash",
+	"Slime",
+	"EnemySpawner",
+	"Fireball",
+	"Xp",
+]

@@ -1,5 +1,5 @@
 import pygame
-from ..utils.Animation import Animation
+from src.utils import Animation
 
 class Fireball(pygame.sprite.Sprite):
     def __init__(self, spritesheet:pygame.Surface, start_pos: pygame.Vector2, target_pos: pygame.Vector2):

@@ -1,7 +1,8 @@
 import pygame
 from ..utils.Animation import Animation
 from ..utils.Flash import Flash
-from config import SLIME_SPEED, SPAWN_ANIMATION_DURATION, SLIME_DMG, SLIME_HP
+from config import SLIME_SPEED, SPAWN_ANIMATION_DURATION, SLIME_DMG, SLIME_HP, SLIME_XP
+from ..xp.xp import Xp
 
 class Slime(pygame.sprite.Sprite):
     def __init__(self, spriteSheet:pygame.Surface, start_x:int, start_y:int, spawnSheet:pygame.Surface) -> None:
@@ -11,6 +12,9 @@ class Slime(pygame.sprite.Sprite):
         self.sprite_width = 32
         self.sprite_height = 25
         self.hp = SLIME_HP
+        self.xp_value = SLIME_XP
+        self.xp_sprite = None 
+        self.xp_group = None
 
         #Animations
         self.idle_animation = Animation(spriteSheet, self.sprite_width, self.sprite_height , 0, 8 , 0.05)
@@ -69,6 +73,9 @@ class Slime(pygame.sprite.Sprite):
         self.current_animation = self.dead_animation
         self.death_timer = 0.0
 
+        xp_orb = Xp(self.xp_sprite, int(self.position.x), int(self.position.y), self.xp_value)
+        self.xp_group.add(xp_orb)
+
 
     def update_animation(self, dt: float) -> None:
         self.current_animation.update(dt)
@@ -98,7 +105,7 @@ class Slime(pygame.sprite.Sprite):
         self.hit_flash.update(dt)
         self.update_animation(dt)
 
-        if self.rect.colliderect(player.rect) and not self.dead:
+        if self.rect.colliderect(player.rect) and not self.dead and not self.spawning:
             player.take_damage(SLIME_DMG, self.position)
 
 

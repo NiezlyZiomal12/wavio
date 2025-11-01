@@ -1,5 +1,5 @@
 import pygame
-from config import PLAYER_SPEED, STARTING_HEALTH, SHOOT_COOLDOWN
+from config import PLAYER_SPEED, STARTING_HEALTH, SHOOT_COOLDOWN, XP_TO_LVL_UP
 from ..utils.Animation import Animation
 from ..weapons.fireball import Fireball
 
@@ -11,6 +11,9 @@ class Player(pygame.sprite.Sprite):
         self.speed = PLAYER_SPEED
         self.max_health = STARTING_HEALTH
         self.current_health = self.max_health
+        self.level = 1
+        self.xp = 0
+        self.xp_to_lvl_up = XP_TO_LVL_UP
         self.position = pygame.math.Vector2(start_x, start_y)
         self.sprite_size = 32
 
@@ -96,8 +99,16 @@ class Player(pygame.sprite.Sprite):
         self.image = self.current_animation.get_current_frame(flip_x=self.facing_left)
 
 
+    def update_lvl(self) -> None:
+        if self.xp >= self.xp_to_lvl_up:
+            self.level += 1
+            self.xp = 0
+            self.xp_to_lvl_up = int(self.xp_to_lvl_up * 1.2)
+
+
     def update(self,dt:float, keys:pygame.key.ScancodeWrapper):
         self.move(keys)
+        self.update_lvl()
 
         #Knockback
         self.position += self.knockback_velocity
@@ -119,14 +130,31 @@ class Player(pygame.sprite.Sprite):
     def draw_health_bar(self, surface:pygame.Surface) -> None:
         bar_width = 200
         bar_height = 20
-        x, y = 10, 10
+        x, y = 10, 40
 
         pygame.draw.rect(surface, (50, 50, 50), (x, y, bar_width, bar_height))
         health_ratio = self.current_health / self.max_health
         pygame.draw.rect(surface, (255, 0, 0), (x, y, bar_width * health_ratio, bar_height))
         pygame.draw.rect(surface, (255, 255, 255), (x, y, bar_width, bar_height), 2)
 
+    
+    def draw_xp_bar(self, surface:pygame.Surface) -> None:
+        bar_width, _ =  pygame.display.get_window_size()
+        bar_width -= 80
+        bar_height = 10
+        x, y = 60, 10
+
+        pygame.draw.rect(surface, (50, 50, 50), (x, y, bar_width, bar_height))
+        xp_ratio = self.xp / self.xp_to_lvl_up
+        pygame.draw.rect(surface, (0, 200, 255), (x, y, bar_width * xp_ratio, bar_height))
+        pygame.draw.rect(surface, (255, 255, 255), (x, y, bar_width, bar_height), 2)
+
+        font = pygame.font.Font(None, 24)
+        level_text = font.render(f"Lvl: {self.level}", True, (255,255,255))
+        surface.blit(level_text, (10,8) )
+
 
     def draw(self, surface:pygame.Surface, camera: object):
         surface.blit(self.image, camera.apply(self.rect))
         self.draw_health_bar(surface)
+        self.draw_xp_bar(surface)

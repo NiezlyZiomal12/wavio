@@ -4,19 +4,25 @@ from src import Slime
 from config import HEIGHT, WIDTH, SPAWN_TIMER
 
 class EnemySpawner:
-    def __init__(self, slime_sprite: pygame.Surface, spawn_sprite: pygame.Surface) -> None:
+    def __init__(self, slime_sprite: pygame.Surface, spawn_sprite: pygame.Surface, xp_group:pygame.sprite.Group , xp_sprite:pygame.Surface) -> None:
         self.slime_sprite = slime_sprite
         self.spawn_sprite = spawn_sprite
         self.enemies = []
         self.timer = 0.0
+        self.xp_group = xp_group
+        self.xp_sprite = xp_sprite
 
-
-    def update(self,dt, player: object, fireball_group: pygame.sprite.Group= None) -> None:
+    def update(self,dt, player: object, fireball_group: pygame.sprite.Group= None, xp_group: pygame.sprite.Group= None) -> None:
         self.timer += dt
         if self.timer >= SPAWN_TIMER:
             self.spawn_slime()
             self.timer = 0.0
         
+        for enemy in self.enemies:
+            enemy.xp_group = xp_group
+            enemy.xp_sprite = self.xp_sprite
+            enemy.update(dt, player, self.enemies, fireball_group)
+
         for enemy in self.enemies:
             enemy.update(dt, player, self.enemies, fireball_group)
         

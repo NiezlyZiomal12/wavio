@@ -15,11 +15,17 @@ class Game:
         player_sprites = pygame.image.load("src/assets/playerSpriteSheet.png").convert_alpha()  
         slime_sprites = pygame.image.load("src/assets/slime-Sheet.png").convert_alpha()
         self.fireball_sprites = pygame.image.load("src/assets/fireball.png").convert_alpha()    
+        xp_sprite = pygame.image.load("src/assets/xp.png").convert_alpha()
+
+        #XP
+        self.xp_group = pygame.sprite.Group()
+        # self.player_xp = 0
+        # self.player_level = 1
         
         # Load objects
         self.player = Player(player_sprites, WIDTH // 2, HEIGHT // 2)
         self.camera = Camera(HEIGHT, WIDTH)
-        self.spawner = EnemySpawner(slime_sprites, spawning_sprites)
+        self.spawner = EnemySpawner(slime_sprites, spawning_sprites, self.xp_group, xp_sprite)
         
         #weapons
         self.fireballs = pygame.sprite.Group()
@@ -38,13 +44,18 @@ class Game:
         self.camera.follow(self.player)
         self.player.shoot(dt, self.fireballs, self.fireball_sprites, self.spawner.enemies)
         
-        self.spawner.update(dt, self.player, self.fireballs)
+        self.spawner.update(dt, self.player, self.fireballs, self.xp_group)
+        self.xp_group.update(dt, self.player)
         self.fireballs.update(dt)
 
 
 
     def render(self) -> None:
         self.window.fill(BG_COLOR)
+
+        for xp_orb in self.xp_group:
+            xp_orb.draw(self.window, self.camera)
+
         self.spawner.draw(self.window, self.camera)
 
         for fireball in self.fireballs:

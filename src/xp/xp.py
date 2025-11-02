@@ -1,6 +1,4 @@
 import pygame
-import random
-import math
 
 class Xp(pygame.sprite.Sprite):
     def __init__(self, image: pygame.Surface, x:int, y:int, amount: int =1):

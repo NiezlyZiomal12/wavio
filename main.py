@@ -1,6 +1,6 @@
 import pygame
 from config import WIDTH, HEIGHT, BG_COLOR, FPS
-from src import Camera, Player, EnemySpawner, Fireball
+from src import Camera, Player, EnemySpawner
 
 class Game:
     def __init__(self):
@@ -13,8 +13,6 @@ class Game:
         # Load assets
         spawning_sprites = pygame.image.load("src/assets/spawn_animation_sheet.png").convert_alpha()
         player_sprites = pygame.image.load("src/assets/playerSpriteSheet.png").convert_alpha()  
-        slime_sprites = pygame.image.load("src/assets/slime-Sheet.png").convert_alpha()
-        zombie_sprites = pygame.image.load("src/assets/zombie_sprite_sheet.png").convert_alpha()
         self.fireball_sprites = pygame.image.load("src/assets/fireball.png").convert_alpha()    
         xp_sprite = pygame.image.load("src/assets/xp.png").convert_alpha()
 
@@ -24,7 +22,7 @@ class Game:
         # Load objects
         self.player = Player(player_sprites, WIDTH // 2, HEIGHT // 2)
         self.camera = Camera(HEIGHT, WIDTH)
-        self.spawner = EnemySpawner(slime_sprites, spawning_sprites, self.xp_group, xp_sprite, zombie_sprites)
+        self.spawner = EnemySpawner(spawning_sprites, self.xp_group, xp_sprite)
         
         #weapons
         self.fireballs = pygame.sprite.Group()

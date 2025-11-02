@@ -14,18 +14,17 @@ class Game:
         spawning_sprites = pygame.image.load("src/assets/spawn_animation_sheet.png").convert_alpha()
         player_sprites = pygame.image.load("src/assets/playerSpriteSheet.png").convert_alpha()  
         slime_sprites = pygame.image.load("src/assets/slime-Sheet.png").convert_alpha()
+        zombie_sprites = pygame.image.load("src/assets/zombie_sprite_sheet.png").convert_alpha()
         self.fireball_sprites = pygame.image.load("src/assets/fireball.png").convert_alpha()    
         xp_sprite = pygame.image.load("src/assets/xp.png").convert_alpha()
 
         #XP
         self.xp_group = pygame.sprite.Group()
-        # self.player_xp = 0
-        # self.player_level = 1
         
         # Load objects
         self.player = Player(player_sprites, WIDTH // 2, HEIGHT // 2)
         self.camera = Camera(HEIGHT, WIDTH)
-        self.spawner = EnemySpawner(slime_sprites, spawning_sprites, self.xp_group, xp_sprite)
+        self.spawner = EnemySpawner(slime_sprites, spawning_sprites, self.xp_group, xp_sprite, zombie_sprites)
         
         #weapons
         self.fireballs = pygame.sprite.Group()

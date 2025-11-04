@@ -1,13 +1,9 @@
 import pygame
-from src.utils import Animation
+from .weapon import Weapon
 
-class Fireball(pygame.sprite.Sprite):
-    def __init__(self, spritesheet:pygame.Surface, start_pos: pygame.Vector2, target_pos: pygame.Vector2):
-        super().__init__()
-        self.speed = 8
-        self.animation = Animation(spritesheet, 51, 32, 0, 4, 0.1)
-        self.image = self.animation.get_current_frame()
-        self.rect = self.image.get_rect(center=start_pos)
+class Fireball(Weapon):
+    def __init__(self, config, sprite_sheet, start_pos, target_pos: pygame.Vector2):
+        super().__init__(config, sprite_sheet, start_pos)
 
         direction = target_pos - start_pos
         if direction.length() > 0:
@@ -17,13 +13,15 @@ class Fireball(pygame.sprite.Sprite):
             self.velocity = pygame.Vector2(0,0)
             self.facing_left = False
     
+        self.lifetime = 1.5
+        self.time_alive = 0.0
 
     def update(self, dt:float):
-        self.animation.update(dt)
-        self.image = self.animation.get_current_frame(flip_x=self.facing_left)
-        self.rect.center += self.velocity
-    
+        super().update(dt) 
+        self.rect.center += self.velocity * dt
 
-    def draw(self, surface:pygame.Surface, camera: object):
-        surface.blit(self.image, camera.apply(self.rect))
+        self.time_alive += dt
+        if self.time_alive >= self.lifetime:
+            self.kill()
+    
         

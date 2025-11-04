@@ -9,8 +9,8 @@ class Enemy(pygame.sprite.Sprite):
 
         self.speed = int(config['speed'] * 0.05)
         self.position = pygame.Vector2(x,y)
-        self.sprite_width = config.get('sprite_width', 32)
-        self.sprite_height = config.get("sprite_height", 32)
+        self.sprite_width = config.get('sprite_width')
+        self.sprite_height = config.get("sprite_height")
         self.hp = config["hp"]
         self.max_hp = config["hp"]
         self.xp_value = config["xp"]
@@ -80,10 +80,11 @@ class Enemy(pygame.sprite.Sprite):
                 self.rect.center = (int(self.position.x), int(self.position.y))
 
 
-    def take_damage(self, damage: int, fireball: object) -> None:
+    def take_damage(self, damage: int, weapon: object) -> None:
         if not self.spawning and not self.dead:
             self.hp -= damage
-            fireball.kill()
+            if hasattr(weapon, "kill"):
+                weapon.kill()
             self.hit_flash.start()
         if self.hp <= 0:
             self.die()
@@ -114,11 +115,13 @@ class Enemy(pygame.sprite.Sprite):
                 self.killed = True
 
 
-    def update(self, dt: float, player: object, other_enemies: list, fireball_group: pygame.sprite.Group) -> None:
+    def update(self, dt: float, player: object, other_enemies: list, weapon_projectiles: pygame.sprite.Group) -> None:
         if not self.dead:
-            fireball_hits = pygame.sprite.spritecollide(self, fireball_group, False)
-            for fireball in fireball_hits:
-                self.take_damage(5, fireball)
+            weapon_hits = pygame.sprite.spritecollide(self, weapon_projectiles, False)
+            for weapon in weapon_hits:
+                self.take_damage(weapon.damage, weapon)
+                if hasattr(weapon, 'should_destroy_on_hit') and weapon.should_destroy_on_hit:
+                    weapon.kill()
 
         if not self.spawning and not self.dead:
             self.move(player.position, other_enemies)

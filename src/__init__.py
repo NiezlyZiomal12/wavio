@@ -3,7 +3,7 @@ from .player import Player
 from .utils import Animation, Flash
 from .enemies import Slime, Zombie, Enemy, Bat
 from .game_logic import EnemySpawner
-from .weapons import Fireball
+from .weapons import Fireball, Sword
 from .xp import Xp
 
 __all__ = [
@@ -13,9 +13,10 @@ __all__ = [
 	"Flash",
 	"Slime",
 	"EnemySpawner",
-	"Fireball",
+    "Fireball",
 	"Xp",
     "Zombie",
     "Enemy",
     "Bat",
+    "Sword",
 ]

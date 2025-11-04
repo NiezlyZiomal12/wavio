@@ -22,7 +22,7 @@ class EnemySpawner:
         }
 
 
-    def update(self,dt, player: object, fireball_group: pygame.sprite.Group= None, xp_group: pygame.sprite.Group= None) -> None:
+    def update(self,dt, player: object, weapon_groups: dict, xp_group: pygame.sprite.Group= None) -> None:
         self.timer += dt
         if self.timer >= SPAWN_TIMER:
             self.spawn_enemies()
@@ -31,7 +31,7 @@ class EnemySpawner:
         for enemy in self.enemies:
             enemy.xp_group = xp_group
             enemy.xp_sprite = self.xp_sprite
-            enemy.update(dt, player, self.enemies, fireball_group)
+            enemy.update(dt, player, self.enemies, weapon_groups)
         
         self.enemies = [enemy for enemy in self.enemies if not enemy.killed]
 

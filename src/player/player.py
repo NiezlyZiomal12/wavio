@@ -1,7 +1,7 @@
 import pygame
 from config import PLAYER_SPEED, STARTING_HEALTH, SHOOT_COOLDOWN, XP_TO_LVL_UP
 from src.utils import Animation
-from src.weapons import Fireball
+from src.weapons import WEAPON_CONFIG, Fireball
 
 
 class Player(pygame.sprite.Sprite):
@@ -37,6 +37,15 @@ class Player(pygame.sprite.Sprite):
         #Shooting
         self.shoot_timer = 0.0
         self.shoot_cooldown = SHOOT_COOLDOWN
+
+        #Weapons
+        self.weapons = []
+        self.weapon_timers = {}
+        self.active_projectiles = pygame.sprite.Group()
+        self.weapon_sprites = {}
+        self.weapon_classes = {
+            "Fireball" : Fireball,
+        }
 
 
     def move(self, keys: pygame.key.ScancodeWrapper) -> None:
@@ -85,13 +94,33 @@ class Player(pygame.sprite.Sprite):
             self.knockback_velocity = direction * 10
 
 
-    def shoot(self,dt: float, fireball_group: pygame.sprite.Group, spriteSheet: pygame.Surface, enemies: list) -> None:
-        self.shoot_timer += dt
-        if self.shoot_timer >= self.shoot_cooldown and enemies:
-            nearest_enemy = min(enemies, key=lambda e: (e.position -self.position).length())
-            fireball = Fireball(spriteSheet, self.position, nearest_enemy.position)
-            fireball_group.add(fireball)
-            self.shoot_timer = 0.0
+    def add_weapon(self, weapon_name: str, sprite_sheet: pygame.Surface) -> None:
+        self.weapons.append(weapon_name)
+        self.weapon_timers[weapon_name] = 0.0
+        self.weapon_sprites[weapon_name] = sprite_sheet
+
+    
+    def shoot(self, dt:float, enemies: list) -> None:
+        if not enemies:
+            return
+        
+        for weapon_name in self.weapons:
+            self.weapon_timers[weapon_name] -= dt
+            config = WEAPON_CONFIG[weapon_name]
+            if self.weapon_timers[weapon_name] <= 0:
+                nearest_enemy = min(enemies, key=lambda e: (e.position - self.position).length())
+                weapon_class = self.weapon_classes[weapon_name]
+                sprite_sheet = self.weapon_sprites[weapon_name]
+
+                for i in range(config["projectile_count"]):
+                    projectile = weapon_class(config, sprite_sheet, self.position, nearest_enemy.position)
+                    self.active_projectiles.add(projectile)
+
+                self.weapon_timers[weapon_name] = config["cooldown"]
+
+
+    def update_weapons(self, dt:float) -> None:
+        self.active_projectiles.update(dt)
 
 
     def update_animation(self, dt: float) -> None:
@@ -106,9 +135,15 @@ class Player(pygame.sprite.Sprite):
             self.xp_to_lvl_up = int(self.xp_to_lvl_up * 1.2)
 
 
-    def update(self,dt:float, keys:pygame.key.ScancodeWrapper):
+    def update(self,dt:float, keys:pygame.key.ScancodeWrapper, enemies:list):
         self.move(keys)
         self.update_lvl()
+
+        #Weapon update
+        if enemies:
+            self.shoot(dt, enemies)
+
+        self.update_weapons(dt)
 
         #Knockback
         self.position += self.knockback_velocity
@@ -155,6 +190,9 @@ class Player(pygame.sprite.Sprite):
 
 
     def draw(self, surface:pygame.Surface, camera: object):
+        for projectile in self.active_projectiles:
+            projectile.draw(surface, camera)
+
         surface.blit(self.image, camera.apply(self.rect))
         self.draw_health_bar(surface)
         self.draw_xp_bar(surface)

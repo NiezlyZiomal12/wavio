@@ -25,27 +25,27 @@ class Game:
         self.spawner = EnemySpawner(spawning_sprites, self.xp_group, xp_sprite)
         
         #weapons
-        self.fireballs = pygame.sprite.Group()
+        self.player.add_weapon("Fireball", self.fireball_sprites)
+
 
     def handle_events(self) -> None:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                self.running = False
+        try:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.running = False
+        except SystemError as e:
+            print(f"Ignoring Pygame event error: {e}")
 
 
     def update(self) -> None:
         dt = self.clock.get_time() / 1000
         keys = pygame.key.get_pressed()
         
-        self.player.update(dt,keys)
+        self.player.update(dt,keys,self.spawner.enemies)
         self.camera.follow(self.player)
-        self.player.shoot(dt, self.fireballs, self.fireball_sprites, self.spawner.enemies)
         
-        self.spawner.update(dt, self.player, self.fireballs, self.xp_group)
+        self.spawner.update(dt, self.player, self.player.active_projectiles, self.xp_group)
         self.xp_group.update(dt, self.player)
-        self.fireballs.update(dt)
-
-
 
     def render(self) -> None:
         self.window.fill(BG_COLOR)
@@ -54,9 +54,6 @@ class Game:
             xp_orb.draw(self.window, self.camera)
 
         self.spawner.draw(self.window, self.camera)
-
-        for fireball in self.fireballs:
-            fireball.draw(self.window, self.camera)
         
         self.player.draw(self.window, self.camera)
 

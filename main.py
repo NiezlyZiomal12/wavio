@@ -13,8 +13,9 @@ class Game:
         # Load assets
         spawning_sprites = pygame.image.load("src/assets/spawn_animation_sheet.png").convert_alpha()
         player_sprites = pygame.image.load("src/assets/playerSpriteSheet.png").convert_alpha()  
-        self.fireball_sprites = pygame.image.load("src/assets/fireball.png").convert_alpha()    
+        fireball_sprites = pygame.image.load("src/assets/fireball.png").convert_alpha()    
         xp_sprite = pygame.image.load("src/assets/xp.png").convert_alpha()
+        boomerang_sprites = pygame.image.load('src/assets/boomerang.png').convert_alpha()
 
         #XP
         self.xp_group = pygame.sprite.Group()
@@ -25,7 +26,8 @@ class Game:
         self.spawner = EnemySpawner(spawning_sprites, self.xp_group, xp_sprite)
         
         #weapons
-        self.player.add_weapon("Fireball", self.fireball_sprites)
+        # self.player.add_weapon("Fireball", fireball_sprites)
+        self.player.add_weapon("Boomerang", boomerang_sprites)
 
 
     def handle_events(self) -> None:

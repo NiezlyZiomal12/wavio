@@ -3,7 +3,7 @@ from src.utils import Animation
 
 
 class Weapon(pygame.sprite.Sprite):
-    def __init__(self, config: dict, sprite_sheet: pygame.sprite.Sprite, start_pos: pygame.Vector2):
+    def __init__(self, config: dict, sprite_sheet: pygame.sprite.Sprite, start_pos: pygame.Vector2, player:object):
         super().__init__()
         self.config = config
 
@@ -27,9 +27,14 @@ class Weapon(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center=start_pos)
         self.facing_left = False
 
+        self.player = player
+
+        self.should_destroy_on_hit = True
+
 
     def update_animation(self, dt:float) -> None:
         self.image = self.animation.get_current_frame(flip_x=self.facing_left)
+        self.animation.update(dt)
 
     
     def update(self, dt:float) -> None:

@@ -1,7 +1,7 @@
 import pygame
 from config import PLAYER_SPEED, STARTING_HEALTH, SHOOT_COOLDOWN, XP_TO_LVL_UP
 from src.utils import Animation
-from src.weapons import WEAPON_CONFIG, Fireball
+from src.weapons import WEAPON_CONFIG, Fireball, Boomerang
 
 
 class Player(pygame.sprite.Sprite):
@@ -45,6 +45,7 @@ class Player(pygame.sprite.Sprite):
         self.weapon_sprites = {}
         self.weapon_classes = {
             "Fireball" : Fireball,
+            "Boomerang" : Boomerang,
         }
 
 
@@ -113,7 +114,7 @@ class Player(pygame.sprite.Sprite):
                 sprite_sheet = self.weapon_sprites[weapon_name]
 
                 for i in range(config["projectile_count"]):
-                    projectile = weapon_class(config, sprite_sheet, self.position, nearest_enemy.position)
+                    projectile = weapon_class(config, sprite_sheet, self.position, nearest_enemy.position, self)
                     self.active_projectiles.add(projectile)
 
                 self.weapon_timers[weapon_name] = config["cooldown"]

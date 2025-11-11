@@ -3,6 +3,7 @@ from typing import List
 
 
 class Animation:
+    """Class for easy sprite animation import"""
     def __init__(self, spritesheet: pygame.Surface, frame_width: int, frame_height: int, row: int, frame_count: int, speed: float):
         self.frames: List[pygame.Surface] = self.load_frames(spritesheet, frame_width, frame_height, row, frame_count)
         self.frame_index: int = 0

@@ -27,8 +27,10 @@ class Weapon(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center=start_pos)
         self.facing_left = False
 
+        #adding player attribute for some weapons 
         self.player = player
 
+        #single hit projectiles prop
         self.should_destroy_on_hit = True
 
 

@@ -1,6 +1,7 @@
 import pygame
 
 class Flash:
+    """Class that does flashing on sprite"""
     def __init__(self, duration: float = 0.1, color: tuple = (255, 255, 255), max_alpha: int = 128):
         self.duration = duration
         self.color = color

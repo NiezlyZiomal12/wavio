@@ -7,11 +7,13 @@ class Boomerang(Weapon):
         super().__init__(config, sprite_sheet, start_pos, player)
 
         self.start_pos = pygame.Vector2(start_pos)
+        #player prop for returning to player 
         self.player = player
         self.pierce_count = config['pierce_count']
         self.return_speed = config['return_speed']
         self.lifetime = config['lifetime']
 
+        #for more randomness
         offset_strength = 0.05
         direction = target_pos - player.position
         if direction.length() > 0:
@@ -27,6 +29,7 @@ class Boomerang(Weapon):
         self.time_alive = 0.0
         self.facing_left = direction.x > 0
         self.should_destroy_on_hit = False
+        #Adding hit cooldown so that dont hit each frame (too much dmg)
         self.hit_cooldown = 0.15
         self.recent_hits = {}
 
@@ -34,6 +37,7 @@ class Boomerang(Weapon):
     def update(self, dt:float) -> None:
         super().update(dt)
 
+        #calculating hit cooldown for each enemy
         enemies_to_remove = []
         for enemy, timer in self.recent_hits.items():
             timer -= dt
@@ -46,6 +50,7 @@ class Boomerang(Weapon):
 
         self.time_alive += dt
 
+        #returning to player after half lifetime
         if not self.returning and self.time_alive > self.lifetime / 2 :
             self.returning = True
 
@@ -63,6 +68,7 @@ class Boomerang(Weapon):
 
         
     def on_hit_enemy(self, enemy:object) -> None:
+        """Function that does pierce damage"""
         if enemy in self.recent_hits:
             return
         self.recent_hits[enemy] = self.hit_cooldown

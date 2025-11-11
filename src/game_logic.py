@@ -11,10 +11,12 @@ class EnemySpawner:
         self.xp_group = xp_group
         self.xp_sprite = xp_sprite
 
+        #loading enemy sprites
         self.enemy_sprites = {}
         for enemy_type in ENEMY_CONFIG.keys():
             self.enemy_sprites[enemy_type] = pygame.image.load(f"src/assets/{enemy_type}-Sheet.png").convert_alpha()
 
+        #adding enemy classes
         self.enemy_classes = {
             "Slime" : Slime,
             "Zombie" : Zombie,
@@ -28,6 +30,7 @@ class EnemySpawner:
             self.spawn_enemies()
             self.timer = 0.0
         
+        #killing enemies and dropping xp
         for enemy in self.enemies:
             enemy.xp_group = xp_group
             enemy.xp_sprite = self.xp_sprite

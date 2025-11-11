@@ -7,6 +7,7 @@ class Enemy(pygame.sprite.Sprite):
         super().__init__()
         self.config = config
 
+        #loading props from config
         self.speed = int(config['speed'] * 0.05)
         self.position = pygame.Vector2(x,y)
         self.sprite_width = config.get('sprite_width')
@@ -59,6 +60,7 @@ class Enemy(pygame.sprite.Sprite):
         if self.dead:
             return
         
+        #Moving towards player and not overlapping with another enemies
         direction = player_pos - self.position
         if direction.length() > 1:
             direction = direction.normalize() * self.speed * 0.5
@@ -85,9 +87,11 @@ class Enemy(pygame.sprite.Sprite):
             self.hp -= damage
             self.hit_flash.start()
             
+            #Check if actual weapon is single hit
             if getattr(weapon, "should_destroy_on_hit", True):
                 weapon.kill()
 
+            #Check if actual projectile is multihit (piercing)
             if hasattr(weapon, "on_hit_enemy"):
                 weapon.on_hit_enemy(self)
 
@@ -121,6 +125,7 @@ class Enemy(pygame.sprite.Sprite):
 
 
     def update(self, dt: float, player: object, other_enemies: list, weapon_projectiles: pygame.sprite.Group) -> None:
+        #taking damage
         if not self.dead:
             weapon_hits = pygame.sprite.spritecollide(self, weapon_projectiles, False)
             for weapon in weapon_hits:
@@ -132,6 +137,7 @@ class Enemy(pygame.sprite.Sprite):
         self.hit_flash.update(dt)
         self.update_animation(dt)
 
+        #Collision with other enemies
         if self.rect.colliderect(player.rect) and not self.dead and not self.spawning:
             player.take_damage(self.damage, self.position)
 

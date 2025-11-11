@@ -6,6 +6,7 @@ class Fireball(Weapon):
     def __init__(self, config, sprite_sheet, start_pos, target_pos: pygame.Vector2, player: object= None):
         super().__init__(config, sprite_sheet, start_pos, player)
 
+        #slight offset for more randomness
         offset_strength = 0.05
         direction = target_pos - start_pos
         if direction.length() > 0:

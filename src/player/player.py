@@ -80,6 +80,7 @@ class Player(pygame.sprite.Sprite):
 
 
     def take_damage(self, amount:int, enemy_pos: pygame.math.Vector2) -> None:
+        #Invisibility frames
         if not self.invicible:
             self.current_health -= amount
             self.current_health = max(0, self.current_health)
@@ -89,6 +90,7 @@ class Player(pygame.sprite.Sprite):
             self.hurt_animation.reset()
             self.current_animation = self.hurt_animation
 
+            #Knockback
             direction = self.position - enemy_pos
             if direction.length() > 0:
                 direction = direction.normalize()
@@ -104,7 +106,7 @@ class Player(pygame.sprite.Sprite):
     def shoot(self, dt:float, enemies: list) -> None:
         if not enemies:
             return
-        
+        #loading weapon from config
         for weapon_name in self.weapons:
             self.weapon_timers[weapon_name] -= dt
             config = WEAPON_CONFIG[weapon_name]
@@ -163,6 +165,7 @@ class Player(pygame.sprite.Sprite):
             self.image = self.current_animation.get_current_frame(flip_x=self.facing_left)
 
 
+    #Ui (might move it to another file)
     def draw_health_bar(self, surface:pygame.Surface) -> None:
         bar_width = 200
         bar_height = 20

@@ -83,9 +83,14 @@ class Enemy(pygame.sprite.Sprite):
     def take_damage(self, damage: int, weapon: object) -> None:
         if not self.spawning and not self.dead:
             self.hp -= damage
-            if hasattr(weapon, "kill"):
-                weapon.kill()
             self.hit_flash.start()
+            
+            if getattr(weapon, "should_destroy_on_hit", True):
+                weapon.kill()
+
+            if hasattr(weapon, "on_hit_enemy"):
+                weapon.on_hit_enemy(self)
+
         if self.hp <= 0:
             self.die()
 
@@ -120,8 +125,6 @@ class Enemy(pygame.sprite.Sprite):
             weapon_hits = pygame.sprite.spritecollide(self, weapon_projectiles, False)
             for weapon in weapon_hits:
                 self.take_damage(weapon.damage, weapon)
-                if hasattr(weapon, 'should_destroy_on_hit') and weapon.should_destroy_on_hit:
-                    weapon.kill()
 
         if not self.spawning and not self.dead:
             self.move(player.position, other_enemies)

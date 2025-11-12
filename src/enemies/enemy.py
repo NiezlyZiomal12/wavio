@@ -83,17 +83,20 @@ class Enemy(pygame.sprite.Sprite):
 
 
     def take_damage(self, damage: int, weapon: object) -> None:
-        if not self.spawning and not self.dead:
-            self.hp -= damage
-            self.hit_flash.start()
+        if self.spawning or self.dead:
+            return
             
-            #Check if actual weapon is single hit
-            if getattr(weapon, "should_destroy_on_hit", True):
-                weapon.kill()
+        #Check if actual weapon is single hit
+        if getattr(weapon, "should_destroy_on_hit", True):
+            weapon.kill()
 
-            #Check if actual projectile is multihit (piercing)
-            if hasattr(weapon, "on_hit_enemy"):
-                weapon.on_hit_enemy(self)
+        #Check if actual projectile is multihit (piercing)
+        if hasattr(weapon, "on_hit_enemy"):
+            if weapon.on_hit_enemy(self) is False:
+                return
+
+        self.hp -= damage
+        self.hit_flash.start()
 
         if self.hp <= 0:
             self.die()

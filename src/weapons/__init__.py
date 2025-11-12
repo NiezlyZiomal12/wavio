@@ -3,6 +3,7 @@ from .weapon_config import WEAPON_CONFIG
 from .sword import Sword
 from .weapon import Weapon
 from .boomerang import Boomerang
+from .sword import Sword
 
 __all__ = [
             "Weapon",
@@ -10,4 +11,6 @@ __all__ = [
             "WEAPON_CONFIG",
             "Sword",
             "Boomerang",
+            "Sword",
+            
            ]

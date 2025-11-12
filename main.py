@@ -16,6 +16,7 @@ class Game:
         fireball_sprites = pygame.image.load("src/assets/fireball.png").convert_alpha()    
         xp_sprite = pygame.image.load("src/assets/xp.png").convert_alpha()
         boomerang_sprites = pygame.image.load('src/assets/boomerang.png').convert_alpha()
+        sword_sprites = pygame.image.load('src/assets/sword.png').convert_alpha()
 
         #XP
         self.xp_group = pygame.sprite.Group()
@@ -27,7 +28,8 @@ class Game:
         
         #weapons
         # self.player.add_weapon("Fireball", fireball_sprites)
-        self.player.add_weapon("Boomerang", boomerang_sprites)
+        # self.player.add_weapon("Boomerang", boomerang_sprites)
+        self.player.add_weapon("Sword", sword_sprites)
 
 
     def handle_events(self) -> None:

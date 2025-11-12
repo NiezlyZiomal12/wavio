@@ -1,7 +1,7 @@
 import pygame
 from config import PLAYER_SPEED, STARTING_HEALTH, SHOOT_COOLDOWN, XP_TO_LVL_UP
 from src.utils import Animation
-from src.weapons import WEAPON_CONFIG, Fireball, Boomerang
+from src.weapons import WEAPON_CONFIG, Fireball, Boomerang, Sword
 
 
 class Player(pygame.sprite.Sprite):
@@ -46,6 +46,8 @@ class Player(pygame.sprite.Sprite):
         self.weapon_classes = {
             "Fireball" : Fireball,
             "Boomerang" : Boomerang,
+            "Sword" : Sword,
+            
         }
 
 

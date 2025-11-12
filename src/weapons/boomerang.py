@@ -67,11 +67,12 @@ class Boomerang(Weapon):
             self.kill()
 
         
-    def on_hit_enemy(self, enemy:object) -> None:
+    def on_hit_enemy(self, enemy:object) -> bool:
         """Function that does pierce damage"""
         if enemy in self.recent_hits:
-            return
+            return False
         self.recent_hits[enemy] = self.hit_cooldown
         self.pierce_count -= 1
         if self.pierce_count <= 0:
             self.returning = True
+        return True

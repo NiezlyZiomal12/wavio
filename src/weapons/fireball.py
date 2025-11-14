@@ -7,7 +7,7 @@ class Fireball(Weapon):
         super().__init__(config, sprite_sheet, start_pos, player)
 
         #slight offset for more randomness
-        offset_strength = 0.05
+        offset_strength = 0.005
         direction = target_pos - start_pos
         if direction.length() > 0:
             offset = pygame.Vector2(-direction.y, direction.x)
@@ -20,7 +20,7 @@ class Fireball(Weapon):
             self.velocity = pygame.Vector2(0,0)
             self.facing_left = False
     
-        self.lifetime = 1.5
+        self.lifetime = config['special']['lifetime']
         self.time_alive = 0.0
 
     def update(self, dt:float):

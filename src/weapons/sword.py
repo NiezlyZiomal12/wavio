@@ -5,8 +5,8 @@ class Sword(Weapon):
     def __init__(self, config, sprite_sheet, start_pos, target_pos : pygame.Vector2, player= None):
         super().__init__(config, sprite_sheet, start_pos, player)
 
-        self.attack_radius = config['attack_radius']
-        self.attack_duration = config['attack_duration']
+        self.attack_radius = config['special']['attack_radius']
+        self.attack_duration = config['special']['attack_duration']
         # Track swing timing
         self.time_alive = 0.0
         self.facing_left = target_pos.x < player.rect.centerx

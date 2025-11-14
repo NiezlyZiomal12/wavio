@@ -9,9 +9,9 @@ class Boomerang(Weapon):
         self.start_pos = pygame.Vector2(start_pos)
         #player prop for returning to player 
         self.player = player
-        self.pierce_count = config['pierce_count']
-        self.return_speed = config['return_speed']
-        self.lifetime = config['lifetime']
+        self.pierce_count = config['special']['pierce_count']
+        self.return_speed = config['special']['return_speed']
+        self.lifetime = config['special']['lifetime']
 
         #for more randomness
         offset_strength = 0.05

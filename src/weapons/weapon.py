@@ -8,8 +8,8 @@ class Weapon(pygame.sprite.Sprite):
         self.config = config
 
         self.speed = config['speed']
-        self.sprite_width = config.get('sprite_width')
-        self.sprite_height = config.get("sprite_height")
+        self.sprite_width = config['animation']['sprite_width']
+        self.sprite_height = config['animation']['sprite_height']
         self.cooldown = config['cooldown']
         self.projectile_count = config['projectile_count']
         self.damage = config['damage']
@@ -18,9 +18,9 @@ class Weapon(pygame.sprite.Sprite):
             sprite_sheet,
             self.sprite_width,
             self.sprite_height,
-            config["start_row"],
-            config["start_frames"], 
-            config["animation_speed"]
+            config['animation']["start_row"],
+            config['animation']["start_frames"], 
+            config['animation']["animation_speed"]
         )
 
         self.image = self.animation.get_current_frame()

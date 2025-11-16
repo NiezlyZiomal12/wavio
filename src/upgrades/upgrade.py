@@ -1,4 +1,5 @@
 import pygame
+from .upgrade_config import UPGRADE_CONFIG
 
 class Upgrade(pygame.sprite.Sprite):
     def __init__(self, config:dict):
@@ -6,10 +7,13 @@ class Upgrade(pygame.sprite.Sprite):
 
         self.name = config['name']
         self.description = config['description']
-        self.image = config['image']
+        self.image = pygame.image.load(config['image']).convert_alpha()
         self.effect = config['effect']
 
 
     def draw(self, surface:pygame.Surface, camera: object):
         surface.blit(self.image, camera.apply(self.rect))
  
+
+def loadUpgrades():
+    return [Upgrade(config) for config in UPGRADE_CONFIG.values()]

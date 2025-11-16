@@ -1,6 +1,7 @@
 import pygame
 from config import WIDTH, HEIGHT, BG_COLOR, FPS
-from src import Camera, Player, EnemySpawner, LevelUpUi
+from src import Camera, Player, EnemySpawner, LevelUpUi, loadUpgrades
+import random
 
 class Game:
     def __init__(self):
@@ -26,6 +27,7 @@ class Game:
         self.player = Player(player_sprites, WIDTH // 2, HEIGHT // 2)
         self.camera = Camera(HEIGHT, WIDTH)
         self.spawner = EnemySpawner(spawning_sprites, self.xp_group, xp_sprite)
+        self.upgrades = loadUpgrades()
 
         #UI
         self.level_up_ui = LevelUpUi(self.window, WIDTH, HEIGHT)
@@ -72,7 +74,8 @@ class Game:
         #lvl up
         if self.player.just_leveled_up:
             self.player.just_leveled_up = False
-            self.level_up_ui.show(["Option A", "Option B", "Option C"])
+            upgrades = random.sample(self.upgrades, 3)
+            self.level_up_ui.show(upgrades)
 
     def render(self) -> None:
         self.window.fill(BG_COLOR)

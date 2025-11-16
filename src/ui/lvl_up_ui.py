@@ -1,6 +1,6 @@
 import pygame
 import time
-from src.utils import Animation
+from src.utils import Animation, wrap_text
 
 class LevelUpUi:
     def __init__(self, window, width, height):
@@ -16,7 +16,7 @@ class LevelUpUi:
         self.animation_start = 0
         self.scale = 0
 
-        self.options = ["UPGRADE A" , 'UPGRADE B', 'UPGRADE C']
+        self.options = []
         self.selected = None
 
         self.popup_rect = pygame.Rect(width // 2 - 200, height // 2 - 150, 400, 300)
@@ -97,25 +97,53 @@ class LevelUpUi:
         # draw animated popup
         self.window.blit(frame, (popup_x, popup_y)) 
 
-        # ---- draw text + buttons over the animated frame ----
+        # ---- draw text + buttons ----
         base_positions = [60, 130, 200]
-        self.option_rects = []  
+        self.option_rects = []
 
         for i, base_y in enumerate(base_positions):
+            upgrade = self.options[i]
+
             rect = pygame.Rect(
                 popup_x + int(40 * self.scale),
                 popup_y + int(base_y * self.scale),
                 int(320 * self.scale),
-                int(50 * self.scale)
+                int(60 * self.scale)
             )
-            self.option_rects.append(rect)  
+            self.option_rects.append(rect)
 
-            pygame.draw.rect(self.window, (70, 70, 70), rect)
-            pygame.draw.rect(self.window, (200, 200, 200), rect, 2) 
+            # Card background
+            pygame.draw.rect(self.window, (45, 45, 45), rect, border_radius=6)
+            pygame.draw.rect(self.window, (180, 180, 180), rect, 2, border_radius=6)
 
-            text = self.font.render(self.options[i], True, (255, 255, 255))
-            self.window.blit(
-                text,
-                (rect.centerx - text.get_width() // 2,
-                 rect.centery - text.get_height() // 2)
+            #Upgrade image
+            icon = pygame.transform.scale(
+                upgrade.image,
+                (int(40 * self.scale), int(40 * self.scale))
             )
+            icon_x = rect.x + int(10 * self.scale)
+            icon_y = rect.centery - icon.get_height() // 2
+            self.window.blit(icon, (icon_x, icon_y))
+
+            #Upgrade Name
+            name_surface = self.font.render(upgrade.name + ":", True, (255, 255, 255))
+            name_x = icon_x + icon.get_width() + int(10 * self.scale)
+            name_y = rect.y + int(10 * self.scale)
+            self.window.blit(name_surface, (name_x, name_y))
+
+            #Upgrade Description
+            desc_lines = wrap_text(
+                upgrade.description,
+                self.font,
+                rect.width - (icon.get_width() + int(25 * self.scale))
+            )
+
+            # Draw wrapped description
+            line_y = name_y + name_surface.get_height()
+            for line in desc_lines:
+                desc_surface = self.font.render(line, True, (200, 200, 200))
+                self.window.blit(desc_surface, (name_x, line_y))
+                line_y += desc_surface.get_height()
+
+            lvl_up_text = self.font.render("Level Up!", True, (255,255,255))
+            self.window.blit(lvl_up_text, (self.popup_rect.centerx - lvl_up_text.get_width() // 2, popup_y - 20))

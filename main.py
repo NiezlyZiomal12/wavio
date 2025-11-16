@@ -1,6 +1,7 @@
 import pygame
 from config import WIDTH, HEIGHT, BG_COLOR, FPS
-from src import Camera, Player, EnemySpawner
+from src import Camera, Player, EnemySpawner, LevelUpUi, loadUpgrades
+import random
 
 class Game:
     def __init__(self):
@@ -9,6 +10,7 @@ class Game:
         pygame.display.set_caption("Wavio")
         self.clock = pygame.time.Clock()
         self.running = True
+        self.paused = False
         
         # Load assets
         spawning_sprites = pygame.image.load("src/assets/spawn_animation_sheet.png").convert_alpha()
@@ -25,10 +27,14 @@ class Game:
         self.player = Player(player_sprites, WIDTH // 2, HEIGHT // 2)
         self.camera = Camera(HEIGHT, WIDTH)
         self.spawner = EnemySpawner(spawning_sprites, self.xp_group, xp_sprite)
+        self.upgrades = loadUpgrades()
+
+        #UI
+        self.level_up_ui = LevelUpUi(self.window, WIDTH, HEIGHT)
         
         #weapons
-        # self.player.add_weapon("Fireball", fireball_sprites)
-        # self.player.add_weapon("Boomerang", boomerang_sprites)
+        self.player.add_weapon("Fireball", fireball_sprites)
+        self.player.add_weapon("Boomerang", boomerang_sprites)
         self.player.add_weapon("Sword", sword_sprites)
 
 
@@ -37,19 +43,39 @@ class Game:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
+                    return
+
+                #level up mechanics
+                selection = self.level_up_ui.handle_event(event)
+                if selection is not None:
+                    self.level_up_ui.hide()
+                    continue
+                
         except SystemError as e:
             print(f"Ignoring Pygame event error: {e}")
 
 
     def update(self) -> None:
         dt = self.clock.get_time() / 1000
-        keys = pygame.key.get_pressed()
+
+        self.level_up_ui.update(dt)
+        if self.level_up_ui.active:
+            return
         
+        keys = pygame.key.get_pressed()
+
         self.player.update(dt,keys,self.spawner.enemies)
         self.camera.follow(self.player)
         
         self.spawner.update(dt, self.player, self.player.active_projectiles, self.xp_group)
         self.xp_group.update(dt, self.player)
+
+
+        #lvl up
+        if self.player.just_leveled_up:
+            self.player.just_leveled_up = False
+            upgrades = random.sample(self.upgrades, 3)
+            self.level_up_ui.show(upgrades)
 
     def render(self) -> None:
         self.window.fill(BG_COLOR)
@@ -60,6 +86,9 @@ class Game:
         self.spawner.draw(self.window, self.camera)
         
         self.player.draw(self.window, self.camera)
+
+        if self.level_up_ui.active:
+            self.level_up_ui.draw()
 
         pygame.display.update()
 

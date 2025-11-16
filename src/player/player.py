@@ -16,6 +16,7 @@ class Player(pygame.sprite.Sprite):
         self.xp_to_lvl_up = XP_TO_LVL_UP
         self.position = pygame.math.Vector2(start_x, start_y)
         self.sprite_size = 32
+        self.just_leveled_up = False
 
         #Animations
         self.idle_animation = Animation(spriteSheet, self.sprite_size, self.sprite_size, 0, 2, 0.5)
@@ -138,6 +139,7 @@ class Player(pygame.sprite.Sprite):
             self.level += 1
             self.xp = 0
             self.xp_to_lvl_up = int(self.xp_to_lvl_up * 1.2)
+            self.just_leveled_up = True
 
 
     def update(self,dt:float, keys:pygame.key.ScancodeWrapper, enemies:list):

@@ -5,6 +5,7 @@ from .enemies import Slime, Zombie, Enemy, Bat
 from .game_logic import EnemySpawner
 from .weapons import Fireball, Sword
 from .xp import Xp
+from .ui import LevelUpUi
 
 __all__ = [
 	"Camera",
@@ -19,4 +20,5 @@ __all__ = [
     "Enemy",
     "Bat",
     "Sword",
+    "LevelUpUi",
 ]

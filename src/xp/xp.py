@@ -1,16 +1,17 @@
 import pygame
 
 class Xp(pygame.sprite.Sprite):
-    def __init__(self, image: pygame.Surface, x:int, y:int, amount: int =1):
+    def __init__(self, image: pygame.Surface, x:int, y:int, amount: int, player: object):
         super().__init__()
-        self.xp_amount = amount
+        self.player = player
+        self.xp_amount = amount * self.player.xp_gain
         self.image = image
         self.rect = self.image.get_rect(center=(x,y))
 
         self.position = pygame.Vector2(x,y)
         self.velocity = pygame.Vector2(0,0)
         self.speed = 100
-        self.collect_radius = 100
+        self.collect_radius = 100 + 100 * self.player.pickup_range
         self.collected = False
 
 

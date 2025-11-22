@@ -4,12 +4,13 @@ from src.enemies import *
 from config import HEIGHT, WIDTH, SPAWN_TIMER
 
 class EnemySpawner:
-    def __init__(self, spawn_sprite: pygame.Surface, xp_group:pygame.sprite.Group , xp_sprite:pygame.Surface) -> None:
+    def __init__(self, spawn_sprite: pygame.Surface, xp_group:pygame.sprite.Group , xp_sprite:pygame.Surface, player:object) -> None:
         self.spawn_sprite = spawn_sprite
         self.enemies = []
         self.timer = 0.0
         self.xp_group = xp_group
         self.xp_sprite = xp_sprite
+        self.player = player
 
         #loading enemy sprites
         self.enemy_sprites = {}
@@ -56,7 +57,7 @@ class EnemySpawner:
             sprite = self.enemy_sprites[enemy_type]
             enemy_class = self.enemy_classes[config["class"]]
             
-            enemy = enemy_class(sprite, x, y, self.spawn_sprite, config)
+            enemy = enemy_class(sprite, x, y, self.spawn_sprite, config, self.player)
             enemy.xp_group = self.xp_group
             enemy.xp_sprite = self.xp_sprite
             self.enemies.append(enemy)

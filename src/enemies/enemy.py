@@ -3,9 +3,10 @@ from src.utils import Animation, Flash
 from src.xp import Xp
 
 class Enemy(pygame.sprite.Sprite):
-    def __init__(self, sprite_sheet:pygame.Surface, x:int, y:int, spawn_sheet:pygame.Surface, config:dict):
+    def __init__(self, sprite_sheet:pygame.Surface, x:int, y:int, spawn_sheet:pygame.Surface, config:dict, player:object):
         super().__init__()
         self.config = config
+        self.player = player
 
         #loading props from config
         self.speed = int(config['speed'] * 0.05)
@@ -97,6 +98,11 @@ class Enemy(pygame.sprite.Sprite):
 
         self.hp -= damage
         self.hit_flash.start()
+        
+        #lifesteal for player
+        heal = damage * self.player.lifesteal
+        self.player.current_health = min(self.player.max_health, self.player.current_health + heal)
+        print(f'healed {heal}')
 
         if self.hp <= 0:
             self.die()
@@ -106,7 +112,7 @@ class Enemy(pygame.sprite.Sprite):
         self.dead = True
         self.current_animation = self.dead_animation
         self.death_timer = 0.0
-        xp_orb = Xp(self.xp_sprite, int(self.position.x), int(self.position.y), self.xp_value)
+        xp_orb = Xp(self.xp_sprite, int(self.position.x), int(self.position.y), self.xp_value, self.player)
         self.xp_group.add(xp_orb)
             
 

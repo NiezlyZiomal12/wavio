@@ -3,7 +3,7 @@ from .weapon import Weapon
 import random
 
 class Fireball(Weapon):
-    def __init__(self, config, sprite_sheet, start_pos, target_pos: pygame.Vector2, player: object= None):
+    def __init__(self, config, sprite_sheet, start_pos, target_pos: pygame.Vector2, player: object):
         super().__init__(config, sprite_sheet, start_pos, player)
 
         #slight offset for more randomness

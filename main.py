@@ -26,7 +26,7 @@ class Game:
         # Load objects
         self.player = Player(player_sprites, WIDTH // 2, HEIGHT // 2)
         self.camera = Camera(HEIGHT, WIDTH)
-        self.spawner = EnemySpawner(spawning_sprites, self.xp_group, xp_sprite)
+        self.spawner = EnemySpawner(spawning_sprites, self.xp_group, xp_sprite, self.player)
         self.upgrades = loadUpgrades()
 
         #UI
@@ -84,7 +84,6 @@ class Game:
             xp_orb.draw(self.window, self.camera)
 
         self.spawner.draw(self.window, self.camera)
-        
         self.player.draw(self.window, self.camera)
 
         if self.level_up_ui.active:

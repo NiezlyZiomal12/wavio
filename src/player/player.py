@@ -9,7 +9,7 @@ class Player(pygame.sprite.Sprite):
         #Base stats
         self.speed = SPEED
         self.max_health = STARTING_HEALTH
-        self.current_health = 50
+        self.current_health = self.max_health
         self.xp_to_lvl_up = XP_TO_LVL_UP
         self.xp_gain = XP_GAIN
         self.damage = DAMAGE

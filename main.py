@@ -48,6 +48,8 @@ class Game:
                 #level up mechanics
                 selection = self.level_up_ui.handle_event(event)
                 if selection is not None:
+                    upgrade = self.level_up_ui.options[selection]
+                    upgrade.apply(self.player)
                     self.level_up_ui.hide()
                     continue
                 

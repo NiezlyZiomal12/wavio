@@ -1,19 +1,28 @@
 import pygame
-from config import PLAYER_SPEED, STARTING_HEALTH, SHOOT_COOLDOWN, XP_TO_LVL_UP
 from src.utils import Animation
 from src.weapons import WEAPON_CONFIG, Fireball, Boomerang, Sword
-
+from .player_config import *
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, spriteSheet:pygame.Surface, start_x:int, start_y:int) -> None:
         super().__init__()
         #Base stats
-        self.speed = PLAYER_SPEED
+        self.speed = SPEED
         self.max_health = STARTING_HEALTH
-        self.current_health = self.max_health
+        self.current_health = 50
+        self.xp_to_lvl_up = XP_TO_LVL_UP
+        self.xp_gain = XP_GAIN
+        self.damage = DAMAGE
+        self.projectile_count = PROJECTILE_COUNT
+        self.luck = LUCK
+        self.armor = ARMOR
+        self.crit_chance = CRIT_CHANCE
+        self.reduce_cooldown = SHOOT_COOLDOWN
+        self.pickup_range = PICKUP_RANGE
+        self.lifesteal = LIFESTEAL
+
         self.level = 1
         self.xp = 0
-        self.xp_to_lvl_up = XP_TO_LVL_UP
         self.position = pygame.math.Vector2(start_x, start_y)
         self.sprite_size = 32
         self.just_leveled_up = False
@@ -37,7 +46,6 @@ class Player(pygame.sprite.Sprite):
 
         #Shooting
         self.shoot_timer = 0.0
-        self.shoot_cooldown = SHOOT_COOLDOWN
 
         #Weapons
         self.weapons = []
@@ -85,7 +93,7 @@ class Player(pygame.sprite.Sprite):
     def take_damage(self, amount:int, enemy_pos: pygame.math.Vector2) -> None:
         #Invisibility frames
         if not self.invicible:
-            self.current_health -= amount
+            self.current_health -= (amount - amount * self.armor)
             self.current_health = max(0, self.current_health)
             self.invicible = True
             self.invicibility_timer = 0.0
@@ -118,11 +126,14 @@ class Player(pygame.sprite.Sprite):
                 weapon_class = self.weapon_classes[weapon_name]
                 sprite_sheet = self.weapon_sprites[weapon_name]
 
-                for i in range(config["projectile_count"]):
-                    projectile = weapon_class(config, sprite_sheet, self.position, nearest_enemy.position, self)
-                    self.active_projectiles.add(projectile)
+                projectile = weapon_class(config, sprite_sheet, self.position, nearest_enemy.position, self)
+                self.active_projectiles.add(projectile)
 
-                self.weapon_timers[weapon_name] = config["cooldown"]
+                for i in range(self.projectile_count - 1):
+                    p = weapon_class(config, sprite_sheet, self.position, nearest_enemy.position, self)
+                    self.active_projectiles.add(p)
+
+                self.weapon_timers[weapon_name] = projectile.cooldown 
 
 
     def update_weapons(self, dt:float) -> None:

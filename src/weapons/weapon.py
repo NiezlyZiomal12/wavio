@@ -1,5 +1,6 @@
 import pygame
 from src.utils import Animation
+import random
 
 
 class Weapon(pygame.sprite.Sprite):
@@ -7,12 +8,18 @@ class Weapon(pygame.sprite.Sprite):
         super().__init__()
         self.config = config
 
+        #adding player attribute for some weapons 
+        self.player = player
+
         self.speed = config['speed']
         self.sprite_width = config['animation']['sprite_width']
         self.sprite_height = config['animation']['sprite_height']
-        self.cooldown = config['cooldown']
-        self.projectile_count = config['projectile_count']
-        self.damage = config['damage']
+        self.cooldown = config['cooldown'] - (config['cooldown'] *self.player.reduce_cooldown)
+        self.damage = config['damage'] * self.player.damage
+
+        crit = random.random() < (self.player.crit_chance)
+        if crit:
+            self.damage *= 2
 
         self.animation = Animation(
             sprite_sheet,
@@ -26,9 +33,6 @@ class Weapon(pygame.sprite.Sprite):
         self.image = self.animation.get_current_frame()
         self.rect = self.image.get_rect(center=start_pos)
         self.facing_left = False
-
-        #adding player attribute for some weapons 
-        self.player = player
 
         #single hit projectiles prop
         self.should_destroy_on_hit = True

@@ -13,6 +13,27 @@ class Upgrade(pygame.sprite.Sprite):
 
     def draw(self, surface:pygame.Surface, camera: object):
         surface.blit(self.image, camera.apply(self.rect))
+
+
+    def apply(self, player):
+        if self.name == "Order":
+            player.damage *= (1 +self.effect["damage"])
+
+        elif self.name == "Boots":
+            player.speed *= (1 +self.effect['speed'])
+
+        elif self.name == "Heart":
+            player.max_health *= (1 + self.effect["max_health"])
+
+        elif self.name == "Armor":
+            player.armor *= (1 + self.effect['armor'])
+
+        elif self.name == "Pearl":
+            player.projectile_count += self.effect['projectile_count']
+
+        elif self.name == "Scroll":
+            player.reduce_cooldown *= (1 + self.effect['reduce_cooldown'])
+
  
 
 def loadUpgrades():

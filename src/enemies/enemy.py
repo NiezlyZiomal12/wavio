@@ -102,7 +102,6 @@ class Enemy(pygame.sprite.Sprite):
         #lifesteal for player
         heal = damage * self.player.lifesteal
         self.player.current_health = min(self.player.max_health, self.player.current_health + heal)
-        print(f'healed {heal}')
 
         if self.hp <= 0:
             self.die()

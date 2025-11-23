@@ -30,8 +30,9 @@ class Weapon(pygame.sprite.Sprite):
             config['animation']["animation_speed"]
         )
 
+        self.position = pygame.Vector2(start_pos)
         self.image = self.animation.get_current_frame()
-        self.rect = self.image.get_rect(center=start_pos)
+        self.rect = self.image.get_rect(center=self.position)
         self.facing_left = False
 
         #single hit projectiles prop

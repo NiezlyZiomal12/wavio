@@ -29,7 +29,7 @@ class Game:
         # Load objects
         self.player = Player(player_sprites, WIDTH // 2, HEIGHT // 2)
         self.camera = Camera(HEIGHT, WIDTH, self.world)
-        self.spawner = EnemySpawner(spawning_sprites, self.xp_group, xp_sprite, self.player)
+        self.spawner = EnemySpawner(spawning_sprites, self.xp_group, xp_sprite, self.player, self.camera)
         self.upgrades = loadUpgrades()
 
         #UI
@@ -89,7 +89,11 @@ class Game:
             enemy.rect.center = enemy.position
         for orb in self.xp_group:
             orb.position = self.world.clamp_pos(orb.position)
-            orb.rect.center = orb.positiona
+            orb.rect.center = orb.position
+        for proj in self.player.active_projectiles:
+            if not (0 <= proj.position.x <= self.world.width and
+                    0 <= proj.position.y <= self.world.height):
+                proj.kill()
 
 
     def render(self) -> None:

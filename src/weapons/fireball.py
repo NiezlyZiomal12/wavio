@@ -25,7 +25,8 @@ class Fireball(Weapon):
 
     def update(self, dt:float):
         super().update(dt) 
-        self.rect.center += self.velocity * dt
+        self.position += self.velocity * dt
+        self.rect.center = self.position
 
         self.time_alive += dt
         if self.time_alive >= self.lifetime:

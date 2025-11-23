@@ -1,16 +1,17 @@
 import pygame
 import random
 from src.enemies import *
-from config import HEIGHT, WIDTH, SPAWN_TIMER
+from config import HEIGHT, WIDTH, SPAWN_TIMER, WORLD_HEIGHT, WORLD_WIDTH
 
 class EnemySpawner:
-    def __init__(self, spawn_sprite: pygame.Surface, xp_group:pygame.sprite.Group , xp_sprite:pygame.Surface, player:object) -> None:
+    def __init__(self, spawn_sprite: pygame.Surface, xp_group:pygame.sprite.Group , xp_sprite:pygame.Surface, player:object, camera:object) -> None:
         self.spawn_sprite = spawn_sprite
         self.enemies = []
         self.timer = 0.0
         self.xp_group = xp_group
         self.xp_sprite = xp_sprite
         self.player = player
+        self.camera = camera
 
         #loading enemy sprites
         self.enemy_sprites = {}
@@ -49,8 +50,7 @@ class EnemySpawner:
         total_enemies = random.randint(4, 8)
         enemy_types = list(ENEMY_CONFIG.keys())
         for i in range(total_enemies): 
-            x = random.randint(100, WIDTH - 100)
-            y = random.randint(100, HEIGHT - 100)
+            x,y = self._spawn_outside_camera(200)
     
             enemy_type = random.choice(enemy_types)
             config = ENEMY_CONFIG[enemy_type]
@@ -61,4 +61,42 @@ class EnemySpawner:
             enemy.xp_group = self.xp_group
             enemy.xp_sprite = self.xp_sprite
             self.enemies.append(enemy)
+
+
+    def _spawn_outside_camera(self, margin=200):
+        cam_x, cam_y = self.camera.offset
+
+        cam_x = int(cam_x)
+        cam_y = int(cam_y)
+
+        left = cam_x - margin
+        right = cam_x + WIDTH + margin
+        top = cam_y - margin
+        bottom = cam_y + HEIGHT + margin
+
+        left = int(left)
+        right = int(right)
+        top = int(top)
+        bottom = int(bottom)
+
+        side = random.choice(["top", "bottom", "left", "right"])
+
+        if side == "top":
+            x = random.randint(left, right)
+            y = top
+        elif side == "bottom":
+            x = random.randint(left, right)
+            y = bottom
+        elif side == "left":
+            x = left
+            y = random.randint(top, bottom)
+        else:
+            x = right
+            y = random.randint(top, bottom)
+
+        x = max(32, min(WORLD_WIDTH - 32, x))
+        y = max(32, min(WORLD_HEIGHT - 32, y))
+
+        return x, y
+
 

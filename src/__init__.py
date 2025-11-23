@@ -7,6 +7,7 @@ from .weapons import Fireball, Sword
 from .xp import Xp
 from .ui import LevelUpUi
 from .upgrades import loadUpgrades
+from .Map import World
 
 __all__ = [
 	"Camera",
@@ -23,4 +24,5 @@ __all__ = [
     "Sword",
     "LevelUpUi",
     "loadUpgrades",
+    "World",
 ]

@@ -1,6 +1,6 @@
 import pygame
-from config import WIDTH, HEIGHT, BG_COLOR, FPS
-from src import Camera, Player, EnemySpawner, LevelUpUi, loadUpgrades
+from config import WIDTH, HEIGHT, BG_COLOR, FPS, WORLD_WIDTH, WORLD_HEIGHT
+from src import Camera, Player, EnemySpawner, LevelUpUi, loadUpgrades, World
 import random
 
 class Game:
@@ -23,9 +23,12 @@ class Game:
         #XP
         self.xp_group = pygame.sprite.Group()
         
+        #World
+        self.world = World(WORLD_WIDTH, WORLD_HEIGHT)
+        
         # Load objects
         self.player = Player(player_sprites, WIDTH // 2, HEIGHT // 2)
-        self.camera = Camera(HEIGHT, WIDTH)
+        self.camera = Camera(HEIGHT, WIDTH, self.world)
         self.spawner = EnemySpawner(spawning_sprites, self.xp_group, xp_sprite, self.player)
         self.upgrades = loadUpgrades()
 
@@ -72,12 +75,22 @@ class Game:
         self.spawner.update(dt, self.player, self.player.active_projectiles, self.xp_group)
         self.xp_group.update(dt, self.player)
 
-
         #lvl up
         if self.player.just_leveled_up:
             self.player.just_leveled_up = False
             upgrades = random.sample(self.upgrades, 3)
             self.level_up_ui.show(upgrades)
+
+        #World boundaries
+        self.player.position = self.world.clamp_pos(self.player.position)
+        self.player.rect.center
+        for enemy in self.spawner.enemies:
+            enemy.position = self.world.clamp_pos(enemy.position)
+            enemy.rect.center = enemy.position
+        for orb in self.xp_group:
+            orb.position = self.world.clamp_pos(orb.position)
+            orb.rect.center = orb.positiona
+
 
     def render(self) -> None:
         self.window.fill(BG_COLOR)

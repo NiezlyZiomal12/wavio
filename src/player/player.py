@@ -60,7 +60,7 @@ class Player(pygame.sprite.Sprite):
         }
 
 
-    def move(self, keys: pygame.key.ScancodeWrapper) -> None:
+    def move(self, keys: pygame.key.ScancodeWrapper, collision_rects= None) -> None:
         # Create movement vector
         movement = pygame.math.Vector2(0, 0)
         
@@ -86,8 +86,31 @@ class Player(pygame.sprite.Sprite):
                     self.idle_animation.reset()
                     self.current_animation = self.idle_animation
 
-        self.position += movement
-        self.rect.center = (int(self.position.x), int(self.position.y))
+        self.movement_with_collisions(movement, collision_rects)
+
+
+    def movement_with_collisions(self, movement:pygame.Vector2, collision_rects):
+        old_pos = self.position.copy()
+
+        # Move X
+        self.position.x += movement.x
+        self.rect.centerx = int(self.position.x)
+
+        for rect in collision_rects:
+            if self.rect.colliderect(rect):
+                self.position.x = old_pos.x
+                self.rect.centerx = int(old_pos.x)
+                break
+
+        # Move Y
+        self.position.y += movement.y
+        self.rect.centery = int(self.position.y)
+
+        for rect in collision_rects:
+            if self.rect.colliderect(rect):
+                self.position.y = old_pos.y
+                self.rect.centery = int(old_pos.y)
+                break
 
 
     def take_damage(self, amount:int, enemy_pos: pygame.math.Vector2) -> None:
@@ -153,8 +176,8 @@ class Player(pygame.sprite.Sprite):
             self.just_leveled_up = True
 
 
-    def update(self,dt:float, keys:pygame.key.ScancodeWrapper, enemies:list):
-        self.move(keys)
+    def update(self,dt:float, keys:pygame.key.ScancodeWrapper, enemies:list, collision_rects):
+        self.move(keys, collision_rects)
         self.update_lvl()
 
         #Weapon update
@@ -164,8 +187,9 @@ class Player(pygame.sprite.Sprite):
         self.update_weapons(dt)
 
         #Knockback
-        self.position += self.knockback_velocity
-        self.knockback_velocity *= self.knockback_decay
+        if self.knockback_velocity.length() > 0:
+            self.movement_with_collisions(self.knockback_velocity, collision_rects)
+            self.knockback_velocity *= self.knockback_decay
 
         if self.invicible:
             self.invicibility_timer += dt

@@ -2,7 +2,7 @@ import pygame
 from .enemy import Enemy
 
 class Bat(Enemy):
-    def move(self, player_pos: pygame.Vector2, other_enemies: list) -> None:
+    def move(self, player_pos: pygame.Vector2, other_enemies: list, collision_rects:list) -> None:
         """Flying enemies ignore ground collisions"""
         if self.dead:
             return

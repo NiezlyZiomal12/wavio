@@ -2,6 +2,7 @@ import pygame
 from config import WIDTH, HEIGHT, BG_COLOR, FPS, WORLD_WIDTH, WORLD_HEIGHT
 from src import Camera, Player, EnemySpawner, LevelUpUi, loadUpgrades, World
 import random
+import pytmx
 
 class Game:
     def __init__(self):
@@ -19,12 +20,17 @@ class Game:
         xp_sprite = pygame.image.load("src/assets/xp.png").convert_alpha()
         boomerang_sprites = pygame.image.load('src/assets/boomerang.png').convert_alpha()
         sword_sprites = pygame.image.load('src/assets/sword.png').convert_alpha()
+        
+        #Tilemap
+        self.level1 = pytmx.load_pygame('src/assets/tilemaps/tmx/level1.tmx')
 
         #XP
         self.xp_group = pygame.sprite.Group()
         
         #World
         self.world = World(WORLD_WIDTH, WORLD_HEIGHT)
+        self.world.load_collisions(self.level1)
+        # self.world.load_objects(self.level1)
         
         # Load objects
         self.player = Player(player_sprites, WIDTH // 2, HEIGHT // 2)
@@ -69,10 +75,10 @@ class Game:
         
         keys = pygame.key.get_pressed()
 
-        self.player.update(dt,keys,self.spawner.enemies)
+        self.player.update(dt,keys,self.spawner.enemies, self.world.collision_rects)
         self.camera.follow(self.player)
         
-        self.spawner.update(dt, self.player, self.player.active_projectiles, self.xp_group)
+        self.spawner.update(dt, self.player, self.player.active_projectiles, self.xp_group, self.world.collision_rects)
         self.xp_group.update(dt, self.player)
 
         #lvl up
@@ -98,6 +104,8 @@ class Game:
 
     def render(self) -> None:
         self.window.fill(BG_COLOR)
+        
+        self.world.draw_tilemap(self.camera, self.level1, self.window)
 
         for xp_orb in self.xp_group:
             xp_orb.draw(self.window, self.camera)

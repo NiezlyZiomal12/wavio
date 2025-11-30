@@ -2,7 +2,7 @@ import pygame
 from .enemy import Enemy
 
 class Zombie(Enemy):
-        def move(self, player_pos: pygame.Vector2, other_enemies: list) -> None:
+        def move(self, player_pos: pygame.Vector2, other_enemies: list, collision_rects:list) -> None:
             if self.dead:
                 return
 
@@ -18,6 +18,12 @@ class Zombie(Enemy):
                     if enemy != self and not enemy.dead:
                         overlap_rect = new_rect.clip(enemy.rect)
                         if overlap_rect.width > self.sprite_width // 2 and overlap_rect.height > self.sprite_height // 2:
+                            can_move = False
+                            break
+                
+                if can_move:
+                    for rect in collision_rects:
+                        if new_rect.colliderect(rect):
                             can_move = False
                             break
 

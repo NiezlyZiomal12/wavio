@@ -6,4 +6,5 @@ mccabe==0.7.0
 platformdirs==4.5.0
 pygame==2.6.1
 pylint==4.0.2
+PyTMX==3.32
 tomlkit==0.13.3

@@ -56,7 +56,7 @@ class Enemy(pygame.sprite.Sprite):
         self.xp_group = None
 
 
-    def move(self, player_pos: pygame.Vector2, other_enemies: list) -> None:
+    def move(self, player_pos: pygame.Vector2, other_enemies: list, collision_rects: list) -> None:
         """Base movement - can be overridden by subclasses"""
         if self.dead:
             return
@@ -70,10 +70,19 @@ class Enemy(pygame.sprite.Sprite):
             new_rect.center = (int(new_position.x), int(new_position.y))
 
             can_move = True
+        
+            #collisions with onther enemies 
             for enemy in other_enemies:
                 if enemy != self and not enemy.dead:
                     overlap_rect = new_rect.clip(enemy.rect)
                     if overlap_rect.width > self.sprite_width // 2 and overlap_rect.height > self.sprite_height // 2:
+                        can_move = False
+                        break
+
+            #collision with objects
+            if can_move:
+                for rect in collision_rects:
+                    if new_rect.colliderect(rect):
                         can_move = False
                         break
 
@@ -132,7 +141,7 @@ class Enemy(pygame.sprite.Sprite):
                 self.killed = True
 
 
-    def update(self, dt: float, player: object, other_enemies: list, weapon_projectiles: pygame.sprite.Group) -> None:
+    def update(self, dt: float, player: object, other_enemies: list, weapon_projectiles: pygame.sprite.Group, collision_rects: list) -> None:
         #taking damage
         if not self.dead:
             weapon_hits = pygame.sprite.spritecollide(self, weapon_projectiles, False)
@@ -140,7 +149,7 @@ class Enemy(pygame.sprite.Sprite):
                 self.take_damage(weapon.damage, weapon)
 
         if not self.spawning and not self.dead:
-            self.move(player.position, other_enemies)
+            self.move(player.position, other_enemies, collision_rects)
         
         self.hit_flash.update(dt)
         self.update_animation(dt)

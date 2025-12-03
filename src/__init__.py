@@ -8,6 +8,7 @@ from .xp import Xp
 from .ui import LevelUpUi
 from .upgrades import loadUpgrades
 from .Map import World
+from .pickables import spawn_random_presents
 
 __all__ = [
 	"Camera",
@@ -25,4 +26,5 @@ __all__ = [
     "LevelUpUi",
     "loadUpgrades",
     "World",
+    "spawn_ranodm_presents",
 ]

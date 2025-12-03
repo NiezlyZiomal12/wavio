@@ -1,6 +1,6 @@
 import pygame
 from config import WIDTH, HEIGHT, BG_COLOR, FPS, WORLD_WIDTH, WORLD_HEIGHT
-from src import Camera, Player, EnemySpawner, LevelUpUi, loadUpgrades, World
+from src import Camera, Player, EnemySpawner, LevelUpUi, loadUpgrades, World, spawn_random_presents
 import random
 import pytmx
 
@@ -20,12 +20,23 @@ class Game:
         xp_sprite = pygame.image.load("src/assets/xp.png").convert_alpha()
         boomerang_sprites = pygame.image.load('src/assets/boomerang.png').convert_alpha()
         sword_sprites = pygame.image.load('src/assets/sword.png').convert_alpha()
+        present_image = pygame.image.load('src/assets/pickable/present.png').convert_alpha()
+        bomb_image = pygame.image.load('src/assets/pickable/bomb.png').convert_alpha()
+        prismat_image = pygame.image.load('src/assets/pickable/prismat.png').convert_alpha()
+        stinky_fish = pygame.image.load('src/assets/pickable/stinky_fish.png').convert_alpha()
         
         #Tilemap
         self.level1 = pytmx.load_pygame('src/assets/tilemaps/tmx/level1.tmx')
 
         #XP
         self.xp_group = pygame.sprite.Group()
+        #pickables
+        pickable_list = [
+            ("bomb", bomb_image),
+            ("prismat", prismat_image),
+            ("stinky_fish", stinky_fish)
+        ]
+        self.pickables = pygame.sprite.Group()
         
         #World
         self.world = World(WORLD_WIDTH, WORLD_HEIGHT)
@@ -37,6 +48,8 @@ class Game:
         self.camera = Camera(HEIGHT, WIDTH, self.world)
         self.spawner = EnemySpawner(spawning_sprites, self.xp_group, xp_sprite, self.player, self.camera)
         self.upgrades = loadUpgrades()
+        self.presents = pygame.sprite.Group()
+        spawn_random_presents(10, self.presents, self.pickables, 5000,500, present_image, pickable_list)
 
         #UI
         self.level_up_ui = LevelUpUi(self.window, WIDTH, HEIGHT)
@@ -80,6 +93,8 @@ class Game:
         
         self.spawner.update(dt, self.player, self.player.active_projectiles, self.xp_group, self.world.collision_rects)
         self.xp_group.update(dt, self.player)
+        self.pickables.update(dt, self.player)
+        self.presents.update(dt, self.player.active_projectiles)
 
         #lvl up
         if self.player.just_leveled_up:
@@ -96,6 +111,12 @@ class Game:
         for orb in self.xp_group:
             orb.position = self.world.clamp_pos(orb.position)
             orb.rect.center = orb.position
+        for pick in self.pickables:
+            pick.position = self.world.clamp_pos(pick.position)
+            pick.rect.center = pick.position
+        for present in self.presents:
+            present.position = self.world.clamp_pos(present.position)
+            present.rect.center = present.position
         for proj in self.player.active_projectiles:
             if not (0 <= proj.position.x <= self.world.width and
                     0 <= proj.position.y <= self.world.height):
@@ -109,6 +130,12 @@ class Game:
 
         for xp_orb in self.xp_group:
             xp_orb.draw(self.window, self.camera)
+
+        for pickable in self.pickables:
+            pickable.draw(self.window, self.camera)
+
+        for present in self.presents:
+            present.draw(self.window, self.camera)
 
         self.spawner.draw(self.window, self.camera)
         self.player.draw(self.window, self.camera)

@@ -19,17 +19,24 @@ class Xp(pygame.sprite.Sprite):
         if self.collected:
             return
         
-        distance_to_player = self.position.distance_to(player.position)
-
-        if distance_to_player < self.collect_radius:
-            direction = (player.position - self.position).normalize()
-            self.velocity = direction * self.speed
-            
-            speed_multiplier = 1 + (1 - distance_to_player / self.collect_radius) * 2
-            self.velocity *= speed_multiplier
+        if self.player.prismat_active:
+            distance_to_player = self.position.distance_to(player.position)
+            direction = (self.player.position - self.position)
+            if direction.length != 0:
+                direction = direction.normalize()
+            self.velocity = direction * (self.speed * 5)
         else:
-            self.velocity = pygame.Vector2(0, 0)
-        
+            distance_to_player = self.position.distance_to(player.position)
+
+            if distance_to_player < self.collect_radius:
+                direction = (player.position - self.position).normalize()
+                self.velocity = direction * self.speed
+                
+                speed_multiplier = 1 + (1 - distance_to_player / self.collect_radius) * 2
+                self.velocity *= speed_multiplier
+            else:
+                self.velocity = pygame.Vector2(0, 0)
+            
         self.position += self.velocity * dt
         self.rect.center = (int(self.position.x), int(self.position.y))
         

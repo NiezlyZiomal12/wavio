@@ -1,4 +1,5 @@
 import pygame
+import random
 
 class Camera:
     def __init__(self, height: int, width: int, world:object) -> None:
@@ -7,6 +8,9 @@ class Camera:
         self.width = width
         self.lerp_speed = 0.1
         self.world = world
+        self.flash_timer = 0
+        self.shake_timer = 0
+        self.shake_strength = 0
 
 
     def follow(self, target: pygame.sprite.Sprite) -> None:
@@ -25,4 +29,17 @@ class Camera:
 
 
     def apply(self, rect: pygame.Rect) -> pygame.Rect:
-        return rect.move(-self.offset.x, -self.offset.y)
+        shaken_rect = rect.move(-self.offset.x, -self.offset.y)
+
+        if self.shake_timer > 0:
+            shaken_rect.x += random.randint(-self.shake_strength, self.shake_strength)
+            shaken_rect.y += random.randint(-self.shake_strength, self.shake_strength)
+        return shaken_rect
+    
+
+    def update(self, dt:float):
+        if self.flash_timer > 0:
+            self.flash_timer -= dt
+
+        if self.shake_timer > 0:
+            self.shake_timer -= dt

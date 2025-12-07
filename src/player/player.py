@@ -56,9 +56,13 @@ class Player(pygame.sprite.Sprite):
             "Fireball" : Fireball,
             "Boomerang" : Boomerang,
             "Sword" : Sword,
-            
         }
 
+        #Pickups
+        self.prismat_active = False
+        self.prismat_radius = 4000
+        self.prismat_timer = PRISMAT_TIMER
+        self.pending_effect = None
 
     def move(self, keys: pygame.key.ScancodeWrapper, collision_rects= None) -> None:
         # Create movement vector
@@ -202,6 +206,13 @@ class Player(pygame.sprite.Sprite):
         else:
             self.current_animation.update(dt)
             self.image = self.current_animation.get_current_frame(flip_x=self.facing_left)
+
+        #Prismat
+        if self.prismat_active:
+            self.prismat_timer -= dt
+            if self.prismat_timer <= 0:
+                self.prismat_active = False
+                self.prismat_timer = PRISMAT_TIMER
 
 
     #Ui (might move it to another file)

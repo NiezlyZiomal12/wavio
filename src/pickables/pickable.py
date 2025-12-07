@@ -1,7 +1,7 @@
 import pygame
 
 class Pickable(pygame.sprite.Sprite):
-    def __init__(self, image: pygame.Surface, pos : pygame.Vector2, effect):
+    def __init__(self, image: pygame.Surface, pos : pygame.Vector2, effect, player:object):
         super().__init__()
         self.image = image
         self.rect = self.image.get_rect(center=(int(pos.x), int(pos.y)))
@@ -9,18 +9,28 @@ class Pickable(pygame.sprite.Sprite):
         self.effect = effect
         self.velocity = pygame.Vector2(0,0)
         self.speed = 100
-        self.collect_radius = 80
+        self.player = player
+        self.collect_radius = 50
         self.collected = False
 
 
     def apply_effect(self):
         print(f"picked up {self.effect}")
         if self.effect == "bomb":
-            pass
-        elif self.effect == "magnet":
-            pass
-        elif self.effect == "freeze":
-            pass
+            self.player.pending_effect = "bomb"
+        elif self.effect == "prismat":
+            self.prismat_effect()
+            print(self.player.prismat_active)
+        elif self.effect == "stinky_fish":
+            self.stinky_fish_effect()
+
+
+    def prismat_effect(self):
+        self.player.prismat_active = True
+
+
+    def stinky_fish_effect(self):
+        self.player.current_health = min(self.player.current_health + 25, self.player.max_health)
 
 
     def update(self, dt:float, player: object) -> None:
@@ -50,3 +60,15 @@ class Pickable(pygame.sprite.Sprite):
     def draw(self, surface:pygame.Surface, camera:object) -> None:
         screen_rect = camera.apply(self.rect)
         surface.blit(self.image, screen_rect)
+
+
+def trigger_bomb(spawner:object, camera:object):
+        BOMB_DAMAGE = 50
+
+        for enemy in spawner.enemies:
+            enemy.take_damage(BOMB_DAMAGE, None)
+
+        camera.flash_timer = 0.2
+
+        camera.shake_timer = 0.4
+        camera.shake_strength = 8

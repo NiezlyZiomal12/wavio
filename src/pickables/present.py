@@ -4,7 +4,7 @@ from src.pickables import Pickable
 import random
 
 class Present(pygame.sprite.Sprite):
-    def __init__(self, image: pygame.Surface, pos: pygame.Vector2, drop_image:pygame.Surface, drop_eff: str, pickables:pygame.sprite.Group):
+    def __init__(self, image: pygame.Surface, pos: pygame.Vector2, drop_image:pygame.Surface, drop_eff: str, pickables:pygame.sprite.Group, player: object):
         super().__init__()
         self.image = image
         self.rect = self.image.get_rect(center=(int(pos.x), int(pos.y)))
@@ -15,6 +15,7 @@ class Present(pygame.sprite.Sprite):
         self.hit_flash = Flash(duration=0.1, color=(255, 255, 255), max_alpha=128)
         self.spawned_pickable = False
         self.pickables = pickables
+        self.player = player
 
     
     def take_damage(self, weapon: object) -> None:
@@ -34,7 +35,7 @@ class Present(pygame.sprite.Sprite):
     
 
     def spawn_pickable(self):
-        pickable = Pickable(self.drop_image, self.position, self.drop_effect)
+        pickable = Pickable(self.drop_image, self.position, self.drop_effect, self.player)
         self.pickables.add(pickable)
     
 
@@ -53,7 +54,7 @@ class Present(pygame.sprite.Sprite):
 
 
 
-def spawn_random_presents(count: int, present:pygame.sprite.Group, pickables:pygame.sprite.Group, width:int, heihgt:int, present_image: pygame.Surface, pickable_types: list):
+def spawn_random_presents(count: int, present:pygame.sprite.Group, pickables:pygame.sprite.Group, width:int, heihgt:int, present_image: pygame.Surface, pickable_types: list, player:object):
     """
     Spawns random presents in the world.
     - pickable_types must be a LIST like: [("bomb", bomb_img), ("prismat", prismat_img), ...]
@@ -64,5 +65,5 @@ def spawn_random_presents(count: int, present:pygame.sprite.Group, pickables:pyg
         pos = pygame.Vector2(x,y)
         effect, effect_image = random.choice(pickable_types)
 
-        p = Present(present_image, pos, effect_image, effect, pickables)
+        p = Present(present_image, pos, effect_image, effect, pickables, player)
         present.add(p)

@@ -1,6 +1,6 @@
 import pygame
 from config import WIDTH, HEIGHT, BG_COLOR, FPS, WORLD_WIDTH, WORLD_HEIGHT
-from src import Camera, Player, EnemySpawner, LevelUpUi, loadUpgrades, World, spawn_random_presents
+from src import Camera, Player, EnemySpawner, LevelUpUi, loadUpgrades, World, spawn_random_presents, trigger_bomb
 import random
 import pytmx
 
@@ -49,7 +49,7 @@ class Game:
         self.spawner = EnemySpawner(spawning_sprites, self.xp_group, xp_sprite, self.player, self.camera)
         self.upgrades = loadUpgrades()
         self.presents = pygame.sprite.Group()
-        spawn_random_presents(10, self.presents, self.pickables, 5000,500, present_image, pickable_list)
+        spawn_random_presents(10, self.presents, self.pickables, 5000,500, present_image, pickable_list, self.player)
 
         #UI
         self.level_up_ui = LevelUpUi(self.window, WIDTH, HEIGHT)
@@ -90,11 +90,17 @@ class Game:
 
         self.player.update(dt,keys,self.spawner.enemies, self.world.collision_rects)
         self.camera.follow(self.player)
+        self.camera.update(dt)
         
         self.spawner.update(dt, self.player, self.player.active_projectiles, self.xp_group, self.world.collision_rects)
         self.xp_group.update(dt, self.player)
         self.pickables.update(dt, self.player)
         self.presents.update(dt, self.player.active_projectiles)
+
+        #bomb pickup
+        if self.player.pending_effect == "bomb":
+            trigger_bomb(self.spawner, self.camera)
+            self.player.pending_effect = None
 
         #lvl up
         if self.player.just_leveled_up:
@@ -142,6 +148,14 @@ class Game:
 
         if self.level_up_ui.active:
             self.level_up_ui.draw()
+
+        #bomb flash
+        if self.camera.flash_timer > 0:
+            fade = self.camera.flash_timer / 0.2
+            alpha = int(255 * fade)
+            flash_surf = pygame.Surface(self.window.get_size(), pygame.SRCALPHA)
+            flash_surf.fill((255, 255, 255, alpha))
+            self.window.blit(flash_surf, (0, 0))
 
         pygame.display.update()
 

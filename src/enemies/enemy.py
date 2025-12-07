@@ -97,13 +97,14 @@ class Enemy(pygame.sprite.Sprite):
             return
             
         #Check if actual weapon is single hit
-        if getattr(weapon, "should_destroy_on_hit", True):
-            weapon.kill()
+        if weapon is not None:
+            if getattr(weapon, "should_destroy_on_hit", True):
+                weapon.kill()
 
-        #Check if actual projectile is multihit (piercing)
-        if hasattr(weapon, "on_hit_enemy"):
-            if weapon.on_hit_enemy(self) is False:
-                return
+            #Check if actual projectile is multihit (piercing)
+            if hasattr(weapon, "on_hit_enemy"):
+                if weapon.on_hit_enemy(self) is False:
+                    return
 
         self.hp -= damage
         self.hit_flash.start()

@@ -26,8 +26,8 @@ class EnemySpawner:
         }
 
 
-    def update(self,dt, player: object, weapon_groups: dict, xp_group: pygame.sprite.Group, collision_rects:list) -> None:
-        self.timer += dt
+    def update(self,dt, player: object, weapon_groups: dict, xp_group: pygame.sprite.Group, collision_rects:list, difficulty:float =1.0) -> None:
+        self.timer += dt * difficulty
         if self.timer >= SPAWN_TIMER:
             self.spawn_enemies()
             self.timer = 0.0

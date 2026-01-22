@@ -1,6 +1,6 @@
 import pygame
 from config import WIDTH, HEIGHT, BG_COLOR, FPS, WORLD_WIDTH, WORLD_HEIGHT
-from src import Camera, Player, EnemySpawner, LevelUpUi, loadUpgrades, World, spawn_random_presents, trigger_bomb
+from src import Camera, Player, EnemySpawner, LevelUpUi, loadUpgrades, World, spawn_random_presents, trigger_bomb, Timer
 import random
 import pytmx
 
@@ -37,7 +37,9 @@ class Game:
             ("stinky_fish", stinky_fish)
         ]
         self.pickables = pygame.sprite.Group()
-        
+        #Timer
+        self.level_timer = Timer(20 * 60)
+
         #World
         self.world = World(WORLD_WIDTH, WORLD_HEIGHT)
         self.world.load_collisions(self.level1)
@@ -86,15 +88,20 @@ class Game:
             return
         
         keys = pygame.key.get_pressed()
-
+        self.level_timer.update(dt)
         self.player.update(dt,keys,self.spawner.enemies, self.world.collision_rects)
         self.camera.follow(self.player)
         self.camera.update(dt)
         
-        self.spawner.update(dt, self.player, self.player.active_projectiles, self.xp_group, self.world.collision_rects)
+        difficulty = 1.0 + (self.level_timer.elapsed // 60)
+        self.spawner.update(dt, self.player, self.player.active_projectiles, self.xp_group, self.world.collision_rects, difficulty)
         self.xp_group.update(dt, self.player)
         self.pickables.update(dt, self.player)
         self.presents.update(dt, self.player.active_projectiles)
+
+        #timer finished
+        if self.level_timer.finished:
+            self.running = False
 
         #bomb pickup
         if self.player.pending_effect == "bomb":
@@ -144,9 +151,12 @@ class Game:
 
         self.spawner.draw(self.window, self.camera)
         self.player.draw(self.window, self.camera)
+        self.level_timer.draw(self.window)
 
         if self.level_up_ui.active:
             self.level_up_ui.draw()
+
+        pygame.display.update()
 
         #bomb flash
         if self.camera.flash_timer > 0:

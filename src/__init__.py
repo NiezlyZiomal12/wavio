@@ -9,6 +9,7 @@ from .ui import LevelUpUi
 from .upgrades import loadUpgrades
 from .Map import World
 from .pickables import spawn_random_presents, trigger_bomb
+from .timer import Timer
 
 __all__ = [
 	"Camera",
@@ -27,5 +28,6 @@ __all__ = [
     "loadUpgrades",
     "World",
     "spawn_ranodm_presents",
-    "trigger_bomb"
+    "trigger_bomb",
+    "Timer"
 ]

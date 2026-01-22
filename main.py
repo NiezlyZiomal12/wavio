@@ -26,7 +26,7 @@ class Game:
         stinky_fish = pygame.image.load('src/assets/pickable/stinky_fish.png').convert_alpha()
         
         #Tilemap
-        self.level1 = pytmx.load_pygame('src/assets/tilemaps/tmx/level1.tmx')
+        self.level1 = pytmx.load_pygame('src/assets/tilemaps/tmx/level1_new.tmx')
 
         #XP
         self.xp_group = pygame.sprite.Group()
@@ -41,7 +41,6 @@ class Game:
         #World
         self.world = World(WORLD_WIDTH, WORLD_HEIGHT)
         self.world.load_collisions(self.level1)
-        # self.world.load_objects(self.level1)
         
         # Load objects
         self.player = Player(player_sprites, WIDTH // 2, HEIGHT // 2)
@@ -49,7 +48,7 @@ class Game:
         self.spawner = EnemySpawner(spawning_sprites, self.xp_group, xp_sprite, self.player, self.camera)
         self.upgrades = loadUpgrades()
         self.presents = pygame.sprite.Group()
-        spawn_random_presents(10, self.presents, self.pickables, 5000,500, present_image, pickable_list, self.player)
+        spawn_random_presents(5, self.presents, self.pickables, WORLD_WIDTH,WORLD_HEIGHT, present_image, pickable_list, self.player)
 
         #UI
         self.level_up_ui = LevelUpUi(self.window, WIDTH, HEIGHT)

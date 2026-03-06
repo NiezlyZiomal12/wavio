@@ -1,6 +1,6 @@
 import pygame
 from config import WIDTH, HEIGHT, BG_COLOR, FPS, WORLD_WIDTH, WORLD_HEIGHT
-from src import Camera, Player, EnemySpawner, LevelUpUi, loadUpgrades, World, spawn_random_presents, trigger_bomb, Timer
+from src import Camera, Player, EnemySpawner, LevelUpUi, loadUpgrades, World, spawn_random_presents, trigger_bomb, Timer, ShopUi
 import random
 import pytmx
 
@@ -14,12 +14,12 @@ class Game:
         self.paused = False
         
         # Load assets
-        spawning_sprites = pygame.image.load("src/assets/spawn_animation_sheet.png").convert_alpha()
-        player_sprites = pygame.image.load("src/assets/playerSpriteSheet.png").convert_alpha()  
-        fireball_sprites = pygame.image.load("src/assets/fireball.png").convert_alpha()    
+        spawning_sprites = pygame.image.load("src/assets/enemies/spawn_animation_sheet.png").convert_alpha()
+        player_sprites = pygame.image.load("src/assets/player/playerSpriteSheet.png").convert_alpha()  
+        fireball_sprites = pygame.image.load("src/assets/weapons/fireball.png").convert_alpha()    
         xp_sprite = pygame.image.load("src/assets/xp.png").convert_alpha()
-        boomerang_sprites = pygame.image.load('src/assets/boomerang.png').convert_alpha()
-        sword_sprites = pygame.image.load('src/assets/sword.png').convert_alpha()
+        boomerang_sprites = pygame.image.load('src/assets/weapons/boomerang.png').convert_alpha()
+        sword_sprites = pygame.image.load('src/assets/weapons/sword.png').convert_alpha()
         present_image = pygame.image.load('src/assets/pickable/present.png').convert_alpha()
         bomb_image = pygame.image.load('src/assets/pickable/bomb.png').convert_alpha()
         prismat_image = pygame.image.load('src/assets/pickable/prismat.png').convert_alpha()
@@ -54,7 +54,9 @@ class Game:
 
         #UI
         self.level_up_ui = LevelUpUi(self.window, WIDTH, HEIGHT)
-        
+        self.shop_ui = ShopUi(self.window, WIDTH, HEIGHT)
+        self.shop_timer = 20
+
         #weapons
         self.player.add_weapon("Fireball", fireball_sprites)
         self.player.add_weapon("Boomerang", boomerang_sprites)
@@ -75,6 +77,9 @@ class Game:
                     upgrade.apply(self.player)
                     self.level_up_ui.hide()
                     continue
+
+                #shop ui
+                self.shop_ui.handle_event(event)
                 
         except SystemError as e:
             print(f"Ignoring Pygame event error: {e}")
@@ -83,8 +88,14 @@ class Game:
     def update(self) -> None:
         dt = self.clock.get_time() / 1000
 
+        #shop timer
+        if self.level_timer.elapsed >= self.shop_timer :
+            self.shop_ui.show()
+            self.shop_timer += 20
+
         self.level_up_ui.update(dt)
-        if self.level_up_ui.active:
+        self.shop_ui.update(dt)
+        if self.level_up_ui.active or self.shop_ui.active:
             return
         
         keys = pygame.key.get_pressed()
@@ -155,6 +166,9 @@ class Game:
 
         if self.level_up_ui.active:
             self.level_up_ui.draw()
+
+        if self.shop_ui.active:
+            self.shop_ui.draw()
 
         pygame.display.update()
 

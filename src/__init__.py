@@ -5,7 +5,7 @@ from .enemies import Slime, Zombie, Enemy, Bat
 from .game_logic import EnemySpawner
 from .weapons import Fireball, Sword
 from .xp import Xp
-from .ui import LevelUpUi
+from .ui import LevelUpUi, ShopUi
 from .upgrades import loadUpgrades
 from .Map import World
 from .pickables import spawn_random_presents, trigger_bomb
@@ -29,5 +29,6 @@ __all__ = [
     "World",
     "spawn_ranodm_presents",
     "trigger_bomb",
-    "Timer"
+    "Timer",
+    "ShopUi"
 ]

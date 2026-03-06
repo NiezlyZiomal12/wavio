@@ -16,7 +16,7 @@ class EnemySpawner:
         #loading enemy sprites
         self.enemy_sprites = {}
         for enemy_type in ENEMY_CONFIG.keys():
-            self.enemy_sprites[enemy_type] = pygame.image.load(f"src/assets/{enemy_type}-Sheet.png").convert_alpha()
+            self.enemy_sprites[enemy_type] = pygame.image.load(f"src/assets/enemies/{enemy_type}-Sheet.png").convert_alpha()
 
         #adding enemy classes
         self.enemy_classes = {

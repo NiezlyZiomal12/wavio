@@ -54,13 +54,16 @@ class Game:
 
         #UI
         self.level_up_ui = LevelUpUi(self.window, WIDTH, HEIGHT)
-        self.shop_ui = ShopUi(self.window, WIDTH, HEIGHT)
-        self.shop_timer = 20
+        self.weapon_sprites = {
+            "Fireball": fireball_sprites,
+            "Boomerang": boomerang_sprites,
+            "Sword": sword_sprites,
+        }
+        self.shop_ui = ShopUi(self.window, WIDTH, HEIGHT, self.player, self.weapon_sprites)
+        self.shop_timer = 5
 
-        #weapons
+        # Starter weapon so the player can fight before first shop.
         self.player.add_weapon("Fireball", fireball_sprites)
-        self.player.add_weapon("Boomerang", boomerang_sprites)
-        self.player.add_weapon("Sword", sword_sprites)
 
 
     def handle_events(self) -> None:
@@ -91,7 +94,7 @@ class Game:
         #shop timer
         if self.level_timer.elapsed >= self.shop_timer :
             self.shop_ui.show()
-            self.shop_timer += 20
+            self.shop_timer += 5
 
         self.level_up_ui.update(dt)
         self.shop_ui.update(dt)

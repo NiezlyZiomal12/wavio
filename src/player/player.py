@@ -2,6 +2,7 @@ import pygame
 from src.utils import Animation
 from src.weapons import WEAPON_CONFIG, Fireball, Boomerang, Sword
 from .player_config import *
+from .weapon_slots import WeaponSlots
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, spriteSheet:pygame.Surface, start_x:int, start_y:int) -> None:
@@ -26,6 +27,7 @@ class Player(pygame.sprite.Sprite):
         self.position = pygame.math.Vector2(start_x, start_y)
         self.sprite_size = 32
         self.just_leveled_up = False
+        self.gold = STARTING_GOLD
 
         #Animations
         self.idle_animation = Animation(spriteSheet, self.sprite_size, self.sprite_size, 0, 2, 0.5)
@@ -48,10 +50,11 @@ class Player(pygame.sprite.Sprite):
         self.shoot_timer = 0.0
 
         #Weapons
-        self.weapons = []
+        self.weapon_slots = WeaponSlots(MAX_WEAPON_SLOTS)
         self.weapon_timers = {}
         self.active_projectiles = pygame.sprite.Group()
         self.weapon_sprites = {}
+        self.weapon_levels = {}
         self.weapon_classes = {
             "Fireball" : Fireball,
             "Boomerang" : Boomerang,
@@ -135,17 +138,62 @@ class Player(pygame.sprite.Sprite):
             self.knockback_velocity = direction * 10
 
 
-    def add_weapon(self, weapon_name: str, sprite_sheet: pygame.Surface) -> None:
-        self.weapons.append(weapon_name)
+    def add_weapon(self, weapon_name: str, sprite_sheet: pygame.Surface) -> bool:
+        if weapon_name not in WEAPON_CONFIG or weapon_name not in self.weapon_classes:
+            return False
+
+        added = self.weapon_slots.add_weapon(
+            weapon_name,
+            sprite_sheet,
+            WEAPON_CONFIG[weapon_name]["animation"],
+        )
+        if not added:
+            return False
+
         self.weapon_timers[weapon_name] = 0.0
         self.weapon_sprites[weapon_name] = sprite_sheet
+        self.weapon_levels[weapon_name] = 1
+
+        return True
+
+
+    def add_gold(self, amount: int) -> None:
+        self.gold += amount
+
+
+    def spend_gold(self, cost: int) -> bool:
+        if cost > self.gold:
+            return False
+        self.gold -= cost
+        return True
+
+
+    def buy_weapon(self, weapon_name: str, sprite_sheet: pygame.Surface, price: int = 0) -> tuple[bool, str]:
+        if not self.spend_gold(price):
+            return False, "not_enough_gold"
+
+        if weapon_name in self.weapon_levels:
+            max_level = WEAPON_CONFIG[weapon_name].get("shop", {}).get("max_level")
+            if self.weapon_levels[weapon_name] >= max_level:
+                self.add_gold(price)
+                return False, "max_level"
+
+            self.weapon_levels[weapon_name] += 1
+            return True, "upgraded"
+
+        added = self.add_weapon(weapon_name, sprite_sheet)
+        if not added:
+            self.add_gold(price)
+            return False, "slots_full"
+        
+        return True, "bought"
 
     
     def shoot(self, dt:float, enemies: list) -> None:
         if not enemies:
             return
         #loading weapon from config
-        for weapon_name in self.weapons:
+        for weapon_name in self.weapon_slots.get_weapons():
             self.weapon_timers[weapon_name] -= dt
             config = WEAPON_CONFIG[weapon_name]
             if self.weapon_timers[weapon_name] <= 0:
@@ -250,3 +298,4 @@ class Player(pygame.sprite.Sprite):
         surface.blit(self.image, camera.apply(self.rect))
         self.draw_health_bar(surface)
         self.draw_xp_bar(surface)
+        self.weapon_slots.draw(surface)

@@ -1,12 +1,16 @@
 import pygame
 import time
-from src.utils import Animation, wrap_text
+from src.utils import Animation
+from src.weapons import WEAPON_CONFIG
+from src.shop import build_weapon_shop_items
 
 class ShopUi:
-    def __init__(self, window, width, height):
+    def __init__(self, window, width, height, player, weapon_sprites: dict[str, pygame.Surface]):
         self.window = window
         self.width = width
         self.height = height
+        self.player = player
+        self.weapon_sprites = weapon_sprites
 
         self.active = False
         self.font = pygame.font.Font(None, 24)
@@ -21,12 +25,10 @@ class ShopUi:
         self.image = self.popupSprite.get_current_frame()
         self.close_button_rect = pygame.Rect(self.popup_rect.right - 40, self.popup_rect.top + 10, 30, 30)
 
-        self.shop_items = [
-            {"name": "Item 1", "price": 100},
-            {"name": "Item 2", "price": 200},
-            {"name": "Item 3", "price": 300},
-        ]
+        self.shop_items = build_weapon_shop_items(WEAPON_CONFIG)
         self.item_rects = []
+        self.message = ""
+        self.message_timer = 0.0
 
 
     def show(self) -> None:
@@ -52,7 +54,30 @@ class ShopUi:
             
             for i, rect in enumerate(self.item_rects):
                 if rect.collidepoint(mx,my):
-                    print(f"Clicked item: {self.shop_items[i]}")
+                    self._buy_item(i)
+                    break
+
+
+    def _buy_item(self, index: int) -> None:
+        item = self.shop_items[index]
+        sprite_sheet = self.weapon_sprites.get(item.item_id)
+
+        success, reason = self.player.buy_weapon(item.item_id, sprite_sheet, item.price)
+        if success:
+            if reason == "upgraded":
+                level = self.player.weapon_levels.get(item.item_id)
+                self.message = f"{item.name} upgraded to Lv.{level}"
+            else:
+                self.message = f"Bought {item.name}"
+        else:
+            if reason == "slots_full":
+                self.message = "Weapon slots are full"
+            elif reason == "max_level":
+                self.message = f"{item.name} is at max level"
+            elif reason == "not_enough_gold":
+                self.message = "Not enough gold"
+
+        self.message_timer = 1.5
 
 
     def update_animation(self, dt:float) -> None:
@@ -62,6 +87,8 @@ class ShopUi:
     
     def update(self, dt:float) -> None:
         self.update_animation(dt)
+        if self.message_timer > 0:
+            self.message_timer = max(0.0, self.message_timer - dt)
 
 
     def draw(self):
@@ -99,6 +126,9 @@ class ShopUi:
         title_font = pygame.font.Font(None, 32)
         title = title_font.render("SHOP", True, (255, 255, 0))
         self.window.blit(title, (popup_x + frame.get_width() // 2 - title.get_width() // 2, popup_y + 15))
+
+        gold_text = self.font.render(f"Gold: {self.player.gold}", True, (255, 230, 120))
+        self.window.blit(gold_text, (popup_x + 20, popup_y + 20))
         
         # Draw close button
         close_button_scaled = pygame.Rect(
@@ -130,7 +160,17 @@ class ShopUi:
             pygame.draw.rect(self.window, (60, 60, 60), item_rect, border_radius=5)
             pygame.draw.rect(self.window, (100, 200, 255), item_rect, 2, border_radius=5)
             
-            item_text = self.font.render(f"{item['name']}", True, (255, 255, 255))
-            price_text = self.font.render(f"{item['price']} gold", True, (255, 215, 0))
-            self.window.blit(item_text, (item_rect.centerx - item_text.get_width() // 2, item_rect.y + 15))
-            self.window.blit(price_text, (item_rect.centerx - price_text.get_width() // 2, item_rect.y + 45))
+            weapon_level = self.player.weapon_levels.get(item.item_id, 0)
+            level_text = f"Lv.{weapon_level}/{item.max_level}"
+
+            item_text = self.font.render(item.name, True, (255, 255, 255))
+            price_text = self.font.render(f"{item.price} gold", True, (255, 215, 0))
+            level_surface = self.font.render(level_text, True, (170, 220, 255))
+
+            self.window.blit(item_text, (item_rect.centerx - item_text.get_width() // 2, item_rect.y + 8))
+            self.window.blit(price_text, (item_rect.centerx - price_text.get_width() // 2, item_rect.y + 30))
+            self.window.blit(level_surface, (item_rect.centerx - level_surface.get_width() // 2, item_rect.y + 52))
+
+        if self.message_timer > 0 and self.message:
+            msg_surface = self.font.render(self.message, True, (255, 255, 255))
+            self.window.blit(msg_surface, (popup_x + frame.get_width() // 2 - msg_surface.get_width() // 2, popup_y + frame.get_height() - 28))

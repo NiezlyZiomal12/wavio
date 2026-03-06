@@ -14,7 +14,12 @@ WEAPON_CONFIG = {
         },
         "special" : {
             "lifetime" : 3.0,
-        }
+        },
+        "shop": {
+            "price": 10,
+            "max_level": 5,
+            "evolution_to": None,
+        },
     },
     "Sword" : {
         "type" : "mele",
@@ -32,6 +37,11 @@ WEAPON_CONFIG = {
         "special" : {
             "attack_duration" : 0.3,
             "attack_radius" : 80,
+        },
+        "shop": {
+            "price": 10,
+            "max_level": 5,
+            "evolution_to": None,
         },
     },
     "Boomerang" : {
@@ -51,6 +61,11 @@ WEAPON_CONFIG = {
             "pierce_count" : 3,
             "return_speed" : 450,
             "lifetime" : 1.3,
+        },
+        "shop": {
+            "price": 10,
+            "max_level": 5,
+            "evolution_to": None,
         },
     },
 }

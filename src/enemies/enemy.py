@@ -1,6 +1,7 @@
 import pygame
+import random
 from src.utils import Animation, Flash
-from src.xp import Xp
+from src.dropable import Xp, Coin
 
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, sprite_sheet:pygame.Surface, x:int, y:int, spawn_sheet:pygame.Surface, config:dict, player:object):
@@ -11,11 +12,12 @@ class Enemy(pygame.sprite.Sprite):
         #loading props from config
         self.speed = int(config['speed'] * 0.05)
         self.position = pygame.Vector2(x,y)
-        self.sprite_width = config.get('sprite_width')
-        self.sprite_height = config.get("sprite_height")
+        self.sprite_width = config["Animation"]["sprite_width"]
+        self.sprite_height = config["Animation"]["sprite_height"]
         self.hp = config["hp"]
         self.max_hp = config["hp"]
-        self.xp_value = config["xp"]
+        self.xp_value = config["Dropable"]["xp"]
+        self.coin_value = config["Dropable"]["coin"]
         self.damage = config["damage"]
 
         #Animations
@@ -24,17 +26,17 @@ class Enemy(pygame.sprite.Sprite):
             sprite_sheet,
             self.sprite_width,
             self.sprite_height,
-            config["idle_row"],
-            config["idle_frames"], 
-            config["idle_speed"]
+            config["Animation"]["idle_row"],
+            config["Animation"]["idle_frames"], 
+            config["Animation"]["idle_speed"]
         )
         self.dead_animation = Animation(
             sprite_sheet,
             self.sprite_width,
             self.sprite_height,
-            config["death_row"],
-            config["death_frames"],
-            config["death_speed"]
+            config["Animation"]["death_row"],
+            config["Animation"]["death_frames"],
+            config["Animation"]["death_speed"]
         )
         self.hit_flash = Flash(duration=0.1, color=(255, 255, 255), max_alpha=128)
         self.current_animation = self.spawn_animation
@@ -54,6 +56,8 @@ class Enemy(pygame.sprite.Sprite):
         # External references
         self.xp_sprite = None
         self.xp_group = None
+        self.coin_sprite = None
+        self.coin_group = None
 
 
     def move(self, player_pos: pygame.Vector2, other_enemies: list, collision_rects: list) -> None:
@@ -121,8 +125,14 @@ class Enemy(pygame.sprite.Sprite):
         self.dead = True
         self.current_animation = self.dead_animation
         self.death_timer = 0.0
+
         xp_orb = Xp(self.xp_sprite, int(self.position.x), int(self.position.y), self.xp_value, self.player)
         self.xp_group.add(xp_orb)
+
+        # Coins drop.
+        if random.random() < 0.3:
+            coin = Coin(self.coin_sprite, int(self.position.x), int(self.position.y), self.coin_value, self.player)
+            self.coin_group.add(coin)
             
 
 

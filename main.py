@@ -17,7 +17,8 @@ class Game:
         spawning_sprites = pygame.image.load("src/assets/enemies/spawn_animation_sheet.png").convert_alpha()
         player_sprites = pygame.image.load("src/assets/player/playerSpriteSheet.png").convert_alpha()  
         fireball_sprites = pygame.image.load("src/assets/weapons/fireball.png").convert_alpha()    
-        xp_sprite = pygame.image.load("src/assets/xp.png").convert_alpha()
+        xp_sprite = pygame.image.load("src/assets/dropable/xp.png").convert_alpha()
+        coin_sprites = pygame.image.load("src/assets/dropable/coin.png").convert_alpha()
         boomerang_sprites = pygame.image.load('src/assets/weapons/boomerang.png').convert_alpha()
         sword_sprites = pygame.image.load('src/assets/weapons/sword.png').convert_alpha()
         present_image = pygame.image.load('src/assets/pickable/present.png').convert_alpha()
@@ -28,8 +29,9 @@ class Game:
         #Tilemap
         self.level1 = pytmx.load_pygame('src/assets/tilemaps/tmx/level1_new.tmx')
 
-        #XP
+        #Dropable
         self.xp_group = pygame.sprite.Group()
+        self.coin_group = pygame.sprite.Group()
         #pickables
         pickable_list = [
             ("bomb", bomb_image),
@@ -47,7 +49,15 @@ class Game:
         # Load objects
         self.player = Player(player_sprites, WIDTH // 2, HEIGHT // 2)
         self.camera = Camera(HEIGHT, WIDTH, self.world)
-        self.spawner = EnemySpawner(spawning_sprites, self.xp_group, xp_sprite, self.player, self.camera)
+        self.spawner = EnemySpawner(
+            spawning_sprites,
+            self.xp_group,
+            xp_sprite,
+            self.coin_group,
+            coin_sprites,
+            self.player,
+            self.camera,
+        )
         self.upgrades = loadUpgrades()
         self.presents = pygame.sprite.Group()
         spawn_random_presents(5, self.presents, self.pickables, WORLD_WIDTH,WORLD_HEIGHT, present_image, pickable_list, self.player)
@@ -60,7 +70,7 @@ class Game:
             "Sword": sword_sprites,
         }
         self.shop_ui = ShopUi(self.window, WIDTH, HEIGHT, self.player, self.weapon_sprites)
-        self.shop_timer = 5
+        self.shop_timer = 30
 
         # Starter weapon so the player can fight before first shop.
         self.player.add_weapon("Fireball", fireball_sprites)
@@ -94,7 +104,7 @@ class Game:
         #shop timer
         if self.level_timer.elapsed >= self.shop_timer :
             self.shop_ui.show()
-            self.shop_timer += 5
+            self.shop_timer += 30
 
         self.level_up_ui.update(dt)
         self.shop_ui.update(dt)
@@ -108,8 +118,9 @@ class Game:
         self.camera.update(dt)
         
         difficulty = 1.0 + (self.level_timer.elapsed // 60)
-        self.spawner.update(dt, self.player, self.player.active_projectiles, self.xp_group, self.world.collision_rects, difficulty)
+        self.spawner.update(dt, self.player, self.player.active_projectiles, self.world.collision_rects, difficulty)
         self.xp_group.update(dt, self.player)
+        self.coin_group.update(dt, self.player)
         self.pickables.update(dt, self.player)
         self.presents.update(dt, self.player.active_projectiles)
 
@@ -137,6 +148,9 @@ class Game:
         for orb in self.xp_group:
             orb.position = self.world.clamp_pos(orb.position)
             orb.rect.center = orb.position
+        for coin in self.coin_group:
+            coin.position = self.world.clamp_pos(coin.position)
+            coin.rect.center = coin.position
         for pick in self.pickables:
             pick.position = self.world.clamp_pos(pick.position)
             pick.rect.center = pick.position
@@ -156,6 +170,9 @@ class Game:
 
         for xp_orb in self.xp_group:
             xp_orb.draw(self.window, self.camera)
+
+        for coin in self.coin_group:
+            coin.draw(self.window, self.camera)
 
         for pickable in self.pickables:
             pickable.draw(self.window, self.camera)

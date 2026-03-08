@@ -4,7 +4,7 @@ from .utils import Animation, Flash
 from .enemies import Slime, Zombie, Enemy, Bat
 from .game_logic import EnemySpawner
 from .weapons import Fireball, Sword
-from .xp import Xp
+from .dropable import Xp
 from .ui import LevelUpUi, ShopUi
 from .upgrades import loadUpgrades
 from .Map import World

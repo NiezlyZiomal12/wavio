@@ -13,6 +13,7 @@ class Player(pygame.sprite.Sprite):
         self.current_health = self.max_health
         self.xp_to_lvl_up = XP_TO_LVL_UP
         self.xp_gain = XP_GAIN
+        self.coin_gain = COIN_GAIN
         self.damage = DAMAGE
         self.projectile_count = PROJECTILE_COUNT
         self.luck = LUCK
@@ -291,6 +292,12 @@ class Player(pygame.sprite.Sprite):
         surface.blit(level_text, (10,8) )
 
 
+    def draw_coins(self, surface:pygame.Surface) -> None:
+        font = pygame.font.Font(None, 24)
+        coin_text = font.render(f"Gold: {self.gold}", None, (252, 186, 3))
+        surface.blit(coin_text, (10,70))
+
+
     def draw(self, surface:pygame.Surface, camera: object):
         for projectile in self.active_projectiles:
             projectile.draw(surface, camera)
@@ -298,4 +305,5 @@ class Player(pygame.sprite.Sprite):
         surface.blit(self.image, camera.apply(self.rect))
         self.draw_health_bar(surface)
         self.draw_xp_bar(surface)
+        self.draw_coins(surface)
         self.weapon_slots.draw(surface)

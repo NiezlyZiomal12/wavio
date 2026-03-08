@@ -4,12 +4,15 @@ from src.enemies import *
 from config import HEIGHT, WIDTH, SPAWN_TIMER, WORLD_HEIGHT, WORLD_WIDTH
 
 class EnemySpawner:
-    def __init__(self, spawn_sprite: pygame.Surface, xp_group:pygame.sprite.Group , xp_sprite:pygame.Surface, player:object, camera:object) -> None:
+    def __init__(self, spawn_sprite: pygame.Surface, xp_group:pygame.sprite.Group , xp_sprite:pygame.Surface,
+                coin_group:pygame.sprite.Group, coin_sprite:pygame.sprite.Sprite, player:object, camera:object) -> None:
         self.spawn_sprite = spawn_sprite
         self.enemies = []
         self.timer = 0.0
         self.xp_group = xp_group
         self.xp_sprite = xp_sprite
+        self.coin_group = coin_group
+        self.coin_sprite = coin_sprite
         self.player = player
         self.camera = camera
 
@@ -26,7 +29,8 @@ class EnemySpawner:
         }
 
 
-    def update(self,dt, player: object, weapon_groups: dict, xp_group: pygame.sprite.Group, collision_rects:list, difficulty:float =1.0) -> None:
+    def update(self, dt: float, player: object, weapon_group: pygame.sprite.Group,
+            collision_rects:list, difficulty:float =1.0) -> None:
         self.timer += dt * difficulty
         if self.timer >= SPAWN_TIMER:
             self.spawn_enemies()
@@ -34,9 +38,11 @@ class EnemySpawner:
         
         #killing enemies and dropping xp
         for enemy in self.enemies:
-            enemy.xp_group = xp_group
+            enemy.xp_group = self.xp_group
             enemy.xp_sprite = self.xp_sprite
-            enemy.update(dt, player, self.enemies, weapon_groups, collision_rects)
+            enemy.coin_group = self.coin_group
+            enemy.coin_sprite = self.coin_sprite
+            enemy.update(dt, player, self.enemies, weapon_group, collision_rects)
         
         self.enemies = [enemy for enemy in self.enemies if not enemy.killed]
 
@@ -60,6 +66,8 @@ class EnemySpawner:
             enemy = enemy_class(sprite, x, y, self.spawn_sprite, config, self.player)
             enemy.xp_group = self.xp_group
             enemy.xp_sprite = self.xp_sprite
+            enemy.coin_group = self.coin_group
+            enemy.coin_sprite = self.coin_sprite
             self.enemies.append(enemy)
 
 

@@ -9,13 +9,23 @@ class Upgrade(pygame.sprite.Sprite):
         self.description = config['description']
         self.image = pygame.image.load(config['image']).convert_alpha()
         self.effect = config['effect']
+        self.max_level = config['max_level']
 
 
     def draw(self, surface:pygame.Surface, camera: object):
         surface.blit(self.image, camera.apply(self.rect))
 
 
-    def apply(self, player):
+    def is_maxed(self, player) -> bool:
+        current_level = player.upgrade_levels.get(self.name, 0)
+        return current_level >= self.max_level
+
+
+    def apply(self, player) -> bool:
+        current_level = player.upgrade_levels.get(self.name, 0)
+        if current_level >= self.max_level:
+            return False
+
         if self.name == "Order":
             player.damage *= (1 +self.effect["damage"])
 
@@ -33,6 +43,9 @@ class Upgrade(pygame.sprite.Sprite):
 
         elif self.name == "Scroll":
             player.reduce_cooldown *= (1 + self.effect['reduce_cooldown'])
+
+        player.upgrade_levels[self.name] = current_level + 1
+        return True
 
  
 

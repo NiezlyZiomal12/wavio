@@ -26,6 +26,7 @@ class ShopUi:
         self.close_button_rect = pygame.Rect(self.popup_rect.right - 40, self.popup_rect.top + 10, 30, 30)
 
         self.shop_items = build_weapon_shop_items(WEAPON_CONFIG)
+        self.visible_shop_items = []
         self.item_rects = []
         self.message = ""
         self.message_timer = 0.0
@@ -59,7 +60,7 @@ class ShopUi:
 
 
     def _buy_item(self, index: int) -> None:
-        item = self.shop_items[index]
+        item = self.visible_shop_items[index]
         sprite_sheet = self.weapon_sprites.get(item.item_id)
 
         success, reason = self.player.buy_weapon(item.item_id, sprite_sheet, item.price)
@@ -84,9 +85,18 @@ class ShopUi:
         self.image = self.popupSprite.get_current_frame()
         self.popupSprite.update(dt)
 
+
+    def _refresh_visible_items(self) -> None:
+        self.visible_shop_items = [
+            item
+            for item in self.shop_items
+            if self.player.weapon_levels.get(item.item_id, 0) < item.max_level
+        ]
+
     
     def update(self, dt:float) -> None:
         self.update_animation(dt)
+        self._refresh_visible_items()
         if self.message_timer > 0:
             self.message_timer = max(0.0, self.message_timer - dt)
 
@@ -148,7 +158,7 @@ class ShopUi:
         item_height = 80
         base_y = popup_y + 70
         
-        for i, item in enumerate(self.shop_items):
+        for i, item in enumerate(self.visible_shop_items):
             row = i // items_per_row
             col = i % items_per_row
             item_x = popup_x + 20 + col * (item_width + 10)

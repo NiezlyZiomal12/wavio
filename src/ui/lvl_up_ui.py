@@ -17,6 +17,7 @@ class LevelUpUi:
         self.scale = 0
 
         self.options = []
+        self.option_levels = {}
         self.selected = None
 
         self.popup_rect = pygame.Rect(width // 2 - 200, height // 2 - 150, 400, 300)
@@ -30,11 +31,16 @@ class LevelUpUi:
         ]
 
     
-    def show(self, options: list= None) -> None:
+    def show(self, options: list= None, player: object = None) -> None:
         self.active = True
         self.selected = None
         if options:
             self.options = options
+            
+        self.option_levels = {
+            upgrade.name: player.upgrade_levels.get(upgrade.name, 0)
+            for upgrade in self.options
+            }
         self.animation_start = time.time()
         self.scale = 0.5
 
@@ -101,8 +107,8 @@ class LevelUpUi:
         base_positions = [60, 130, 200]
         self.option_rects = []
 
-        for i, base_y in enumerate(base_positions):
-            upgrade = self.options[i]
+        for i, upgrade in enumerate(self.options):
+            base_y = base_positions[i]
 
             rect = pygame.Rect(
                 popup_x + int(40 * self.scale),
@@ -131,6 +137,14 @@ class LevelUpUi:
             name_y = rect.y + int(10 * self.scale)
             self.window.blit(name_surface, (name_x, name_y))
 
+            # Current upgrade level text
+            current_level = self.option_levels.get(upgrade.name, 0)
+            level_text = f"{current_level}/{upgrade.max_level}"
+            level_surface = self.font.render(level_text, True, (255, 220, 140))
+            level_x = rect.right - level_surface.get_width() - int(10 * self.scale)
+            level_y = rect.y + int(10 * self.scale)
+            self.window.blit(level_surface, (level_x, level_y))
+
             #Upgrade Description
             desc_lines = wrap_text(
                 upgrade.description,
@@ -145,5 +159,5 @@ class LevelUpUi:
                 self.window.blit(desc_surface, (name_x, line_y))
                 line_y += desc_surface.get_height()
 
-            lvl_up_text = self.font.render("Level Up!", True, (255,255,255))
-            self.window.blit(lvl_up_text, (self.popup_rect.centerx - lvl_up_text.get_width() // 2, popup_y - 20))
+        lvl_up_text = self.font.render("Level Up!", True, (255,255,255))
+        self.window.blit(lvl_up_text, (self.popup_rect.centerx - lvl_up_text.get_width() // 2, popup_y - 20))

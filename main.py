@@ -136,8 +136,10 @@ class Game:
         #lvl up
         if self.player.just_leveled_up:
             self.player.just_leveled_up = False
-            upgrades = random.sample(self.upgrades, 3)
-            self.level_up_ui.show(upgrades)
+            available_upgrades = [upgrade for upgrade in self.upgrades if not upgrade.is_maxed(self.player)]
+            if available_upgrades:
+                upgrades = random.sample(available_upgrades, min(3, len(available_upgrades)))
+                self.level_up_ui.show(upgrades, self.player)
 
         #World boundaries
         self.player.position = self.world.clamp_pos(self.player.position)

@@ -56,6 +56,7 @@ class Player(pygame.sprite.Sprite):
         self.active_projectiles = pygame.sprite.Group()
         self.weapon_sprites = {}
         self.weapon_levels = {}
+        self.upgrade_levels = {}
         self.weapon_classes = {
             "Fireball" : Fireball,
             "Boomerang" : Boomerang,

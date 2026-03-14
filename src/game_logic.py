@@ -1,7 +1,8 @@
 import pygame
 import random
 from src.enemies import *
-from config import HEIGHT, WIDTH, SPAWN_TIMER, WORLD_HEIGHT, WORLD_WIDTH
+from src.enemies.bosses import *
+from config import HEIGHT, WIDTH, SPAWN_TIMER, WORLD_HEIGHT, WORLD_WIDTH, BOSS_SPAWN_TIMER
 
 class EnemySpawner:
     def __init__(self, spawn_sprite: pygame.Surface, xp_group:pygame.sprite.Group , xp_sprite:pygame.Surface,
@@ -9,6 +10,8 @@ class EnemySpawner:
         self.spawn_sprite = spawn_sprite
         self.enemies = []
         self.timer = 0.0
+        self.boss_timer = 0.0
+        self.game_time = 0.0
         self.xp_group = xp_group
         self.xp_sprite = xp_sprite
         self.coin_group = coin_group
@@ -21,29 +24,48 @@ class EnemySpawner:
         for enemy_type in ENEMY_CONFIG.keys():
             self.enemy_sprites[enemy_type] = pygame.image.load(f"src/assets/enemies/{enemy_type}-Sheet.png").convert_alpha()
 
+        self.boss_sprites = {}
+        #loading bosses sprites
+        for boss_type in BOSS_CONFIG.keys():
+            self.boss_sprites[boss_type] = pygame.image.load(f"src/assets/bosses/{boss_type}-Sheet.png").convert_alpha()
+
         #adding enemy classes
         self.enemy_classes = {
             "Slime" : Slime,
             "Zombie" : Zombie,
             "Bat" : Bat,
         }
+        self.boss_classes = {
+            "Golem" : Golem
+        }
 
 
     def update(self, dt: float, player: object, weapon_group: pygame.sprite.Group,
             collision_rects:list, difficulty:float =1.0) -> None:
+        
+        # track total game time
         self.timer += dt * difficulty
+        self.game_time += dt
+        self.boss_timer += dt
+
         if self.timer >= SPAWN_TIMER:
             self.spawn_enemies()
             self.timer = 0.0
-        
-        #killing enemies and dropping xp
+
+        #BOSS tiemer
+        if self.boss_timer >= BOSS_SPAWN_TIMER:
+            boss_amount = 1 + int(self.game_time // 300)
+            self.spawn_boss(boss_amount)
+            self.boss_timer = 0.0
+
+        # Update all living enemies (including bosses).
         for enemy in self.enemies:
             enemy.xp_group = self.xp_group
             enemy.xp_sprite = self.xp_sprite
             enemy.coin_group = self.coin_group
             enemy.coin_sprite = self.coin_sprite
             enemy.update(dt, player, self.enemies, weapon_group, collision_rects)
-        
+
         self.enemies = [enemy for enemy in self.enemies if not enemy.killed]
 
 
@@ -69,6 +91,24 @@ class EnemySpawner:
             enemy.coin_group = self.coin_group
             enemy.coin_sprite = self.coin_sprite
             self.enemies.append(enemy)
+
+
+    def spawn_boss(self, amount= int) -> None:
+        boss_types = list(BOSS_CONFIG.keys())
+        for i in range(amount): 
+            x,y = self._spawn_outside_camera(200)
+    
+            boss_type = random.choice(boss_types)
+            config = BOSS_CONFIG[boss_type]
+            sprite = self.boss_sprites[boss_type]
+            boss_class = self.boss_classes[config["class"]]
+            
+            boss = boss_class(sprite, x, y, self.spawn_sprite, config, self.player)
+            boss.xp_group = self.xp_group
+            boss.xp_sprite = self.xp_sprite
+            boss.coin_group = self.coin_group
+            boss.coin_sprite = self.coin_sprite
+            self.enemies.append(boss)
 
 
     def _spawn_outside_camera(self, margin=200):

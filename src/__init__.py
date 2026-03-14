@@ -2,6 +2,7 @@ from .camera import Camera
 from .player import Player
 from .utils import Animation, Flash
 from .enemies import Slime, Zombie, Enemy, Bat
+from .enemies.bosses import Golem
 from .game_logic import EnemySpawner
 from .weapons import Fireball, Sword
 from .dropable import Xp
@@ -30,5 +31,6 @@ __all__ = [
     "spawn_ranodm_presents",
     "trigger_bomb",
     "Timer",
-    "ShopUi"
+    "ShopUi", 
+    "Golem",
 ]

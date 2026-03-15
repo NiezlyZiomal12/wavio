@@ -14,6 +14,8 @@ class LevelUpUi:
         self.upgrades = loadUpgrades()
         self.active = False
         self.font = pygame.font.Font(None , 24)
+        self.roll_cost = 15
+        self.roll_amount = 1
 
         #popup animation
         self.animation_time = 0.2
@@ -61,8 +63,16 @@ class LevelUpUi:
         self.active = False
 
 
+    def _current_roll_cost(self) -> int:
+        return self.roll_cost + 5 * self.roll_amount
+
+
     def reroll_items(self) -> None:
-        self.show()
+        roll_cost = self._current_roll_cost()
+        if self.player.gold >= roll_cost:
+            self.player.spend_gold(roll_cost)
+            self.show()
+            self.roll_amount += 1
 
 
     def handle_event(self, event: pygame.event.Event) -> int:
@@ -74,9 +84,11 @@ class LevelUpUi:
             for i, rect in enumerate(self.option_rects):
                 if rect.collidepoint(mx,my):
                     self.selected = i
+                    self.roll_amount = 1
                     return i
             #close button
             if self.close_button_rect.collidepoint(mx,my):
+                self.roll_amount = 1
                 self.hide()
                 return
             
@@ -211,7 +223,8 @@ class LevelUpUi:
         pygame.draw.rect(self.window, (70,70,70), reroll_rect, border_radius=6)
         pygame.draw.rect(self.window, (200,200,200), reroll_rect, 2, border_radius=6)
 
-        reroll_text = self.font.render("Reroll", True, (255,255,255))
+        current_roll_cost = self._current_roll_cost()
+        reroll_text = self.font.render(f"Reroll ({current_roll_cost}g)", True, (255,255,255))
         self.window.blit(
             reroll_text,
             (
@@ -219,3 +232,6 @@ class LevelUpUi:
                 reroll_rect.centery - reroll_text.get_height() // 2
             )
         )
+
+        gold_text = self.font.render(f"Gold: {self.player.gold}", True, (255, 230, 120))
+        self.window.blit(gold_text, (popup_x + 20, popup_y + 20))

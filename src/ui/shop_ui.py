@@ -12,6 +12,9 @@ class ShopUi:
         self.player = player
         self.weapon_sprites = weapon_sprites
 
+        self.roll_cost = 15
+        self.roll_amount = 1
+
         self.active = False
         self.font = pygame.font.Font(None, 24)
 
@@ -58,6 +61,9 @@ class ShopUi:
                     self._buy_item(i)
                     break
 
+            if self.reroll_button_rect.collidepoint(mx, my):
+                self.reroll_items()
+
 
     def _buy_item(self, index: int) -> None:
         item = self.visible_shop_items[index]
@@ -93,7 +99,20 @@ class ShopUi:
             if self.player.weapon_levels.get(item.item_id, 0) < item.max_level
         ]
 
+
+    def _current_roll_cost(self) -> int:
+        return self.roll_cost + 5 * self.roll_amount
+
+
+    def reroll_items(self) -> None:
+        roll_cost = self._current_roll_cost()
+        if self.player.gold >= roll_cost:
+            self.player.spend_gold(roll_cost)
+            self._refresh_visible_items()
+            self.show()
+            self.roll_amount += 1
     
+
     def update(self, dt:float) -> None:
         self.update_animation(dt)
         self._refresh_visible_items()
@@ -184,3 +203,26 @@ class ShopUi:
         if self.message_timer > 0 and self.message:
             msg_surface = self.font.render(self.message, True, (255, 255, 255))
             self.window.blit(msg_surface, (popup_x + frame.get_width() // 2 - msg_surface.get_width() // 2, popup_y + frame.get_height() - 28))
+
+        # reroll button
+        reroll_rect = pygame.Rect(
+            popup_x + self.popup_rect.width // 2 - 60,
+            popup_y + self.popup_rect.height - 40,
+            120,
+            30
+        )
+
+        self.reroll_button_rect = reroll_rect
+
+        pygame.draw.rect(self.window, (70,70,70), reroll_rect, border_radius=6)
+        pygame.draw.rect(self.window, (200,200,200), reroll_rect, 2, border_radius=6)
+
+        current_roll_cost = self._current_roll_cost()
+        reroll_text = self.font.render(f"Reroll ({current_roll_cost}g)", True, (255,255,255))
+        self.window.blit(
+            reroll_text,
+            (
+                reroll_rect.centerx - reroll_text.get_width() // 2,
+                reroll_rect.centery - reroll_text.get_height() // 2
+            )
+        )

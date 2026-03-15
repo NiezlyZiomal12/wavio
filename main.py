@@ -1,6 +1,6 @@
 import pygame
 from config import WIDTH, HEIGHT, BG_COLOR, FPS, WORLD_WIDTH, WORLD_HEIGHT
-from src import Camera, Player, EnemySpawner, LevelUpUi, loadUpgrades, World, spawn_random_presents, trigger_bomb, Timer, ShopUi
+from src import Camera, Player, EnemySpawner, LevelUpUi, World, spawn_random_presents, trigger_bomb, Timer, ShopUi
 import random
 import pytmx
 
@@ -58,12 +58,11 @@ class Game:
             self.player,
             self.camera,
         )
-        self.upgrades = loadUpgrades()
         self.presents = pygame.sprite.Group()
         spawn_random_presents(5, self.presents, self.pickables, WORLD_WIDTH,WORLD_HEIGHT, present_image, pickable_list, self.player)
 
         #UI
-        self.level_up_ui = LevelUpUi(self.window, WIDTH, HEIGHT)
+        self.level_up_ui = LevelUpUi(self.window, WIDTH, HEIGHT, self.player)
         self.weapon_sprites = {
             "Fireball": fireball_sprites,
             "Boomerang": boomerang_sprites,
@@ -136,10 +135,7 @@ class Game:
         #lvl up
         if self.player.just_leveled_up:
             self.player.just_leveled_up = False
-            available_upgrades = [upgrade for upgrade in self.upgrades if not upgrade.is_maxed(self.player)]
-            if available_upgrades:
-                upgrades = random.sample(available_upgrades, min(3, len(available_upgrades)))
-                self.level_up_ui.show(upgrades, self.player)
+            self.level_up_ui.show()
 
         #World boundaries
         self.player.position = self.world.clamp_pos(self.player.position)

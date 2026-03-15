@@ -1,13 +1,17 @@
 import pygame
 import time
 from src.utils import Animation, wrap_text
+from src.upgrades import loadUpgrades
+import random
 
 class LevelUpUi:
-    def __init__(self, window, width, height):
+    def __init__(self, window, width, height, player):
         self.window = window
         self.width = width
         self.height = height
 
+        self.player = player
+        self.upgrades = loadUpgrades()
         self.active = False
         self.font = pygame.font.Font(None , 24)
 
@@ -23,6 +27,8 @@ class LevelUpUi:
         self.popup_rect = pygame.Rect(width // 2 - 200, height // 2 - 150, 400, 300)
         self.popupSprite = Animation(pygame.image.load("src/assets/ui/lvlUpUi.png").convert_alpha(), 400,300,0, 2, 0.2)
         self.image = self.popupSprite.get_current_frame()
+        self.close_button_rect = pygame.Rect(self.popup_rect.right - 40, self.popup_rect.top + 10, 30, 30)
+        self.reroll_button_rect = pygame.Rect(self.popup_rect.centerx - 60, self.popup_rect.bottom - 40, 120, 30)
 
         self.option_rects = [
             pygame.Rect(self.popup_rect.x + 40, self.popup_rect.y + 60, 320, 50),
@@ -31,22 +37,32 @@ class LevelUpUi:
         ]
 
     
-    def show(self, options: list= None, player: object = None) -> None:
+    def show(self) -> None:
         self.active = True
         self.selected = None
-        if options:
-            self.options = options
-            
+        self.options = self._show_upgrades()
+
         self.option_levels = {
-            upgrade.name: player.upgrade_levels.get(upgrade.name, 0)
+            upgrade.name: self.player.upgrade_levels.get(upgrade.name, 0)
             for upgrade in self.options
             }
         self.animation_start = time.time()
         self.scale = 0.5
 
 
+    def _show_upgrades(self):
+        available_upgrades = [upgrade for upgrade in self.upgrades if not upgrade.is_maxed(self.player)]
+        if available_upgrades:
+                upgrades = random.sample(available_upgrades, min(3, len(available_upgrades)))
+        return upgrades
+
+
     def hide(self):
         self.active = False
+
+
+    def reroll_items(self) -> None:
+        self.show()
 
 
     def handle_event(self, event: pygame.event.Event) -> int:
@@ -59,6 +75,15 @@ class LevelUpUi:
                 if rect.collidepoint(mx,my):
                     self.selected = i
                     return i
+            #close button
+            if self.close_button_rect.collidepoint(mx,my):
+                self.hide()
+                return
+            
+            # reroll button
+            if self.reroll_button_rect.collidepoint(mx, my):
+                self.reroll_items()
+
         return None
     
 
@@ -161,3 +186,36 @@ class LevelUpUi:
 
         lvl_up_text = self.font.render("Level Up!", True, (255,255,255))
         self.window.blit(lvl_up_text, (self.popup_rect.centerx - lvl_up_text.get_width() // 2, popup_y - 20))
+        
+        # Draw close button
+        close_button_scaled = pygame.Rect(
+            popup_x + self.popup_rect.width - 40,
+            popup_y + 10,
+            30,
+            30
+        )
+        pygame.draw.rect(self.window, (255, 0, 0), close_button_scaled)
+        close_text = self.font.render("X", True, (255, 255, 255))
+        self.window.blit(close_text, (close_button_scaled.centerx - close_text.get_width() // 2, close_button_scaled.centery - close_text.get_height() // 2))
+
+        # reroll button
+        reroll_rect = pygame.Rect(
+            popup_x + self.popup_rect.width // 2 - 60,
+            popup_y + self.popup_rect.height - 40,
+            120,
+            30
+        )
+
+        self.reroll_button_rect = reroll_rect
+
+        pygame.draw.rect(self.window, (70,70,70), reroll_rect, border_radius=6)
+        pygame.draw.rect(self.window, (200,200,200), reroll_rect, 2, border_radius=6)
+
+        reroll_text = self.font.render("Reroll", True, (255,255,255))
+        self.window.blit(
+            reroll_text,
+            (
+                reroll_rect.centerx - reroll_text.get_width() // 2,
+                reroll_rect.centery - reroll_text.get_height() // 2
+            )
+        )

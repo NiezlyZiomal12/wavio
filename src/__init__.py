@@ -6,7 +6,7 @@ from .enemies.bosses import Golem
 from .game_logic import EnemySpawner
 from .weapons import Fireball, Sword
 from .dropable import Xp
-from .ui import LevelUpUi, ShopUi
+from .ui import LevelUpUi, PauseMenuUi, ShopUi
 from .upgrades import loadUpgrades
 from .Map import World
 from .pickables import spawn_random_presents, trigger_bomb
@@ -26,6 +26,7 @@ __all__ = [
     "Bat",
     "Sword",
     "LevelUpUi",
+    "PauseMenuUi",
     "loadUpgrades",
     "World",
     "spawn_ranodm_presents",

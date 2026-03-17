@@ -1,7 +1,6 @@
 import pygame
 from config import WIDTH, HEIGHT, BG_COLOR, FPS, WORLD_WIDTH, WORLD_HEIGHT
-from src import Camera, Player, EnemySpawner, LevelUpUi, World, spawn_random_presents, trigger_bomb, Timer, ShopUi
-import random
+from src import Camera, Player, EnemySpawner, LevelUpUi, PauseMenuUi, World, spawn_random_presents, trigger_bomb, Timer, ShopUi
 import pytmx
 
 class Game:
@@ -69,6 +68,7 @@ class Game:
             "Sword": sword_sprites,
         }
         self.shop_ui = ShopUi(self.window, WIDTH, HEIGHT, self.player, self.weapon_sprites)
+        self.pause_ui = PauseMenuUi(self.window, WIDTH, HEIGHT)
         self.shop_timer = 30
 
         # Starter weapon so the player can fight before first shop.
@@ -81,6 +81,16 @@ class Game:
                 if event.type == pygame.QUIT:
                     self.running = False
                     return
+
+                #pausing the game
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                    self.pause_ui.toggle()
+                    self.paused = self.pause_ui.active
+                    continue
+
+                if self.pause_ui.active:
+                    self.pause_ui.handle_event(event)
+                    continue
 
                 #level up mechanics
                 selection = self.level_up_ui.handle_event(event)
@@ -100,6 +110,11 @@ class Game:
     def update(self) -> None:
         dt = self.clock.get_time() / 1000
 
+        self.pause_ui.update(dt)
+        if self.pause_ui.active:
+            self.paused = True
+            return
+
         #shop timer
         if self.level_timer.elapsed >= self.shop_timer :
             self.shop_ui.show()
@@ -109,6 +124,8 @@ class Game:
         self.shop_ui.update(dt)
         if self.level_up_ui.active or self.shop_ui.active:
             return
+
+        self.paused = False
         
         keys = pygame.key.get_pressed()
         self.level_timer.update(dt)
@@ -187,6 +204,9 @@ class Game:
 
         if self.shop_ui.active:
             self.shop_ui.draw()
+
+        if self.pause_ui.active:
+            self.pause_ui.draw()
 
         pygame.display.update()
 

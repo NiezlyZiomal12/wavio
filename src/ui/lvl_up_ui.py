@@ -1,6 +1,6 @@
 import pygame
 import time
-from src.utils import Animation, wrap_text
+from src.utils import Animation, Button, wrap_text
 from src.upgrades import loadUpgrades
 import random
 
@@ -29,8 +29,12 @@ class LevelUpUi:
         self.popup_rect = pygame.Rect(width // 2 - 200, height // 2 - 150, 400, 300)
         self.popupSprite = Animation(pygame.image.load("src/assets/ui/lvlUpUi.png").convert_alpha(), 400,300,0, 2, 0.2)
         self.image = self.popupSprite.get_current_frame()
+
         self.close_button_rect = pygame.Rect(self.popup_rect.right - 40, self.popup_rect.top + 10, 30, 30)
+        self.close_button = Button(self.close_button_rect, "X", self.font, lambda _button: self.hide(), None,(194, 36, 21), (194, 36, 21), (255,255,255), (194, 36, 21), 2, 8)
+        
         self.reroll_button_rect = pygame.Rect(self.popup_rect.centerx - 60, self.popup_rect.bottom - 40, 120, 30)
+        self.reroll_button = Button(rect=self.reroll_button_rect, text="Reroll", font=self.font, on_click=lambda _button: self.reroll_items(), bg_color=(70, 70, 70), hover_color=(95, 95, 95), text_color=(255, 255, 255), border_color=(200, 200, 200), border_width=2, border_radius=6)
 
         self.option_rects = [
             pygame.Rect(self.popup_rect.x + 40, self.popup_rect.y + 60, 320, 50),
@@ -61,6 +65,7 @@ class LevelUpUi:
 
     def hide(self):
         self.active = False
+        self.roll_amount = 1
 
 
     def _current_roll_cost(self) -> int:
@@ -78,6 +83,9 @@ class LevelUpUi:
     def handle_event(self, event: pygame.event.Event) -> int:
         if not self.active:
             return None
+
+        self.reroll_button.handle_event(event)
+        self.close_button.handle_event(event)
         
         if event.type == pygame.MOUSEBUTTONDOWN:
             mx, my = event.pos
@@ -86,15 +94,6 @@ class LevelUpUi:
                     self.selected = i
                     self.roll_amount = 1
                     return i
-            #close button
-            if self.close_button_rect.collidepoint(mx,my):
-                self.roll_amount = 1
-                self.hide()
-                return
-            
-            # reroll button
-            if self.reroll_button_rect.collidepoint(mx, my):
-                self.reroll_items()
 
         return None
     
@@ -106,6 +105,8 @@ class LevelUpUi:
     
     def update(self, dt:float) -> None:
         self.update_animation(dt)
+        self.reroll_button.update()
+        self.close_button.update()
     
 
     def draw(self):
@@ -199,39 +200,13 @@ class LevelUpUi:
         lvl_up_text = self.font.render("Level Up!", True, (255,255,255))
         self.window.blit(lvl_up_text, (self.popup_rect.centerx - lvl_up_text.get_width() // 2, popup_y - 20))
         
-        # Draw close button
-        close_button_scaled = pygame.Rect(
-            popup_x + self.popup_rect.width - 40,
-            popup_y + 10,
-            30,
-            30
-        )
-        pygame.draw.rect(self.window, (255, 0, 0), close_button_scaled)
-        close_text = self.font.render("X", True, (255, 255, 255))
-        self.window.blit(close_text, (close_button_scaled.centerx - close_text.get_width() // 2, close_button_scaled.centery - close_text.get_height() // 2))
+        # close button
+        self.close_button.draw(self.window)
 
         # reroll button
-        reroll_rect = pygame.Rect(
-            popup_x + self.popup_rect.width // 2 - 60,
-            popup_y + self.popup_rect.height - 40,
-            120,
-            30
-        )
-
-        self.reroll_button_rect = reroll_rect
-
-        pygame.draw.rect(self.window, (70,70,70), reroll_rect, border_radius=6)
-        pygame.draw.rect(self.window, (200,200,200), reroll_rect, 2, border_radius=6)
-
         current_roll_cost = self._current_roll_cost()
-        reroll_text = self.font.render(f"Reroll ({current_roll_cost}g)", True, (255,255,255))
-        self.window.blit(
-            reroll_text,
-            (
-                reroll_rect.centerx - reroll_text.get_width() // 2,
-                reroll_rect.centery - reroll_text.get_height() // 2
-            )
-        )
+        self.reroll_button.set_text(f"Reroll ({current_roll_cost}g)")
+        self.reroll_button.draw(self.window)
 
         gold_text = self.font.render(f"Gold: {self.player.gold}", True, (255, 230, 120))
         self.window.blit(gold_text, (popup_x + 20, popup_y + 20))

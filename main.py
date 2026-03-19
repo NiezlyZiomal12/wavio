@@ -68,7 +68,7 @@ class Game:
             "Sword": sword_sprites,
         }
         self.shop_ui = ShopUi(self.window, WIDTH, HEIGHT, self.player, self.weapon_sprites)
-        self.pause_ui = PauseMenuUi(self.window, WIDTH, HEIGHT)
+        self.pause_ui = PauseMenuUi(self.window, WIDTH, HEIGHT, self.player)
         self.shop_timer = 30
 
         # Starter weapon so the player can fight before first shop.

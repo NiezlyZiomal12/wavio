@@ -1,0 +1,135 @@
+{
+  "defaults": {
+    "font": {
+      "name": "fira_code",
+      "size": "16"
+    },
+    "colours": {
+      "normal_text": "#EAF1FA",
+      "disabled_text": "#7D8A9B",
+      "dark_bg": "#131A23",
+      "normal_bg": "#253343",
+      "hovered_bg": "#2E4054",
+      "active_bg": "#3A5068",
+      "selected_bg": "#3A5068",
+      "normal_border": "#6A849E",
+      "hovered_border": "#9DB4CC",
+      "active_border": "#A9C3DD",
+      "selected_border": "#A9C3DD",
+      "link_text": "#8EC7FF",
+      "link_hover": "#B4DEFF"
+    },
+    "misc": {
+      "shape": "rounded_rectangle",
+      "shape_corner_radius": "8",
+      "border_width": "1",
+      "shadow_width": "1",
+      "padding": "6,6"
+    }
+  },
+
+  "#pause_popup": {
+    "misc": {
+      "shape_corner_radius": "12",
+      "border_width": "2"
+    },
+    "colours": {
+      "dark_bg": "#1A2430",
+      "normal_bg": "#1F2B39",
+      "normal_border": "#8FAAC5"
+    }
+  },
+
+  "#pause_left_panel": {
+    "colours": {
+      "dark_bg": "#223141",
+      "normal_bg": "#27384A",
+      "normal_border": "#7E9AB5"
+    },
+    "misc": {
+      "shape_corner_radius": "10",
+      "padding": "10,10"
+    }
+  },
+
+  "#pause_right_panel": {
+    "colours": {
+      "dark_bg": "#1A2430",
+      "normal_bg": "#1D2936",
+      "normal_border": "#627B95"
+    },
+    "misc": {
+      "shape_corner_radius": "10",
+      "padding": "10,10"
+    }
+  },
+
+  "UIButton": {
+    "misc": {
+      "shape_corner_radius": "8",
+      "border_width": "2",
+      "padding": "8,6"
+    },
+    "colours": {
+      "normal_bg": "#34495E",
+      "hovered_bg": "#44627F",
+      "active_bg": "#4E7397",
+      "normal_border": "#9AB7D2",
+      "hovered_border": "#C3D7EA",
+      "active_border": "#D4E4F3",
+      "normal_text": "#F2F7FD"
+    }
+  },
+
+  "UITextBox": {
+    "colours": {
+      "dark_bg": "#131D28",
+      "normal_bg": "#16202C",
+      "normal_border": "#516A84",
+      "normal_text": "#DCE8F4",
+      "link_text": "#8FC7FF",
+      "link_hover": "#BFE2FF"
+    },
+    "misc": {
+      "shape_corner_radius": "6",
+      "border_width": "1",
+      "line_spacing": "1.1"
+    }
+  },
+
+  "UILabel": {
+    "colours": {
+      "normal_text": "#E7F0FA"
+    }
+  },
+
+  "#pause_title": {
+    "font": {
+      "name": "fira_code",
+      "size": "30"
+    },
+    "colours": {
+      "normal_text": "#F3F8FF"
+    }
+  },
+
+  "#stats_title": {
+    "font": {
+      "name": "fira_code",
+      "size": "20"
+    },
+    "colours": {
+      "normal_text": "#DBE8F7"
+    }
+  },
+
+  "#stats_hint": {
+    "font": {
+      "name": "fira_code",
+      "size": "14"
+    },
+    "colours": {
+      "normal_text": "#9EB1C5"
+    }
+  }
+}

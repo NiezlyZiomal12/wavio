@@ -3,13 +3,19 @@ import pytmx
 
 from config import WIDTH, HEIGHT, BG_COLOR, WORLD_WIDTH, WORLD_HEIGHT
 from ..camera import Camera
-from ..player import Player
+from ..player.player_classes import Warrior, Mage, Rogue
 from ..game_logic import EnemySpawner
 from ..ui import LevelUpUi, PauseMenuUi, ShopUi
 from ..Map import World
 from ..pickables import spawn_random_presents, trigger_bomb
 from ..timer import Timer
 
+
+CHARACTER_CLASSES = {
+    "Warrior": Warrior,
+    "Mage": Mage,
+    "Rogue": Rogue,
+}
 
 class GameScene:
     def __init__(self, window: pygame.Surface):
@@ -53,7 +59,8 @@ class GameScene:
         self.world.load_collisions(self.level1)
 
         # Load objects
-        self.player = Player(player_sprites, WIDTH // 2, HEIGHT // 2)
+        selected_player_class = CHARACTER_CLASSES["Mage"]
+        self.player = selected_player_class(player_sprites, WIDTH // 2, HEIGHT // 2)
         self.camera = Camera(HEIGHT, WIDTH, self.world)
         self.spawner = EnemySpawner(
             spawning_sprites,
@@ -87,8 +94,11 @@ class GameScene:
         self.pause_ui = PauseMenuUi(self.window, WIDTH, HEIGHT, self.player)
         self.shop_timer = 30
 
-        # Starter weapon so the player can fight before first shop.
-        self.player.add_weapon("Fireball", fireball_sprites)
+        # Starter weapon based on selected character.
+        starter_weapon = self.player.starting_weapon_name
+        starter_sprite = self.weapon_sprites[starter_weapon]
+        self.player.add_weapon(starter_weapon, starter_sprite)
+
 
     def handle_events(self, events: list[pygame.event.Event]) -> None:
         try:
@@ -120,6 +130,7 @@ class GameScene:
 
         except SystemError as error:
             print(f"Ignoring Pygame event error: {error}")
+
 
     def update(self, dt: float) -> None:
         self.pause_ui.update(dt)

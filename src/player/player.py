@@ -1,34 +1,42 @@
 import pygame
 from src.utils import Animation
 from src.weapons import WEAPON_CONFIG, Fireball, Boomerang, Sword
-from .player_config import *
 from .weapon_slots import WeaponSlots
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, spriteSheet:pygame.Surface, start_x:int, start_y:int) -> None:
         super().__init__()
         #Base stats
-        self.speed = SPEED
-        self.max_health = STARTING_HEALTH
+        self.speed = 5
+        self.max_health = 100
         self.current_health = self.max_health
-        self.xp_to_lvl_up = XP_TO_LVL_UP
-        self.xp_gain = XP_GAIN
-        self.coin_gain = COIN_GAIN
-        self.damage = DAMAGE
-        self.projectile_count = PROJECTILE_COUNT
-        self.luck = LUCK
-        self.armor = ARMOR
-        self.crit_chance = CRIT_CHANCE
-        self.reduce_cooldown = SHOOT_COOLDOWN
-        self.pickup_range = PICKUP_RANGE
-        self.lifesteal = LIFESTEAL
+        self.xp_to_lvl_up = 20
+        self.xp_gain = 1
+        self.coin_gain = 1
+        self.damage = 1
+        self.projectile_count = 1
+        self.luck = 1
+        self.armor = 0.0
+        self.crit_chance = 0.0
+        self.reduce_cooldown = 0.0
+        self.pickup_range = 0.0
+        self.lifesteal = 0.0
+
+        #mults
+        self.hp_mult = 0
+        self.armor_mult = 0
+        self.cd_mult = 0
+        self.dmg_mult = 0
+        self.speed_mult = 0
+        self.crit_mult = 0
+
 
         self.level = 1
         self.xp = 0
         self.position = pygame.math.Vector2(start_x, start_y)
         self.sprite_size = 32
         self.just_leveled_up = False
-        self.gold = STARTING_GOLD
+        self.gold = 200
 
         #Animations
         self.idle_animation = Animation(spriteSheet, self.sprite_size, self.sprite_size, 0, 2, 0.5)
@@ -51,7 +59,7 @@ class Player(pygame.sprite.Sprite):
         self.shoot_timer = 0.0
 
         #Weapons
-        self.weapon_slots = WeaponSlots(MAX_WEAPON_SLOTS)
+        self.weapon_slots = WeaponSlots(6)
         self.weapon_timers = {}
         self.active_projectiles = pygame.sprite.Group()
         self.weapon_sprites = {}
@@ -66,8 +74,10 @@ class Player(pygame.sprite.Sprite):
         #Pickups
         self.prismat_active = False
         self.prismat_radius = 4000
-        self.prismat_timer = PRISMAT_TIMER
+        self.prismat_timer = 3.0
         self.pending_effect = None
+        self.starting_weapon_name = None
+
 
     def move(self, keys: pygame.key.ScancodeWrapper, collision_rects= None) -> None:
         # Create movement vector
@@ -262,7 +272,7 @@ class Player(pygame.sprite.Sprite):
             self.prismat_timer -= dt
             if self.prismat_timer <= 0:
                 self.prismat_active = False
-                self.prismat_timer = PRISMAT_TIMER
+                self.prismat_timer = 3.0
 
 
     #Ui (might move it to another file)

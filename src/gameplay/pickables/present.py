@@ -1,6 +1,6 @@
 import pygame
-from src.utils import Flash
-from src.pickables import Pickable
+from src.core import Flash
+from src.gameplay.pickables import Pickable
 import random
 
 class Present(pygame.sprite.Sprite):

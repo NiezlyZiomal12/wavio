@@ -1,4 +1,4 @@
-from src.scenes import StateManager
+from src.world import StateManager
 
 
 def run_game() -> None:

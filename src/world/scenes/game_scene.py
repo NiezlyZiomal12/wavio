@@ -2,13 +2,12 @@ import pygame
 import pytmx
 
 from config import WIDTH, HEIGHT, BG_COLOR, WORLD_WIDTH, WORLD_HEIGHT
-from ..camera import Camera
-from ..player.player_classes import Warrior, Mage, Rogue
-from ..game_logic import EnemySpawner
-from ..ui import LevelUpUi, PauseMenuUi, ShopUi
+from src.core import Camera, Timer
+from src.gameplay.player.player_classes import Warrior, Mage, Rogue
+from src.game_logic import EnemySpawner
+from src.ui import LevelUpUi, PauseMenuUi, ShopUi
 from ..Map import World
-from ..pickables import spawn_random_presents, trigger_bomb
-from ..timer import Timer
+from src.gameplay.pickables import spawn_random_presents, trigger_bomb
 
 
 CHARACTER_CLASSES = {
@@ -24,17 +23,17 @@ class GameScene:
         self.paused = False
 
         # Load assets
-        spawning_sprites = pygame.image.load("src/assets/enemies/spawn_animation_sheet.png").convert_alpha()
+        spawning_sprites = pygame.image.load("src/assets/entities/enemies/spawn_animation_sheet.png").convert_alpha()
         player_sprites = pygame.image.load("src/assets/player/playerSpriteSheet.png").convert_alpha()
-        fireball_sprites = pygame.image.load("src/assets/weapons/fireball.png").convert_alpha()
-        xp_sprite = pygame.image.load("src/assets/dropable/xp.png").convert_alpha()
-        coin_sprites = pygame.image.load("src/assets/dropable/coin.png").convert_alpha()
-        boomerang_sprites = pygame.image.load("src/assets/weapons/boomerang.png").convert_alpha()
-        sword_sprites = pygame.image.load("src/assets/weapons/sword.png").convert_alpha()
-        present_image = pygame.image.load("src/assets/pickable/present.png").convert_alpha()
-        bomb_image = pygame.image.load("src/assets/pickable/bomb.png").convert_alpha()
-        prismat_image = pygame.image.load("src/assets/pickable/prismat.png").convert_alpha()
-        stinky_fish = pygame.image.load("src/assets/pickable/stinky_fish.png").convert_alpha()
+        fireball_sprites = pygame.image.load("src/assets/items/weapons/fireball.png").convert_alpha()
+        xp_sprite = pygame.image.load("src/assets/items/dropable/xp.png").convert_alpha()
+        coin_sprites = pygame.image.load("src/assets/items/dropable/coin.png").convert_alpha()
+        boomerang_sprites = pygame.image.load("src/assets/items/weapons/boomerang.png").convert_alpha()
+        sword_sprites = pygame.image.load("src/assets/items/weapons/sword.png").convert_alpha()
+        present_image = pygame.image.load("src/assets/items/pickable/present.png").convert_alpha()
+        bomb_image = pygame.image.load("src/assets/items/pickable/bomb.png").convert_alpha()
+        prismat_image = pygame.image.load("src/assets/items/pickable/prismat.png").convert_alpha()
+        stinky_fish = pygame.image.load("src/assets/items/pickable/stinky_fish.png").convert_alpha()
 
         # Tilemap
         self.level1 = pytmx.load_pygame("src/assets/tilemaps/tmx/level1_new.tmx")

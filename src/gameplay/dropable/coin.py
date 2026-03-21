@@ -1,5 +1,5 @@
 import pygame
-from src.utils import Animation
+from src.core import Animation
 
 class Coin(pygame.sprite.Sprite):
     def __init__(self, sprite_sheet: pygame.sprite.Sprite, x:int, y:int, amount: int, player: object):

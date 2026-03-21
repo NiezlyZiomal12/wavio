@@ -1,7 +1,7 @@
 import pygame
 import random
-from src.utils import Animation, Flash
-from src.dropable import Xp, Coin
+from src.core import Animation, Flash
+from src.gameplay.dropable import Xp, Coin
 
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, sprite_sheet:pygame.Surface, x:int, y:int, spawn_sheet:pygame.Surface, config:dict, player:object):

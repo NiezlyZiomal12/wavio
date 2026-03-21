@@ -1,6 +1,6 @@
 import pygame
-from src.utils import Animation
-from src.weapons import WEAPON_CONFIG, Fireball, Boomerang, Sword
+from src.core import Animation
+from src.gameplay.weapons import WEAPON_CONFIG, Fireball, Boomerang, Sword
 from .weapon_slots import WeaponSlots
 
 class Player(pygame.sprite.Sprite):

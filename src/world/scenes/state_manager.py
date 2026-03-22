@@ -3,6 +3,7 @@ import pygame
 from config import WIDTH, HEIGHT, FPS
 from .start_menu import StartMenuScene
 from .game_scene import GameScene
+from .character_select_scene import Character_select_scene
 
 
 class StateManager:
@@ -15,7 +16,9 @@ class StateManager:
         self.state = "menu"
 
         self.menu = StartMenuScene(self.window)
+        self.character_select_scene = Character_select_scene(self.window)
         self.game = None
+
 
     def run(self) -> None:
         while self.running:
@@ -32,11 +35,30 @@ class StateManager:
                 self.menu.render()
 
                 if self.menu.start_requested:
-                    self.game = GameScene(self.window)
+                    self.state = "character_select_scene"
+                continue
+
+            if self.state == "character_select_scene":
+                self.character_select_scene.handle_events(events)
+                if not self.character_select_scene.running:
+                    self.running = False
+                    break
+                
+                self.character_select_scene.update(dt)
+                self.character_select_scene.render()
+
+                if self.character_select_scene.start_game:
+                    self.game = GameScene(
+                        self.window,
+                        self.character_select_scene.get_selected_character()
+                    )
                     self.state = "game"
                 continue
 
-            if self.state == "game" and self.game is not None:
+            if self.state == "game":
+                if self.game is None:
+                    self.game = GameScene(self.window)
+
                 self.game.handle_events(events)
                 if not self.game.running:
                     self.running = False

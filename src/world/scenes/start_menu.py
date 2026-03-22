@@ -1,6 +1,6 @@
 import pygame
 import pygame_gui
-from pygame_gui.elements import UIButton, UILabel
+from pygame_gui.elements import UIButton
 
 from config import WIDTH, HEIGHT
 

@@ -1,7 +1,7 @@
 import pygame
 import random
-from src.enemies import *
-from src.enemies.bosses import *
+from src.gameplay.enemies import *
+from src.gameplay.enemies.bosses import *
 from config import HEIGHT, WIDTH, SPAWN_TIMER, WORLD_HEIGHT, WORLD_WIDTH, BOSS_SPAWN_TIMER
 
 class EnemySpawner:
@@ -22,12 +22,12 @@ class EnemySpawner:
         #loading enemy sprites
         self.enemy_sprites = {}
         for enemy_type in ENEMY_CONFIG.keys():
-            self.enemy_sprites[enemy_type] = pygame.image.load(f"src/assets/enemies/{enemy_type}-Sheet.png").convert_alpha()
+            self.enemy_sprites[enemy_type] = pygame.image.load(f"src/assets/entities/enemies/{enemy_type}-Sheet.png").convert_alpha()
 
         self.boss_sprites = {}
         #loading bosses sprites
         for boss_type in BOSS_CONFIG.keys():
-            self.boss_sprites[boss_type] = pygame.image.load(f"src/assets/bosses/{boss_type}-Sheet.png").convert_alpha()
+            self.boss_sprites[boss_type] = pygame.image.load(f"src/assets/entities/bosses/{boss_type}-Sheet.png").convert_alpha()
 
         #adding enemy classes
         self.enemy_classes = {

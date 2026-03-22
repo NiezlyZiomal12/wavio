@@ -1,9 +1,8 @@
 import pygame
 import time
-from src.utils import Animation
-from src.weapons import WEAPON_CONFIG
+from src.gameplay.weapons import WEAPON_CONFIG
 from src.shop import build_weapon_shop_items
-from src.utils import Button
+from src.core import Button, Animation
 
 class ShopUi:
     def __init__(self, window, width, height, player, weapon_sprites: dict[str, pygame.Surface]):

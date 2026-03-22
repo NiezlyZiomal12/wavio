@@ -1,7 +1,7 @@
 import pygame
 import time
-from src.utils import Animation, Button, wrap_text
-from src.upgrades import loadUpgrades
+from src.core import Animation, Button, wrap_text
+from src.gameplay.upgrades import loadUpgrades
 import random
 
 class LevelUpUi:

@@ -1,5 +1,5 @@
 import pygame
-from src.utils import Animation
+from src.core import Animation
 import random
 
 

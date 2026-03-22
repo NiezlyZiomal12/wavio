@@ -17,7 +17,7 @@ CHARACTER_CLASSES = {
 }
 
 class GameScene:
-    def __init__(self, window: pygame.Surface):
+    def __init__(self, window: pygame.Surface, selected_character: str):
         self.window = window
         self.running = True
         self.paused = False
@@ -58,7 +58,7 @@ class GameScene:
         self.world.load_collisions(self.level1)
 
         # Load objects
-        selected_player_class = CHARACTER_CLASSES["Mage"]
+        selected_player_class = CHARACTER_CLASSES[selected_character]
         self.player = selected_player_class(player_sprites, WIDTH // 2, HEIGHT // 2)
         self.camera = Camera(HEIGHT, WIDTH, self.world)
         self.spawner = EnemySpawner(
@@ -204,6 +204,7 @@ class GameScene:
         for proj in self.player.active_projectiles:
             if not (0 <= proj.position.x <= self.world.width and 0 <= proj.position.y <= self.world.height):
                 proj.kill()
+
 
     def render(self) -> None:
         self.window.fill(BG_COLOR)

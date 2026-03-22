@@ -7,6 +7,8 @@ class Mage(Player):
 		super().__init__(spriteSheet, start_x, start_y)
 		character_config = CHARACTERS["Mage"]
 		self.class_name = "Mage"
+		self.unlocked = True
+		
 		self.max_health = character_config["Stats"]["max_health"]
 		self.current_health = self.max_health
 		self.reduce_cooldown = character_config["Stats"]["reduce_cooldown"]

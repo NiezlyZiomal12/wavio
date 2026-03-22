@@ -6,6 +6,8 @@ class Rogue(Player):
 	def __init__(self, spriteSheet, start_x: int, start_y: int) -> None:
 		super().__init__(spriteSheet, start_x, start_y)
 		self.class_name = "Rogue"
+		self.unlocked = True
+		
 		self.max_health = character_config["Stats"]["max_health"]
 		self.current_health = self.max_health
 		self.speed = character_config["Stats"]["speed"]

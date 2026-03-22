@@ -1,12 +1,12 @@
 import pygame
 import pytmx
-from config import WIDTH, HEIGHT
 
 class World:
-    def __init__(self, width: int, height : int):
-        self.width = width
-        self.height = height
+    def __init__(self, world_width: int, world_height : int, window: pygame.Surface):
+        self.width = world_width
+        self.height = world_height
         self.collision_rects = []
+        self.window = window
 
     def clamp_pos(self, vector : pygame.Vector2) -> pygame.Vector2:
         vector.x = max(0, min(vector.x, self.width))
@@ -27,12 +27,13 @@ class World:
 
     def draw_tilemap(self,camera: object, level: pytmx.TiledMap, window: pygame.Surface) -> None:
         cam_x, cam_y = camera.offset
+        screen_w, screen_h = window.get_size()
         tile_w = level.tilewidth
         tile_h = level.tileheight
         start_x = max(int(cam_x // tile_w) - 2, 0)
-        end_x   = min(int((cam_x + WIDTH) // tile_w) + 2, level.width)
+        end_x   = min(int((cam_x + screen_w) // tile_w) + 2, level.width)
         start_y = max(int(cam_y // tile_h) - 2, 0)
-        end_y   = min(int((cam_y + HEIGHT) // tile_h) + 2, level.height)
+        end_y   = min(int((cam_y + screen_h) // tile_h) + 2, level.height)
         for layer in level.visible_layers:
             if isinstance(layer, pytmx.TiledTileLayer):
                 for x in range(start_x, end_x):

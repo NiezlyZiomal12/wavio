@@ -1,7 +1,7 @@
 import pygame
 import pytmx
 
-from config import WIDTH, HEIGHT, BG_COLOR, WORLD_WIDTH, WORLD_HEIGHT
+from config import WIDTH, HEIGHT, BG_COLOR
 from src.core import Camera, Timer
 from src.gameplay.player.player_classes import Warrior, Mage, Rogue
 from src.game_logic import EnemySpawner
@@ -21,6 +21,8 @@ class GameScene:
         self.window = window
         self.running = True
         self.paused = False
+        self.current_size = self.window.get_size()
+        self.width, self.height = self.current_size
 
         # Load assets
         spawning_sprites = pygame.image.load("src/assets/entities/enemies/spawn_animation_sheet.png").convert_alpha()
@@ -54,13 +56,15 @@ class GameScene:
         self.level_timer = Timer(20 * 60)
 
         # World
-        self.world = World(WORLD_WIDTH, WORLD_HEIGHT)
+        map_world_width = self.level1.width * self.level1.tilewidth
+        map_world_height = self.level1.height * self.level1.tileheight
+        self.world = World(map_world_width, map_world_height, self.window)
         self.world.load_collisions(self.level1)
 
         # Load objects
         selected_player_class = CHARACTER_CLASSES[selected_character]
-        self.player = selected_player_class(player_sprites, WIDTH // 2, HEIGHT // 2)
-        self.camera = Camera(HEIGHT, WIDTH, self.world)
+        self.player = selected_player_class(player_sprites, self.width // 2, self.height // 2)
+        self.camera = Camera(self.height, self.width, self.world)
         self.spawner = EnemySpawner(
             spawning_sprites,
             self.xp_group,
@@ -75,8 +79,8 @@ class GameScene:
             5,
             self.presents,
             self.pickables,
-            WORLD_WIDTH,
-            WORLD_HEIGHT,
+            self.world.width,
+            self.world.height,
             present_image,
             pickable_list,
             self.player,
@@ -90,7 +94,7 @@ class GameScene:
             "Sword": sword_sprites,
         }
         self.shop_ui = ShopUi(self.window, WIDTH, HEIGHT, self.player, self.weapon_sprites)
-        self.pause_ui = PauseMenuUi(self.window, WIDTH, HEIGHT, self.player)
+        self.pause_ui = PauseMenuUi(self.window, self.player)
         self.shop_timer = 30
 
         # Starter weapon based on selected character.

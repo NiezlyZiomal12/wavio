@@ -9,7 +9,10 @@ from .character_select_scene import Character_select_scene
 class StateManager:
     def __init__(self):
         pygame.init()
-        self.window = pygame.display.set_mode((WIDTH, HEIGHT))
+        self.info = pygame.display.Info()
+        self.window = pygame.display.set_mode((self.info.current_w, self.info.current_h), pygame.FULLSCREEN)
+        # self.window = pygame.display.set_mode((WIDTH, HEIGHT))
+
         pygame.display.set_caption("Wavio")
         self.clock = pygame.time.Clock()
         self.running = True

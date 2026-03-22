@@ -5,35 +5,15 @@ from pygame_gui.elements import UIButton, UILabel, UIPanel, UITextBox
 
 
 class PauseMenuUi:
-    def __init__(self, window, width: int, height: int, player: object):
+    def __init__(self, window, player: object):
         self.window = window
-        self.width = width
-        self.height = height
         self.player = player
         self.active = False
-        self.manager = pygame_gui.UIManager((width, height), theme_path="src/assets/pygame_gui_styles/pause_theme.json")
+        self.current_size = self.window.get_size()
+        self.manager = pygame_gui.UIManager(self.current_size, theme_path="src/assets/pygame_gui_styles/pause_theme.json")
         self._last_stats_text = ""
-
-        self.popup_rect = pygame.Rect(0, 0, 720, 420)
-        self.popup_rect.center = (width // 2, height // 2)
-
-        left_panel_rect = pygame.Rect(
-            28,
-            28,
-            290,
-            self.popup_rect.height - 56,
-        )
-        right_panel_rect = pygame.Rect(
-            left_panel_rect.right + 22,
-            28,
-            self.popup_rect.width - left_panel_rect.width - 78,
-            self.popup_rect.height - 56,
-        )
-
-        button_width = left_panel_rect.width - 40
-        button_height = 46
-        start_y = 108
-        gap = 14
+        layout = self._compute_layout()
+        self.popup_rect = layout["popup"]
 
         self.popup_panel = UIPanel(
             relative_rect=self.popup_rect,
@@ -42,21 +22,21 @@ class PauseMenuUi:
         )
 
         self.left_panel = UIPanel(
-            relative_rect=left_panel_rect,
+            relative_rect=layout["left_panel"],
             manager=self.manager,
             container=self.popup_panel,
             object_id="#pause_left_panel",
         )
 
         self.right_panel = UIPanel(
-            relative_rect=right_panel_rect,
+            relative_rect=layout["right_panel"],
             manager=self.manager,
             container=self.popup_panel,
             object_id="#pause_right_panel",
         )
 
         self.title_label = UILabel(
-            relative_rect=pygame.Rect(20, 24, left_panel_rect.width - 40, 52),
+            relative_rect=layout["title_label"],
             text="Paused",
             manager=self.manager,
             container=self.left_panel,
@@ -64,39 +44,39 @@ class PauseMenuUi:
         )
 
         self.resume_button = UIButton(
-            relative_rect=pygame.Rect(20, start_y, button_width, button_height),
+            relative_rect=layout["resume_button"],
             text="Resume",
             manager=self.manager,
             container=self.left_panel,
         )
         self.restart_button = UIButton(
-            relative_rect=pygame.Rect(20, start_y + (button_height + gap), button_width, button_height),
+            relative_rect=layout["restart_button"],
             text="Restart",
             manager=self.manager,
             container=self.left_panel,
         )
         self.options_button = UIButton(
-            relative_rect=pygame.Rect(20, start_y + 2 * (button_height + gap), button_width, button_height),
+            relative_rect=layout["options_button"],
             text="Options",
             manager=self.manager,
             container=self.left_panel,
         )
         self.menu_button = UIButton(
-            relative_rect=pygame.Rect(20, start_y + 3 * (button_height + gap), button_width, button_height),
+            relative_rect=layout["menu_button"],
             text="Menu",
             manager=self.manager,
             container=self.left_panel,
         )
 
         self.stats_title = UILabel(
-            relative_rect=pygame.Rect(16, 16, right_panel_rect.width - 32, 24),
+            relative_rect=layout["stats_title"],
             text="Stats Dashboard",
             manager=self.manager,
             container=self.right_panel,
             object_id="#stats_title",
         )
         self.stats_hint = UILabel(
-            relative_rect=pygame.Rect(16, 44, right_panel_rect.width - 32, 20),
+            relative_rect=layout["stats_hint"],
             text="Use mouse wheel to scroll",
             manager=self.manager,
             container=self.right_panel,
@@ -105,7 +85,7 @@ class PauseMenuUi:
 
         self.stats_box = UITextBox(
             html_text="",
-            relative_rect=pygame.Rect(16, 72, right_panel_rect.width - 32, right_panel_rect.height - 88),
+            relative_rect=layout["stats_box"],
             manager=self.manager,
             container=self.right_panel,
         )
@@ -158,6 +138,8 @@ class PauseMenuUi:
                 self.hide()
 
     def update(self, dt: float) -> None:
+        self._sync_to_window_size()
+
         if not self.active:
             return
 
@@ -214,7 +196,115 @@ class PauseMenuUi:
         if not self.active:
             return
 
-        overlay = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
+        overlay = pygame.Surface(self.current_size, pygame.SRCALPHA)
         overlay.fill((8, 12, 18, 175))
         self.window.blit(overlay, (0, 0))
         self.manager.draw_ui(self.window)
+
+
+    def _sync_to_window_size(self) -> None:
+        new_size = self.window.get_size()
+        if new_size == self.current_size:
+            return
+
+        self.current_size = new_size
+        self.width, self.height = new_size
+        self.manager.set_window_resolution(self.current_size)
+        self._apply_layout()
+
+
+    def _compute_layout(self) -> dict[str, pygame.Rect]:
+        width, height = self.current_size
+
+        margin = max(18, int(min(width, height) * 0.04))
+        popup_width = max(520, min(920, width - (2 * margin)))
+        popup_height = max(340, min(620, height - (2 * margin)))
+        popup_rect = pygame.Rect((width - popup_width) // 2, (height - popup_height) // 2, popup_width, popup_height)
+
+        inner_pad = max(14, int(popup_width * 0.03))
+        column_gap = max(12, int(popup_width * 0.025))
+
+        left_width = max(220, int(popup_width * 0.4))
+        max_left_width = popup_width - (2 * inner_pad) - column_gap - 180
+        left_width = min(left_width, max_left_width)
+
+        left_panel = pygame.Rect(inner_pad, inner_pad, left_width, popup_height - (2 * inner_pad))
+        right_x = left_panel.right + column_gap
+        right_panel = pygame.Rect(right_x, inner_pad, popup_width - right_x - inner_pad, popup_height - (2 * inner_pad))
+
+        left_content_pad = max(14, int(left_panel.width * 0.07))
+        title_height = max(36, int(left_panel.height * 0.14))
+        title_y = max(14, int(left_panel.height * 0.06))
+        title_label = pygame.Rect(left_content_pad, title_y, left_panel.width - (2 * left_content_pad), title_height)
+
+        button_width = left_panel.width - (2 * left_content_pad)
+        button_height = max(36, min(56, int(left_panel.height * 0.14)))
+        buttons_start_y = title_label.bottom + max(14, int(left_panel.height * 0.06))
+        gap = max(10, int(left_panel.height * 0.035))
+
+        resume_button = pygame.Rect(left_content_pad, buttons_start_y, button_width, button_height)
+        restart_button = pygame.Rect(left_content_pad, buttons_start_y + (button_height + gap), button_width, button_height)
+        options_button = pygame.Rect(left_content_pad, buttons_start_y + 2 * (button_height + gap), button_width, button_height)
+        menu_button = pygame.Rect(left_content_pad, buttons_start_y + 3 * (button_height + gap), button_width, button_height)
+
+        right_pad = max(12, int(right_panel.width * 0.06))
+        stats_title = pygame.Rect(right_pad, max(12, int(right_panel.height * 0.05)), right_panel.width - (2 * right_pad), 24)
+        stats_hint = pygame.Rect(right_pad, stats_title.bottom + 8, right_panel.width - (2 * right_pad), 20)
+        stats_box = pygame.Rect(
+            right_pad,
+            stats_hint.bottom + 8,
+            right_panel.width - (2 * right_pad),
+            right_panel.height - stats_hint.bottom - 20,
+        )
+
+        return {
+            "popup": popup_rect,
+            "left_panel": left_panel,
+            "right_panel": right_panel,
+            "title_label": title_label,
+            "resume_button": resume_button,
+            "restart_button": restart_button,
+            "options_button": options_button,
+            "menu_button": menu_button,
+            "stats_title": stats_title,
+            "stats_hint": stats_hint,
+            "stats_box": stats_box,
+        }
+
+
+    def _apply_layout(self) -> None:
+        layout = self._compute_layout()
+        self.popup_rect = layout["popup"]
+
+        self.popup_panel.set_dimensions((self.popup_rect.width, self.popup_rect.height))
+        self.popup_panel.set_relative_position((self.popup_rect.x, self.popup_rect.y))
+
+        self.left_panel.set_dimensions((layout["left_panel"].width, layout["left_panel"].height))
+        self.left_panel.set_relative_position((layout["left_panel"].x, layout["left_panel"].y))
+
+        self.right_panel.set_dimensions((layout["right_panel"].width, layout["right_panel"].height))
+        self.right_panel.set_relative_position((layout["right_panel"].x, layout["right_panel"].y))
+
+        self.title_label.set_dimensions((layout["title_label"].width, layout["title_label"].height))
+        self.title_label.set_relative_position((layout["title_label"].x, layout["title_label"].y))
+
+        self.resume_button.set_dimensions((layout["resume_button"].width, layout["resume_button"].height))
+        self.resume_button.set_relative_position((layout["resume_button"].x, layout["resume_button"].y))
+
+        self.restart_button.set_dimensions((layout["restart_button"].width, layout["restart_button"].height))
+        self.restart_button.set_relative_position((layout["restart_button"].x, layout["restart_button"].y))
+
+        self.options_button.set_dimensions((layout["options_button"].width, layout["options_button"].height))
+        self.options_button.set_relative_position((layout["options_button"].x, layout["options_button"].y))
+
+        self.menu_button.set_dimensions((layout["menu_button"].width, layout["menu_button"].height))
+        self.menu_button.set_relative_position((layout["menu_button"].x, layout["menu_button"].y))
+
+        self.stats_title.set_dimensions((layout["stats_title"].width, layout["stats_title"].height))
+        self.stats_title.set_relative_position((layout["stats_title"].x, layout["stats_title"].y))
+
+        self.stats_hint.set_dimensions((layout["stats_hint"].width, layout["stats_hint"].height))
+        self.stats_hint.set_relative_position((layout["stats_hint"].x, layout["stats_hint"].y))
+
+        self.stats_box.set_dimensions((layout["stats_box"].width, layout["stats_box"].height))
+        self.stats_box.set_relative_position((layout["stats_box"].x, layout["stats_box"].y))

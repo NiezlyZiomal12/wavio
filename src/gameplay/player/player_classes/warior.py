@@ -1,11 +1,14 @@
+import pygame
+
 from ..player import Player
 from ..characters_config import CHARACTERS
 
 
 character_config = CHARACTERS["Warrior"]
 class Warrior(Player):
-	def __init__(self, spriteSheet, start_x: int, start_y: int) -> None:
-		super().__init__(spriteSheet, start_x, start_y)
+	def __init__(self, start_x: int, start_y: int) -> None:
+		sprite_sheet = pygame.image.load("src/assets/player/playerSpriteSheet.png").convert_alpha()
+		super().__init__(sprite_sheet, start_x, start_y)
 		self.class_name = "Warrior"
 		self.unlocked = True
 		

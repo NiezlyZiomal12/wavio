@@ -1,10 +1,13 @@
+import pygame
+
 from ..player import Player
 from ..characters_config import CHARACTERS
 
 
 class Mage(Player):
-	def __init__(self, spriteSheet, start_x: int, start_y: int) -> None:
-		super().__init__(spriteSheet, start_x, start_y)
+	def __init__(self, start_x: int, start_y: int) -> None:
+		sprite_sheet = pygame.image.load("src/assets/player/mageSpriteSheet.png").convert_alpha()
+		super().__init__(sprite_sheet, start_x, start_y)
 		character_config = CHARACTERS["Mage"]
 		self.class_name = "Mage"
 		self.unlocked = True

@@ -5,17 +5,17 @@ from src.gameplay.enemies.bosses import *
 from config import HEIGHT, WIDTH, SPAWN_TIMER, WORLD_HEIGHT, WORLD_WIDTH, BOSS_SPAWN_TIMER
 
 class EnemySpawner:
-    def __init__(self, spawn_sprite: pygame.Surface, xp_group:pygame.sprite.Group , xp_sprite:pygame.Surface,
-                coin_group:pygame.sprite.Group, coin_sprite:pygame.sprite.Sprite, player:object, camera:object) -> None:
-        self.spawn_sprite = spawn_sprite
+    def __init__(self, xp_group:pygame.sprite.Group, coin_group:pygame.sprite.Group, player:object, camera:object) -> None:
+        self.spawn_sprite = pygame.image.load("src/assets/entities/enemies/spawn_animation_sheet.png").convert_alpha()
+        self.xp_sprite = pygame.image.load("src/assets/items/dropable/xp.png").convert_alpha()
+        self.coin_sprite = pygame.image.load("src/assets/items/dropable/coin.png").convert_alpha()
+       
         self.enemies = []
         self.timer = 0.0
         self.boss_timer = 0.0
         self.game_time = 0.0
         self.xp_group = xp_group
-        self.xp_sprite = xp_sprite
         self.coin_group = coin_group
-        self.coin_sprite = coin_sprite
         self.player = player
         self.camera = camera
 

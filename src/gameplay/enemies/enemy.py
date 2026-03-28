@@ -21,7 +21,7 @@ class Enemy(pygame.sprite.Sprite):
         self.damage = config["damage"]
 
         #Animations
-        self.spawn_animation = Animation(spawn_sheet, 32, 32, 0, 3, 0.1)
+        self.spawn_animation = Animation(spawn_sheet, 64, 64, 0, 3, 0.1)
         self.idle_animation = Animation(
             sprite_sheet,
             self.sprite_width,
@@ -47,12 +47,11 @@ class Enemy(pygame.sprite.Sprite):
         self.facing_left = False
         self.spawning = True
         self.spawn_timer = 0.0
-        self.spawn_duration = config.get("spawn_duration", 1.0)
+        self.spawn_duration = config["Animation"]["spawn_duration"]
         self.dead = False
         self.death_timer = 0.0
-        self.dead_duration = config.get("dead_duration", 1.0)
+        self.dead_duration = config["Animation"]["dead_duration"]
         self.killed = False
-        
         # External references
         self.xp_sprite = None
         self.xp_group = None

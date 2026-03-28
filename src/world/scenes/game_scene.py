@@ -25,14 +25,9 @@ class GameScene:
         self.width, self.height = self.current_size
 
         # Load assets
-        spawning_sprites = pygame.image.load("src/assets/entities/enemies/spawn_animation_sheet.png").convert_alpha()
-        player_sprites = pygame.image.load("src/assets/player/playerSpriteSheet.png").convert_alpha()
         fireball_sprites = pygame.image.load("src/assets/items/weapons/fireball.png").convert_alpha()
-        xp_sprite = pygame.image.load("src/assets/items/dropable/xp.png").convert_alpha()
-        coin_sprites = pygame.image.load("src/assets/items/dropable/coin.png").convert_alpha()
         boomerang_sprites = pygame.image.load("src/assets/items/weapons/boomerang.png").convert_alpha()
         sword_sprites = pygame.image.load("src/assets/items/weapons/sword.png").convert_alpha()
-        present_image = pygame.image.load("src/assets/items/pickable/present.png").convert_alpha()
         bomb_image = pygame.image.load("src/assets/items/pickable/bomb.png").convert_alpha()
         prismat_image = pygame.image.load("src/assets/items/pickable/prismat.png").convert_alpha()
         stinky_fish = pygame.image.load("src/assets/items/pickable/stinky_fish.png").convert_alpha()
@@ -63,14 +58,11 @@ class GameScene:
 
         # Load objects
         selected_player_class = CHARACTER_CLASSES[selected_character]
-        self.player = selected_player_class(player_sprites, self.width // 2, self.height // 2)
+        self.player = selected_player_class(self.width // 2, self.height // 2)
         self.camera = Camera(self.height, self.width, self.world)
         self.spawner = EnemySpawner(
-            spawning_sprites,
             self.xp_group,
-            xp_sprite,
             self.coin_group,
-            coin_sprites,
             self.player,
             self.camera,
         )
@@ -81,7 +73,6 @@ class GameScene:
             self.pickables,
             self.world.width,
             self.world.height,
-            present_image,
             pickable_list,
             self.player,
         )

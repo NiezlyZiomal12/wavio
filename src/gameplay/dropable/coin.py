@@ -7,7 +7,7 @@ class Coin(pygame.sprite.Sprite):
         self.player = player
         self.gold_amount = amount * self.player.coin_gain
         self.animation = Animation(
-            sprite_sheet, 16,16, 0, 15, 0.08
+            sprite_sheet, 32,32, 0, 15, 0.08
         )
         self.image = self.animation.get_current_frame()
         self.rect = self.image.get_rect(center=(x,y))

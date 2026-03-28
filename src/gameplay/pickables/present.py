@@ -4,9 +4,9 @@ from src.gameplay.pickables import Pickable
 import random
 
 class Present(pygame.sprite.Sprite):
-    def __init__(self, image: pygame.Surface, pos: pygame.Vector2, drop_image:pygame.Surface, drop_eff: str, pickables:pygame.sprite.Group, player: object):
+    def __init__(self, pos: pygame.Vector2, drop_image:pygame.Surface, drop_eff: str, pickables:pygame.sprite.Group, player: object):
         super().__init__()
-        self.image = image
+        self.image = pygame.image.load("src/assets/items/pickable/present.png").convert_alpha()
         self.rect = self.image.get_rect(center=(int(pos.x), int(pos.y)))
         self.position = pygame.Vector2(pos)
         self.health = 5
@@ -54,7 +54,7 @@ class Present(pygame.sprite.Sprite):
 
 
 
-def spawn_random_presents(count: int, present:pygame.sprite.Group, pickables:pygame.sprite.Group, width:int, heihgt:int, present_image: pygame.Surface, pickable_types: list, player:object):
+def spawn_random_presents(count: int, present:pygame.sprite.Group, pickables:pygame.sprite.Group, width:int, heihgt:int, pickable_types: list, player:object):
     """
     Spawns random presents in the world.
     - pickable_types must be a LIST like: [("bomb", bomb_img), ("prismat", prismat_img), ...]
@@ -65,5 +65,5 @@ def spawn_random_presents(count: int, present:pygame.sprite.Group, pickables:pyg
         pos = pygame.Vector2(x,y)
         effect, effect_image = random.choice(pickable_types)
 
-        p = Present(present_image, pos, effect_image, effect, pickables, player)
+        p = Present(pos, effect_image, effect, pickables, player)
         present.add(p)

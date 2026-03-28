@@ -9,16 +9,16 @@ ENEMY_CONFIG = {
             "coin": 5,
         },
         "Animation" : {
-            "sprite_width": 32,
-            "sprite_height": 25,
+            "sprite_width": 64,
+            "sprite_height": 50,
             "idle_row": 0,
             "idle_frames": 8,
             "idle_speed": 0.05,
             "death_row": 2,
             "death_frames": 5,
-            "death_speed": 0.2,
+            "death_speed": 0.1,
             "spawn_duration": 1.0,
-            "dead_duration": 1.0
+            "dead_duration": 0.5
         },
 
     },
@@ -32,16 +32,16 @@ ENEMY_CONFIG = {
             "coin": 7,
         },
         "Animation" : {
-            "sprite_width": 32,
-            "sprite_height": 32,
+            "sprite_width": 64,
+            "sprite_height": 64,
             "idle_row": 1,
             "idle_frames": 8,
             "idle_speed": 0.2,
             "death_row": 4,
             "death_frames": 6,
-            "death_speed": 0.5,
+            "death_speed": 0.1,
             "spawn_duration": 1.0,
-            "dead_duration": 1.0
+            "dead_duration": 0.5
         },
     },
     "bat" : {
@@ -54,16 +54,16 @@ ENEMY_CONFIG = {
             "coin": 10,
         },
         "Animation" : {
-            "sprite_width": 32,
-            "sprite_height": 32,
+            "sprite_width": 64,
+            "sprite_height": 64,
             "idle_row": 1,
             "idle_frames": 4,
-            "idle_speed": 0.3,
+            "idle_speed": 0.1,
             "death_row": 2,
             "death_frames": 4,
-            "death_speed": 0.5,
+            "death_speed": 0.1,
             "spawn_duration": 1.0,
-            "dead_duration": 1.0
+            "dead_duration": 0.5
         },
     },
 }

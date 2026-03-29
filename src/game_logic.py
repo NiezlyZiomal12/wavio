@@ -33,7 +33,7 @@ class EnemySpawner:
         self.enemy_classes = {
             "Slime" : Slime,
             "Zombie" : Zombie,
-            "Bat" : Bat,
+            # "Bat" : Bat,
         }
         self.boss_classes = {
             "Golem" : Golem

@@ -8,26 +8,14 @@ class Zombie(Enemy):
 
             direction = player_pos - self.position
             if direction.length() > 1:
-                direction = direction.normalize() * self.speed * 0.5
-                new_position = self.position + direction
-                new_rect = self.rect.copy()
-                new_rect.center = (int(new_position.x), int(new_position.y))
+                chase = direction.normalize()
+                separation = self._get_separation_force(other_enemies)
+                movement = chase + (separation * 1.2)
 
-                can_move = True
-                for enemy in other_enemies:
-                    if enemy != self and not enemy.dead:
-                        overlap_rect = new_rect.clip(enemy.rect)
-                        if overlap_rect.width > self.sprite_width // 2 and overlap_rect.height > self.sprite_height // 2:
-                            can_move = False
-                            break
-                
-                if can_move:
-                    for rect in collision_rects:
-                        if new_rect.colliderect(rect):
-                            can_move = False
-                            break
+                if movement.length_squared() == 0:
+                    return
 
-                if can_move:
-                    self.position = new_position
-                    self.facing_left = direction.x < 0
-                    self.rect.center = (int(self.position.x), int(self.position.y))
+                movement = movement.normalize() * self.speed * 0.5
+                self._move_with_world_collision(movement, collision_rects)
+
+                self.facing_left = movement.x < 0

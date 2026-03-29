@@ -75,36 +75,19 @@ class Golem(Enemy):
             return
 
         if self._is_dashing:
-            direction = self._dash_direction * self.speed * self.dash_speed_multiplier * 0.5
+            movement = self._dash_direction * self.speed * self.dash_speed_multiplier * 0.5
         else:
             direction = player_pos - self.position
             if direction.length_squared() == 0:
                 return
-            direction = direction.normalize() * self.speed * 0.5
+            chase = direction.normalize()
+            separation = self._get_separation_force(other_enemies)
+            movement = (chase + (separation * 1.0)).normalize() * self.speed * 0.5
 
-        new_position = self.position + direction
-        new_rect = self.rect.copy()
-        new_rect.center = (int(new_position.x), int(new_position.y))
+        moved = self._move_with_world_collision(movement, collision_rects)
+        self.facing_left = movement.x < 0
 
-        can_move = True
-        for enemy in other_enemies:
-            if enemy != self and not enemy.dead:
-                overlap_rect = new_rect.clip(enemy.rect)
-                if overlap_rect.width > self.sprite_width // 2 and overlap_rect.height > self.sprite_height // 2:
-                    can_move = False
-                    break
-
-        if can_move:
-            for rect in collision_rects:
-                if new_rect.colliderect(rect):
-                    can_move = False
-                    break
-
-        if can_move:
-            self.position = new_position
-            self.facing_left = direction.x < 0
-            self.rect.center = (int(self.position.x), int(self.position.y))
-        elif self._is_dashing:
+        if not moved and self._is_dashing:
             self._is_dashing = False
             self._dash_timer = 0.0
 

@@ -21,7 +21,7 @@ class Enemy(pygame.sprite.Sprite):
         self.damage = config["damage"]
 
         #Animations
-        self.spawn_animation = Animation(spawn_sheet, 32, 32, 0, 3, 0.1)
+        self.spawn_animation = Animation(spawn_sheet, 64, 64, 0, 3, 0.1)
         self.idle_animation = Animation(
             sprite_sheet,
             self.sprite_width,
@@ -47,12 +47,11 @@ class Enemy(pygame.sprite.Sprite):
         self.facing_left = False
         self.spawning = True
         self.spawn_timer = 0.0
-        self.spawn_duration = config.get("spawn_duration", 1.0)
+        self.spawn_duration = config["Animation"]["spawn_duration"]
         self.dead = False
         self.death_timer = 0.0
-        self.dead_duration = config.get("dead_duration", 1.0)
+        self.dead_duration = config["Animation"]["dead_duration"]
         self.killed = False
-        
         # External references
         self.xp_sprite = None
         self.xp_group = None
@@ -60,40 +59,75 @@ class Enemy(pygame.sprite.Sprite):
         self.coin_group = None
 
 
+    def _get_separation_force(self, other_enemies: list) -> pygame.Vector2:
+        """Push enemies apart softly instead of hard-stopping movement."""
+        force = pygame.Vector2()
+        personal_space = max(self.sprite_width, self.sprite_height) * 0.8
+
+        for enemy in other_enemies:
+            if enemy == self or enemy.dead:
+                continue
+
+            offset = self.position - enemy.position
+            distance = offset.length()
+
+            if distance <= 0:
+                continue
+
+            if distance < personal_space:
+                weight = (personal_space - distance) / personal_space
+                force += offset.normalize() * weight
+
+        return force
+
+
+    def _move_with_world_collision(self, movement: pygame.Vector2, collision_rects: list) -> bool:
+        """Move on each axis separately so enemies can slide along obstacles."""
+        moved = False
+
+        if movement.x != 0:
+            next_pos_x = pygame.Vector2(self.position.x + movement.x, self.position.y)
+            next_rect_x = self.rect.copy()
+            next_rect_x.center = (int(next_pos_x.x), int(next_pos_x.y))
+
+            blocked_x = any(next_rect_x.colliderect(rect) for rect in collision_rects)
+            if not blocked_x:
+                self.position.x = next_pos_x.x
+                moved = True
+
+        if movement.y != 0:
+            next_pos_y = pygame.Vector2(self.position.x, self.position.y + movement.y)
+            next_rect_y = self.rect.copy()
+            next_rect_y.center = (int(next_pos_y.x), int(next_pos_y.y))
+
+            blocked_y = any(next_rect_y.colliderect(rect) for rect in collision_rects)
+            if not blocked_y:
+                self.position.y = next_pos_y.y
+                moved = True
+
+        self.rect.center = (int(self.position.x), int(self.position.y))
+        return moved
+
+
     def move(self, player_pos: pygame.Vector2, other_enemies: list, collision_rects: list) -> None:
         """Base movement - can be overridden by subclasses"""
         if self.dead:
             return
         
-        #Moving towards player and not overlapping with another enemies
+        # Blend chase direction with separation, so enemies spread naturally.
         direction = player_pos - self.position
         if direction.length() > 1:
-            direction = direction.normalize() * self.speed * 0.5
-            new_position = self.position + direction
-            new_rect = self.rect.copy()
-            new_rect.center = (int(new_position.x), int(new_position.y))
+            chase = direction.normalize()
+            separation = self._get_separation_force(other_enemies)
+            movement = chase + (separation * 1.2)
 
-            can_move = True
-        
-            #collisions with onther enemies 
-            for enemy in other_enemies:
-                if enemy != self and not enemy.dead:
-                    overlap_rect = new_rect.clip(enemy.rect)
-                    if overlap_rect.width > self.sprite_width // 2 and overlap_rect.height > self.sprite_height // 2:
-                        can_move = False
-                        break
+            if movement.length_squared() == 0:
+                return
 
-            #collision with objects
-            if can_move:
-                for rect in collision_rects:
-                    if new_rect.colliderect(rect):
-                        can_move = False
-                        break
+            movement = movement.normalize() * self.speed * 0.5
+            self._move_with_world_collision(movement, collision_rects)
 
-            if can_move:
-                self.position = new_position
-                self.facing_left = direction.x > 0
-                self.rect.center = (int(self.position.x), int(self.position.y))
+            self.facing_left = movement.x > 0
 
 
     def take_damage(self, damage: int, weapon: object) -> None:

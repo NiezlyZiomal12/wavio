@@ -10,8 +10,8 @@ class Xp(pygame.sprite.Sprite):
 
         self.position = pygame.Vector2(x,y)
         self.velocity = pygame.Vector2(0,0)
-        self.speed = 100
-        self.collect_radius = 100 + 100 * self.player.pickup_range
+        self.speed = 150
+        self.collect_radius = 150 + 100 * self.player.pickup_range
         self.collected = False
 
 

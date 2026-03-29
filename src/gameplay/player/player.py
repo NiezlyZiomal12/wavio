@@ -23,25 +23,25 @@ class Player(pygame.sprite.Sprite):
         self.lifesteal = 0.0
 
         #mults
-        self.hp_mult = 0
-        self.armor_mult = 0
-        self.cd_mult = 0
-        self.dmg_mult = 0
-        self.speed_mult = 0
-        self.crit_mult = 0
+        self.hp_mult = 1
+        self.armor_mult = 1
+        self.cd_mult = 1
+        self.dmg_mult = 1
+        self.speed_mult = 1
+        self.crit_mult = 1
 
 
         self.level = 1
         self.xp = 0
         self.position = pygame.math.Vector2(start_x, start_y)
-        self.sprite_size = 32
+        self.sprite_size = 64
         self.just_leveled_up = False
         self.gold = 200
 
         #Animations
         self.idle_animation = Animation(spriteSheet, self.sprite_size, self.sprite_size, 0, 2, 0.5)
         self.walk_animation = Animation(spriteSheet, self.sprite_size, self.sprite_size, 3, 8, 0.1)   
-        self.hurt_animation = Animation(spriteSheet, self.sprite_size, self.sprite_size, 6, 3, 0.2)     
+        self.hurt_animation = Animation(spriteSheet, self.sprite_size, self.sprite_size, 6, 3, 0.1)     
         self.current_animation = self.idle_animation
         self.image = self.current_animation.get_current_frame()
         self.rect = self.image.get_rect(center=(start_x, start_y))

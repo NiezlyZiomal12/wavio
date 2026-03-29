@@ -2,7 +2,7 @@ import pygame
 import random
 from src.gameplay.enemies import *
 from src.gameplay.enemies.bosses import *
-from config import HEIGHT, WIDTH, SPAWN_TIMER, WORLD_HEIGHT, WORLD_WIDTH, BOSS_SPAWN_TIMER
+from config import SPAWN_TIMER, BOSS_SPAWN_TIMER
 
 class EnemySpawner:
     def __init__(self, xp_group:pygame.sprite.Group, coin_group:pygame.sprite.Group, player:object, camera:object) -> None:
@@ -33,7 +33,7 @@ class EnemySpawner:
         self.enemy_classes = {
             "Slime" : Slime,
             "Zombie" : Zombie,
-            # "Bat" : Bat,
+            "Bat" : Bat,
         }
         self.boss_classes = {
             "Golem" : Golem
@@ -49,13 +49,13 @@ class EnemySpawner:
         self.boss_timer += dt
 
         if self.timer >= SPAWN_TIMER:
-            self.spawn_enemies()
+            self.spawn_enemies(collision_rects)
             self.timer = 0.0
 
         #BOSS tiemer
         if self.boss_timer >= BOSS_SPAWN_TIMER:
             boss_amount = 1 + int(self.game_time // 300)
-            self.spawn_boss(boss_amount)
+            self.spawn_boss(boss_amount, collision_rects)
             self.boss_timer = 0.0
 
         # Update all living enemies (including bosses).
@@ -74,16 +74,16 @@ class EnemySpawner:
             enemy.draw(surface, camera)
 
 
-    def spawn_enemies(self) -> None:
+    def spawn_enemies(self, collision_rects: list) -> None:
         total_enemies = random.randint(4, 8)
         enemy_types = list(ENEMY_CONFIG.keys())
-        for i in range(total_enemies): 
-            x,y = self._spawn_outside_camera(200)
-    
+        for i in range(total_enemies):
             enemy_type = random.choice(enemy_types)
             config = ENEMY_CONFIG[enemy_type]
             sprite = self.enemy_sprites[enemy_type]
             enemy_class = self.enemy_classes[config["class"]]
+
+            x, y = self._spawn_outside_camera(config, collision_rects, margin=200)
             
             enemy = enemy_class(sprite, x, y, self.spawn_sprite, config, self.player)
             enemy.xp_group = self.xp_group
@@ -93,15 +93,15 @@ class EnemySpawner:
             self.enemies.append(enemy)
 
 
-    def spawn_boss(self, amount= int) -> None:
+    def spawn_boss(self, amount: int, collision_rects: list) -> None:
         boss_types = list(BOSS_CONFIG.keys())
-        for i in range(amount): 
-            x,y = self._spawn_outside_camera(200)
-    
+        for i in range(amount):
             boss_type = random.choice(boss_types)
             config = BOSS_CONFIG[boss_type]
             sprite = self.boss_sprites[boss_type]
             boss_class = self.boss_classes[config["class"]]
+
+            x, y = self._spawn_outside_camera(config, collision_rects, margin=260)
             
             boss = boss_class(sprite, x, y, self.spawn_sprite, config, self.player)
             boss.xp_group = self.xp_group
@@ -111,40 +111,77 @@ class EnemySpawner:
             self.enemies.append(boss)
 
 
-    def _spawn_outside_camera(self, margin=200):
-        cam_x, cam_y = self.camera.offset
+    def _is_valid_spawn_position(self, x: int, y: int, config: dict, collision_rects: list) -> bool:
+        sprite_w = config["Animation"]["sprite_width"]
+        sprite_h = config["Animation"]["sprite_height"]
+        enemy_rect = pygame.Rect(0, 0, sprite_w, sprite_h)
+        enemy_rect.center = (x, y)
 
-        cam_x = int(cam_x)
-        cam_y = int(cam_y)
+        if any(enemy_rect.colliderect(rect) for rect in collision_rects):
+            return False
+
+        min_enemy_spacing = int(max(sprite_w, sprite_h) * 0.9)
+        min_enemy_spacing_sq = min_enemy_spacing * min_enemy_spacing
+        for enemy in self.enemies:
+            if (enemy.position.x - x) ** 2 + (enemy.position.y - y) ** 2 < min_enemy_spacing_sq:
+                return False
+
+        # Prevent instant contact spawn on top of player.
+        min_player_spacing = int(max(sprite_w, sprite_h) * 1.2)
+        if (self.player.position.x - x) ** 2 + (self.player.position.y - y) ** 2 < min_player_spacing * min_player_spacing:
+            return False
+
+        return True
+
+
+    def _random_point_outside_camera(self, margin: int) -> tuple[int, int]:
+        cam_x = int(self.camera.offset.x)
+        cam_y = int(self.camera.offset.y)
+        screen_w = int(self.camera.width)
+        screen_h = int(self.camera.height)
 
         left = cam_x - margin
-        right = cam_x + WIDTH + margin
+        right = cam_x + screen_w + margin
         top = cam_y - margin
-        bottom = cam_y + HEIGHT + margin
-
-        left = int(left)
-        right = int(right)
-        top = int(top)
-        bottom = int(bottom)
+        bottom = cam_y + screen_h + margin
 
         side = random.choice(["top", "bottom", "left", "right"])
-
         if side == "top":
-            x = random.randint(left, right)
-            y = top
-        elif side == "bottom":
-            x = random.randint(left, right)
-            y = bottom
-        elif side == "left":
-            x = left
-            y = random.randint(top, bottom)
-        else:
-            x = right
-            y = random.randint(top, bottom)
+            return random.randint(left, right), top
+        if side == "bottom":
+            return random.randint(left, right), bottom
+        if side == "left":
+            return left, random.randint(top, bottom)
+        return right, random.randint(top, bottom)
 
-        x = max(32, min(WORLD_WIDTH - 32, x))
-        y = max(32, min(WORLD_HEIGHT - 32, y))
 
-        return x, y
+    def _spawn_outside_camera(self, config: dict, collision_rects: list, margin: int = 200) -> tuple[int, int]:
+        sprite_w = config["Animation"]["sprite_width"]
+        sprite_h = config["Animation"]["sprite_height"]
+        half_w = max(16, sprite_w // 2)
+        half_h = max(16, sprite_h // 2)
+        world_w = int(self.camera.world.width)
+        world_h = int(self.camera.world.height)
+
+        for _ in range(40):
+            x, y = self._random_point_outside_camera(margin)
+            x = max(half_w, min(world_w - half_w, x))
+            y = max(half_h, min(world_h - half_h, y))
+
+            if self._is_valid_spawn_position(x, y, config, collision_rects):
+                return x, y
+
+        # Fallback if safe point is hard to find.
+        for _ in range(80):
+            x = random.randint(half_w, world_w - half_w)
+            y = random.randint(half_h, world_h - half_h)
+            if self._is_valid_spawn_position(x, y, config, collision_rects):
+                return x, y
+
+        # Last-resort spawn near player but still inside map bounds.
+        return (
+            max(half_w, min(world_w - half_w, int(self.player.position.x + random.randint(-120, 120)))),
+            max(half_h, min(world_h - half_h, int(self.player.position.y + random.randint(-120, 120)))),
+        )
 
 

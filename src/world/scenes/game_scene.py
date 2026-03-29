@@ -45,7 +45,10 @@ class GameScene:
             ("prismat", prismat_image),
             ("stinky_fish", stinky_fish),
         ]
+        self.pickable_list = pickable_list
         self.pickables = pygame.sprite.Group()
+        self.present_spawn_timer = 0.0
+        self.present_spawn_interval = 10.0
 
         # Timer
         self.level_timer = Timer(20 * 60)
@@ -73,8 +76,9 @@ class GameScene:
             self.pickables,
             self.world.width,
             self.world.height,
-            pickable_list,
+            self.pickable_list,
             self.player,
+            self.world.collision_rects,
         )
 
         # UI
@@ -146,6 +150,21 @@ class GameScene:
 
         keys = pygame.key.get_pressed()
         self.level_timer.update(dt)
+        self.present_spawn_timer += dt
+
+        if self.present_spawn_timer >= self.present_spawn_interval:
+            spawn_random_presents(
+                10,
+                self.presents,
+                self.pickables,
+                self.world.width,
+                self.world.height,
+                self.pickable_list,
+                self.player,
+                self.world.collision_rects,
+            )
+            self.present_spawn_timer = 0.0
+
         self.player.update(dt, keys, self.spawner.enemies, self.world.collision_rects)
         self.camera.follow(self.player)
         self.camera.update(dt)

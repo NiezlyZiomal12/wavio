@@ -28,6 +28,9 @@ class GameScene:
         fireball_sprites = pygame.image.load("src/assets/items/weapons/fireball.png").convert_alpha()
         boomerang_sprites = pygame.image.load("src/assets/items/weapons/boomerang.png").convert_alpha()
         sword_sprites = pygame.image.load("src/assets/items/weapons/sword.png").convert_alpha()
+        spear_sprites = pygame.image.load("src/assets/items/weapons/spear.png").convert_alpha()
+        sun_sprites = pygame.image.load("src/assets/items/weapons/sun.png").convert_alpha()
+        meteor_sprites = pygame.image.load("src/assets/items/weapons/meteor.png").convert_alpha()
         bomb_image = pygame.image.load("src/assets/items/pickable/bomb.png").convert_alpha()
         prismat_image = pygame.image.load("src/assets/items/pickable/prismat.png").convert_alpha()
         stinky_fish = pygame.image.load("src/assets/items/pickable/stinky_fish.png").convert_alpha()
@@ -87,6 +90,9 @@ class GameScene:
             "Fireball": fireball_sprites,
             "Boomerang": boomerang_sprites,
             "Sword": sword_sprites,
+            "Spear": spear_sprites,
+            "Sun": sun_sprites,
+            "Meteor": meteor_sprites,
         }
         self.shop_ui = ShopUi(self.window, WIDTH, HEIGHT, self.player, self.weapon_sprites)
         self.pause_ui = PauseMenuUi(self.window, self.player)

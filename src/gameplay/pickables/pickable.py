@@ -15,12 +15,10 @@ class Pickable(pygame.sprite.Sprite):
 
 
     def apply_effect(self):
-        print(f"picked up {self.effect}")
         if self.effect == "bomb":
             self.player.pending_effect = "bomb"
         elif self.effect == "prismat":
             self.prismat_effect()
-            print(self.player.prismat_active)
         elif self.effect == "stinky_fish":
             self.stinky_fish_effect()
 

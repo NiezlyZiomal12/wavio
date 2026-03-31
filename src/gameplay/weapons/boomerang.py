@@ -1,6 +1,5 @@
 import pygame
 from .weapon import Weapon
-import random
 
 class Boomerang(Weapon):
     def __init__(self, config, sprite_sheet, start_pos,target_pos, player):
@@ -11,31 +10,32 @@ class Boomerang(Weapon):
         self.player = player
         self.pierce_count = config['special']['pierce_count']
         self.return_speed = config['special']['return_speed']
-        self.lifetime = config['special']['lifetime']
 
-        #for more randomness
-        offset_strength = 0.05
-        direction = target_pos - player.position
+        self.max_range = 360.0
+        self.max_return_speed = 800
+
+        direction = target_pos - start_pos
         if direction.length() > 0:
-            offset = pygame.Vector2(-direction.y, direction.x)
-            offset *= random.uniform(-offset_strength, offset_strength) * direction.length()
-            direction += offset
-
             self.velocity = direction.normalize() * self.speed
         else:
             self.velocity = pygame.Vector2(0,0)
 
         self.returning = False
-        self.time_alive = 0.0
         self.facing_left = direction.x > 0
         self.should_destroy_on_hit = False
+        self.distance_traveled = 0.0
         #Adding hit cooldown so that dont hit each frame (too much dmg)
         self.hit_cooldown = 0.15
         self.recent_hits = {}
+        self.life = 0
+        self.lifetime = config['special']['lifetime']
 
 
     def update(self, dt:float) -> None:
         super().update(dt)
+
+        if self.velocity.length() > self.max_return_speed:
+            self.velocity = self.velocity.normalize() * self.max_return_speed
 
         #calculating hit cooldown for each enemy
         enemies_to_remove = []
@@ -48,24 +48,26 @@ class Boomerang(Weapon):
         for enemy in enemies_to_remove:
             del self.recent_hits[enemy]
 
-        self.time_alive += dt
-
-        #returning to player after half lifetime
-        if not self.returning and self.time_alive > self.lifetime / 2 :
-            self.returning = True
+        if not self.returning:
+            self.distance_traveled = (self.position - self.start_pos).length()
+            if self.distance_traveled >= self.max_range:
+                self.returning = True
 
         if self.returning:
             to_player = (pygame.Vector2(self.player.rect.center) - pygame.Vector2(self.rect.center))
             if to_player.length() > 5:
-                self.velocity = to_player.normalize() * self.return_speed
+                acceleration = to_player.normalize() * self.return_speed * 40
+                self.velocity += acceleration * dt 
             else:
                 self.kill()
+        
+        self.life += dt
+        if self.life >= self.lifetime:
+            self.kill()
+            self.life = 0
 
         self.position += self.velocity * dt
         self.rect.center = self.position
-
-        if self.time_alive >= self.lifetime:
-            self.kill()
 
         
     def on_hit_enemy(self, enemy:object) -> bool:

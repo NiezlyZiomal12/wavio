@@ -28,7 +28,7 @@ CHARACTERS = {
 
     },
     "Rogue" : {
-        "Starting_weapon" : "Boomerang",
+        "Starting_weapon" : "Meteor",
         "Stats" : {
             "max_health" : 80,
             "speed" : 7,

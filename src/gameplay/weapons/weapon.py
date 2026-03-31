@@ -4,7 +4,7 @@ import random
 
 
 class Weapon(pygame.sprite.Sprite):
-    def __init__(self, config: dict, sprite_sheet: pygame.sprite.Sprite, start_pos: pygame.Vector2, player:object):
+    def __init__(self, config: dict, start_pos: pygame.Vector2, player:object):
         super().__init__()
         self.config = config
 
@@ -16,13 +16,14 @@ class Weapon(pygame.sprite.Sprite):
         self.sprite_height = config['animation']['sprite_height']
         self.cooldown = config['cooldown'] - (config['cooldown'] *self.player.reduce_cooldown)
         self.damage = config['damage'] * self.player.damage
+        self.sprite_sheet = pygame.image.load(config['sprite_path']).convert_alpha()
 
         crit = random.random() < (self.player.crit_chance)
         if crit:
             self.damage *= 2
 
         self.animation = Animation(
-            sprite_sheet,
+            self.sprite_sheet,
             self.sprite_width,
             self.sprite_height,
             config['animation']["start_row"],

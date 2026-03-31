@@ -4,8 +4,8 @@ from .weapon import Weapon
 
 
 class Spear(Weapon):
-    def __init__(self, config, sprite_sheet, start_pos, target_pos: pygame.Vector2, player):
-        super().__init__(config, sprite_sheet, start_pos, player)
+    def __init__(self, config, start_pos, target_pos: pygame.Vector2, player):
+        super().__init__(config, start_pos, player)
 
         self.attack_duration = config["special"]["attack_duration"]
         self.attack_range = config["special"]["attack_range"]

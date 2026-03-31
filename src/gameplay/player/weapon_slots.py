@@ -12,10 +12,11 @@ class WeaponSlots:
         pygame.draw.rect(self.slot_background, (180, 180, 180), self.slot_background.get_rect(), 2, border_radius=6)
 
 
-    def _build_weapon_icon(self, sprite_sheet: pygame.Surface, animation_config: dict) -> pygame.Surface:
-        width = animation_config["sprite_width"]
-        height = animation_config["sprite_height"]
-        row = animation_config["start_row"]
+    def _build_weapon_icon(self, config: dict) -> pygame.Surface:
+        width = config["animation"]["sprite_width"]
+        height = config["animation"]["sprite_height"]
+        row = config["animation"]["start_row"]
+        sprite_sheet = pygame.image.load(config["sprite_path"]).convert_alpha()
         frame_rect = pygame.Rect(0, row * height, width, height)
 
         frame = pygame.Surface((width, height), pygame.SRCALPHA)
@@ -29,12 +30,12 @@ class WeaponSlots:
         return len(self.weapons) < self.max_slots
 
 
-    def add_weapon(self, weapon_name: str, sprite_sheet: pygame.Surface, animation_config: dict) -> bool:
+    def add_weapon(self, weapon_name: str, config: dict) -> bool:
         if not self.can_add_weapon(weapon_name):
             return False
 
         self.weapons.append(weapon_name)
-        self.weapon_icons[weapon_name] = self._build_weapon_icon(sprite_sheet, animation_config)
+        self.weapon_icons[weapon_name] = self._build_weapon_icon(config)
         return True
 
 

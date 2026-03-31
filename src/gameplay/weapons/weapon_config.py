@@ -5,6 +5,7 @@ WEAPON_CONFIG = {
         "speed" : 300,
         "cooldown" : 1.0,
         "projectile_count" : 2,
+        "sprite_path" : "src/assets/items/weapons/fireball.png",
         "animation" : {
             "sprite_width" : 51,
             "sprite_height": 32,
@@ -27,6 +28,7 @@ WEAPON_CONFIG = {
         "cooldown" : 1,
         "speed" : 0,
         "projectile_count" : 3,
+        "sprite_path" : "src/assets/items/weapons/sword.png",
         "animation" : {
             "sprite_height": 191,
             "start_row" : 0,
@@ -50,6 +52,7 @@ WEAPON_CONFIG = {
         "speed" : 400,
         "cooldown" : 1.5,
         "projectile_count" : 3,
+        "sprite_path" : "src/assets/items/weapons/boomerang.png",
         "animation" : {
             "sprite_width" : 32,
             "sprite_height": 32,
@@ -74,6 +77,7 @@ WEAPON_CONFIG = {
         "speed" : 0,
         "cooldown" : 1.2,
         "projectile_count" : 1,
+        "sprite_path" : "src/assets/items/weapons/spear.png",
         "animation" : {
             "sprite_width" : 128,
             "sprite_height": 96,
@@ -100,6 +104,7 @@ WEAPON_CONFIG = {
         "speed" : 0,
         "cooldown" : 1.0,
         "projectile_count" : 1,
+        "sprite_path" : "src/assets/items/weapons/sun.png",
         "animation" : {
             "sprite_width" : 192,
             "sprite_height": 192,
@@ -124,6 +129,7 @@ WEAPON_CONFIG = {
         "cooldown" : 3.0,
         "projectile_count" : 2,
         "range" : 500,
+        "sprite_path" : "src/assets/items/weapons/meteor.png",
         "animation" : {
             "sprite_width" : 96,
             "sprite_height": 96,

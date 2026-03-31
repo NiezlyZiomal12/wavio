@@ -1,19 +1,12 @@
 import pygame
 from .weapon import Weapon
-import random
 
 class Fireball(Weapon):
     def __init__(self, config, sprite_sheet, start_pos, target_pos: pygame.Vector2, player: object):
         super().__init__(config, sprite_sheet, start_pos, player)
 
-        #slight offset for more randomness
-        offset_strength = 0.005
         direction = target_pos - start_pos
         if direction.length() > 0:
-            offset = pygame.Vector2(-direction.y, direction.x)
-            offset *= random.uniform(-offset_strength, offset_strength) * direction.length()
-            direction += offset
-
             self.velocity = direction.normalize() * self.speed
             self.facing_left = direction.x >0
         else:

@@ -1,6 +1,8 @@
 import pygame
+import random
+import math
 from src.core import Animation
-from src.gameplay.weapons import WEAPON_CONFIG, Fireball, Boomerang, Sword
+from src.gameplay.weapons import WEAPON_CONFIG, Fireball, Boomerang, Sword, Spear, Sun, Meteor
 from .weapon_slots import WeaponSlots
 
 class Player(pygame.sprite.Sprite):
@@ -69,6 +71,9 @@ class Player(pygame.sprite.Sprite):
             "Fireball" : Fireball,
             "Boomerang" : Boomerang,
             "Sword" : Sword,
+            "Spear" : Spear,
+            "Sun" : Sun,
+            "Meteor" : Meteor,
         }
 
         #Pickups
@@ -213,14 +218,30 @@ class Player(pygame.sprite.Sprite):
                 weapon_class = self.weapon_classes[weapon_name]
                 sprite_sheet = self.weapon_sprites[weapon_name]
 
-                projectile = weapon_class(config, sprite_sheet, self.position, nearest_enemy.position, self)
-                self.active_projectiles.add(projectile)
+                total_projectiles = self.projectile_count
+                volley_rotation = random.uniform(0, math.tau)
+                projectile = None
 
-                for i in range(self.projectile_count - 1):
-                    p = weapon_class(config, sprite_sheet, self.position, nearest_enemy.position, self)
-                    self.active_projectiles.add(p)
+                for i in range(total_projectiles):
+                    start_pos = self._get_projectile_spawn_pos(i, total_projectiles, volley_rotation)
+                    projectile = weapon_class(config, sprite_sheet, start_pos, nearest_enemy.position, self)
+                    self.active_projectiles.add(projectile)
 
-                self.weapon_timers[weapon_name] = projectile.cooldown 
+                self.weapon_timers[weapon_name] = projectile.cooldown
+
+
+    def _get_projectile_spawn_pos(self, index: int, total: int, rotation: float) -> pygame.Vector2:
+        """Spawn on a small ring around player to avoid projectile stacking."""
+        ring_min = max(8, self.rect.width // 4)
+        ring_max = max(ring_min + 4, self.rect.width // 2)
+
+        if total <= 1:
+            angle = random.uniform(0, math.tau)
+        else:
+            angle = rotation + (index / total) * math.tau + random.uniform(-0.12, 0.12)
+
+        radius = random.uniform(ring_min, ring_max)
+        return self.position + pygame.Vector2(math.cos(angle), math.sin(angle)) * radius
 
 
     def update_weapons(self, dt:float) -> None:

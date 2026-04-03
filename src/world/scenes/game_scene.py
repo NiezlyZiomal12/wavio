@@ -155,7 +155,10 @@ class GameScene:
             )
             self.present_spawn_timer = 0.0
 
-        self.player.update(dt, keys, self.spawner.enemies, self.world.collision_rects)
+        shoot_targets = list(self.spawner.enemies)
+        shoot_targets.extend(present for present in self.presents if not present.spawning)
+
+        self.player.update(dt, keys, shoot_targets, self.world.collision_rects)
         self.camera.follow(self.player)
         self.camera.update(dt)
 

@@ -66,6 +66,8 @@ class Player(pygame.sprite.Sprite):
         self.active_projectiles = pygame.sprite.Group()
         self.equipped_weapons: dict[str, EquippedWeapon] = {}
 
+        self.upgrade_levels = {}
+
         #Pickups
         self.prismat_active = False
         self.prismat_radius = 4000
@@ -200,8 +202,8 @@ class Player(pygame.sprite.Sprite):
         return True, "bought"
 
     
-    def shoot(self, dt:float, enemies: list) -> None:
-        if not enemies:
+    def shoot(self, dt:float, targets: list) -> None:
+        if not targets:
             return
         #loading weapon from config
         for weapon_name in self.weapon_slots.get_weapons():
@@ -212,7 +214,7 @@ class Player(pygame.sprite.Sprite):
             weapon_state.tick(dt)
             config = WEAPON_CONFIG[weapon_name]
             if weapon_state.ready():
-                nearest_enemy = min(enemies, key=lambda e: (e.position - self.position).length())
+                nearest_target = min(targets, key=lambda e: (e.position - self.position).length())
                 weapon_class = weapon_state.weapon_class
 
                 total_projectiles = self.projectile_count
@@ -221,7 +223,7 @@ class Player(pygame.sprite.Sprite):
 
                 for i in range(total_projectiles):
                     start_pos = self._get_projectile_spawn_pos(i, total_projectiles, volley_rotation)
-                    projectile = weapon_class(config, start_pos, nearest_enemy.position, self)
+                    projectile = weapon_class(config, start_pos, nearest_target.position, self)
                     self.active_projectiles.add(projectile)
 
                 weapon_state.trigger_cooldown(projectile.cooldown)
@@ -258,13 +260,12 @@ class Player(pygame.sprite.Sprite):
             self.just_leveled_up = True
 
 
-    def update(self,dt:float, keys:pygame.key.ScancodeWrapper, enemies:list, collision_rects):
+    def update(self,dt:float, keys:pygame.key.ScancodeWrapper, targets:list, collision_rects):
         self.move(keys, collision_rects)
         self.update_lvl()
 
         #Weapon update
-        if enemies:
-            self.shoot(dt, enemies)
+        self.shoot(dt, targets)
 
         self.update_weapons(dt)
 

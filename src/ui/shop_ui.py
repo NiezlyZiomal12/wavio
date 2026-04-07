@@ -1,6 +1,7 @@
 import pygame
 import pygame_gui
 import time
+import random
 from pygame_gui.elements import UIButton
 from src.gameplay.weapons import WEAPON_CONFIG
 from src.shop import build_weapon_shop_items
@@ -46,6 +47,7 @@ class ShopUi:
 
 
         self.shop_items = build_weapon_shop_items(WEAPON_CONFIG)
+        self.max_visible_items = 3
         self.visible_shop_items = []
         self.item_rects = []
         self.message = ""
@@ -156,12 +158,37 @@ class ShopUi:
         self.popupSprite.update(dt)
 
 
-    def _refresh_visible_items(self) -> None:
-        self.visible_shop_items = [
+    def _refresh_visible_items(self, force_new: bool = False) -> None:
+        eligible_items = [
             item
             for item in self.shop_items
             if self.player.weapon_levels.get(item.item_id, 0) < item.max_level
         ]
+
+        if not eligible_items:
+            self.visible_shop_items = []
+            return
+
+        visible_count = min(self.max_visible_items, len(eligible_items))
+
+        if force_new or not self.visible_shop_items:
+            self.visible_shop_items = random.sample(eligible_items, visible_count)
+            return
+
+        eligible_ids = {item.item_id for item in eligible_items}
+        retained_items = [
+            item for item in self.visible_shop_items if item.item_id in eligible_ids
+        ]
+
+        if len(retained_items) < visible_count:
+            retained_ids = {item.item_id for item in retained_items}
+            refill_pool = [
+                item for item in eligible_items if item.item_id not in retained_ids
+            ]
+            needed = visible_count - len(retained_items)
+            retained_items.extend(random.sample(refill_pool, min(needed, len(refill_pool))))
+
+        self.visible_shop_items = retained_items[:visible_count]
 
 
     def _current_roll_cost(self) -> int:
@@ -172,7 +199,7 @@ class ShopUi:
         roll_cost = self._current_roll_cost()
         if self.player.gold >= roll_cost:
             self.player.spend_gold(roll_cost)
-            self._refresh_visible_items()
+            self._refresh_visible_items(force_new=True)
             self.show()
             self.roll_amount += 1
     

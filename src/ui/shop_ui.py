@@ -6,6 +6,7 @@ from pygame_gui.elements import UIButton
 from src.gameplay.weapons import WEAPON_CONFIG
 from src.shop import build_weapon_shop_items
 from src.core import Animation
+from config import FONT
 
 class ShopUi:
     def __init__(self, window, width, height, player):
@@ -19,7 +20,7 @@ class ShopUi:
         self.roll_amount = 1
 
         self.active = False
-        self.font = pygame.font.Font(None, 24)
+        self.font = pygame.font.Font(FONT, 24)
 
         #popup animation
         self.animation_time = 0.2
@@ -35,11 +36,13 @@ class ShopUi:
             relative_rect=pygame.Rect(0, 0, 34, 34),
             text="X",
             manager=self.manager,
+            object_id="#button"
         )
         self.reroll_button = UIButton(
             relative_rect=pygame.Rect(0, 0, 150, 38),
             text="Reroll",
             manager=self.manager,
+            object_id="#button"
         )
         self._set_ui_visible(False)
         self._responsive_ui(force=True)
@@ -50,8 +53,6 @@ class ShopUi:
         self.max_visible_items = 3
         self.visible_shop_items = []
         self.item_rects = []
-        self.message = ""
-        self.message_timer = 0.0
 
 
     def _set_ui_visible(self, visible: bool) -> None:
@@ -82,7 +83,7 @@ class ShopUi:
         self.popup_rect = self._compute_popup_rect()
 
         font_size = max(16, min(28, int(min(self.popup_rect.width, self.popup_rect.height) * 0.07)))
-        self.font = pygame.font.Font(None, font_size)
+        self.font = pygame.font.Font(FONT, font_size)
 
         close_size = max(28, min(40, int(self.popup_rect.width * 0.08)))
         self.close_button.set_dimensions((close_size, close_size))
@@ -136,21 +137,7 @@ class ShopUi:
     def _buy_item(self, index: int) -> None:
         item = self.visible_shop_items[index]
         success, reason = self.player.buy_weapon(item.item_id, item.price)
-        if success:
-            if reason == "upgraded":
-                level = self.player.weapon_levels.get(item.item_id)
-                self.message = f"{item.name} upgraded to Lv.{level}"
-            else:
-                self.message = f"Bought {item.name}"
-        else:
-            if reason == "slots_full":
-                self.message = "Weapon slots are full"
-            elif reason == "max_level":
-                self.message = f"{item.name} is at max level"
-            elif reason == "not_enough_gold":
-                self.message = "Not enough gold"
 
-        self.message_timer = 1.5
 
 
     def update_animation(self, dt:float) -> None:
@@ -210,8 +197,6 @@ class ShopUi:
         self._refresh_visible_items()
         if self.active:
             self.manager.update(dt)
-        if self.message_timer > 0:
-            self.message_timer = max(0.0, self.message_timer - dt)
 
 
     def draw(self):
@@ -248,7 +233,7 @@ class ShopUi:
         self.window.blit(frame, (popup_x, popup_y)) 
         
         # Draw title
-        title_font = pygame.font.Font(None, 32)
+        title_font = pygame.font.Font(FONT, 32)
         title = title_font.render("SHOP", True, (255, 255, 0))
         self.window.blit(title, (popup_x + frame.get_width() // 2 - title.get_width() // 2, popup_y + 15))
 
@@ -287,10 +272,6 @@ class ShopUi:
             self.window.blit(item_text, (item_rect.centerx - item_text.get_width() // 2, item_rect.y + 8))
             self.window.blit(price_text, (item_rect.centerx - price_text.get_width() // 2, item_rect.y + 30))
             self.window.blit(level_surface, (item_rect.centerx - level_surface.get_width() // 2, item_rect.y + 52))
-
-        if self.message_timer > 0 and self.message:
-            msg_surface = self.font.render(self.message, True, (255, 255, 255))
-            self.window.blit(msg_surface, (popup_x + frame.get_width() // 2 - msg_surface.get_width() // 2, popup_y + frame.get_height() - 28))
 
         # reroll button
         current_roll_cost = self._current_roll_cost()

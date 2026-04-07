@@ -10,12 +10,13 @@ class StartMenuScene:
         self.start_requested = False
 
         self.current_size = self.window.get_size()
-        self.manager = pygame_gui.UIManager(self.current_size)
+        self.manager = pygame_gui.UIManager(self.current_size, theme_path="src/assets/pygame_gui_styles/pause_theme.json")
 
         self.start_button = UIButton(
             relative_rect=pygame.Rect(0, 0, 260, 64),
             text="Start Game",
             manager=self.manager,
+            object_id="#button",
         )
         self._responsive_ui()
 

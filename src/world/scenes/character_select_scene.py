@@ -18,12 +18,14 @@ class Character_select_scene:
             relative_rect=pygame.Rect(0,0, 440, 40),
             text="Choose Your Character",
             manager=self.manager,
+            object_id="#label"
         )
 
         self.selected_label = UILabel(
             relative_rect=pygame.Rect(0,0, 360, 30),
             text=f"Selected: {self.selected_character}",
             manager=self.manager,
+            object_id="#label"
         )
 
         self.container_panel = UIPanel(
@@ -40,6 +42,7 @@ class Character_select_scene:
                 text=name,
                 manager=self.manager,
                 container=self.container_panel,
+                object_id="#button"
             )
             self.character_buttons[name] = button
 
@@ -47,6 +50,7 @@ class Character_select_scene:
             relative_rect=pygame.Rect(0, 0, 160, 56),
             text="Battle",
             manager=self.manager,
+            object_id="#button"
         )
 
         self._responsive_ui()

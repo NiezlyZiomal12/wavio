@@ -81,7 +81,7 @@ class GameScene:
         self.level_up_ui = LevelUpUi(self.window, WIDTH, HEIGHT, self.player)
         self.shop_ui = ShopUi(self.window, WIDTH, HEIGHT, self.player)
         self.pause_ui = PauseMenuUi(self.window, self.player)
-        self.shop_timer = 30
+        self.shop_timer = 5
 
         # Starter weapon based on selected character.
         starter_weapon = self.player.starting_weapon_name

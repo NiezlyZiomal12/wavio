@@ -2,7 +2,9 @@
   "defaults": {
     "font": {
       "name": "fira_code",
-      "size": "16"
+      "size": "24",
+      "regular_path": "src/assets/fonts/ByteBounce.ttf",
+      "bold_path": "src/assets/fonts/ByteBounce.ttf"
     },
     "colours": {
       "normal_text": "#EAF1FA",
@@ -64,72 +66,50 @@
     }
   },
 
-  "UIButton": {
-    "misc": {
-      "shape_corner_radius": "8",
-      "border_width": "2",
-      "padding": "8,6"
-    },
-    "colours": {
-      "normal_bg": "#34495E",
-      "hovered_bg": "#44627F",
-      "active_bg": "#4E7397",
-      "normal_border": "#9AB7D2",
-      "hovered_border": "#C3D7EA",
-      "active_border": "#D4E4F3",
-      "normal_text": "#F2F7FD"
-    }
-  },
-
-  "UITextBox": {
-    "colours": {
-      "dark_bg": "#131D28",
-      "normal_bg": "#16202C",
-      "normal_border": "#516A84",
-      "normal_text": "#DCE8F4",
-      "link_text": "#8FC7FF",
-      "link_hover": "#BFE2FF"
-    },
-    "misc": {
-      "shape_corner_radius": "6",
-      "border_width": "1",
-      "line_spacing": "1.1"
-    }
-  },
-
-  "UILabel": {
-    "colours": {
-      "normal_text": "#E7F0FA"
-    }
-  },
-
-  "#pause_title": {
+  "#label": {
     "font": {
       "name": "fira_code",
-      "size": "30"
+      "size": "24",
+      "regular_path": "src/assets/fonts/ByteBounce.ttf"
     },
     "colours": {
       "normal_text": "#F3F8FF"
     }
   },
 
-  "#stats_title": {
+  "#pause_title": {
     "font": {
       "name": "fira_code",
-      "size": "20"
+      "size": "30",
+      "regular_path": "src/assets/fonts/ByteBounce.ttf"
     },
     "colours": {
-      "normal_text": "#DBE8F7"
+      "normal_text": "#F3F8FF"
     }
   },
 
-  "#stats_hint": {
+  "#button": {
     "font": {
       "name": "fira_code",
-      "size": "14"
+      "size": "24",
+      "regular_path": "src/assets/fonts/ByteBounce.ttf"
     },
     "colours": {
-      "normal_text": "#9EB1C5"
+      "normal_text": "#F3F8FF"
+    }
+  },
+
+  "#textBox": {
+    "font": {
+      "name": "fira_code",
+      "size": "24",
+      "regular_path": "src/assets/fonts/ByteBounce.ttf"
+    },
+    "colours": {
+      "normal_text": "#F3F8FF"
     }
   }
 }
+
+
+

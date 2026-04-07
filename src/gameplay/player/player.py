@@ -5,6 +5,7 @@ from src.core import Animation
 from src.gameplay.weapons import WEAPON_CONFIG, Fireball, Boomerang, Sword, Spear, Sun, Meteor
 from .weapon_slots import WeaponSlots
 from .equippedWeapon import EquippedWeapon
+from config import FONT
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, spriteSheet:pygame.Surface, start_x:int, start_y:int) -> None:
@@ -317,13 +318,13 @@ class Player(pygame.sprite.Sprite):
         pygame.draw.rect(surface, (0, 200, 255), (x, y, bar_width * xp_ratio, bar_height))
         pygame.draw.rect(surface, (255, 255, 255), (x, y, bar_width, bar_height), 2)
 
-        font = pygame.font.Font(None, 24)
+        font = pygame.font.Font(FONT, 24)
         level_text = font.render(f"Lvl: {self.level}", True, (255,255,255))
         surface.blit(level_text, (10,8) )
 
 
     def draw_coins(self, surface:pygame.Surface) -> None:
-        font = pygame.font.Font(None, 24)
+        font = pygame.font.Font(FONT, 24)
         coin_text = font.render(f"Gold: {self.gold}", None, (252, 186, 3))
         surface.blit(coin_text, (10,70))
 

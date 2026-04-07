@@ -5,6 +5,7 @@ from pygame_gui.elements import UIButton
 from src.core import Animation, wrap_text
 from src.gameplay.upgrades import loadUpgrades
 import random
+from config import FONT
 
 class LevelUpUi:
     def __init__(self, window, width, height, player):
@@ -17,7 +18,7 @@ class LevelUpUi:
         self.upgrades = loadUpgrades()
         self.active = False
         self.font_size = 24
-        self.font = pygame.font.Font(None, self.font_size)
+        self.font = pygame.font.Font(FONT, self.font_size)
         self.roll_cost = 15
         self.roll_amount = 1
 
@@ -39,11 +40,13 @@ class LevelUpUi:
             relative_rect=pygame.Rect(0, 0, 34, 34),
             text="X",
             manager=self.manager,
+            object_id="#button"
         )
         self.reroll_button = UIButton(
             relative_rect=pygame.Rect(0, 0, 150, 38),
             text="Reroll",
             manager=self.manager,
+            object_id="#button"
         )
         self._set_ui_visible(False)
         self._responsive_ui(force=True)
@@ -83,7 +86,7 @@ class LevelUpUi:
         self.popup_rect = self._compute_popup_rect()
 
         self.font_size = max(16, min(28, int(min(self.popup_rect.width, self.popup_rect.height) * 0.07)))
-        self.font = pygame.font.Font(None, self.font_size)
+        self.font = pygame.font.Font(FONT, self.font_size)
 
         close_size = max(28, min(40, int(self.popup_rect.width * 0.08)))
         self.close_button.set_dimensions((close_size, close_size))

@@ -1,10 +1,11 @@
 import pygame
+from config import FONT
 
 class Timer:
     def __init__(self, duration_seconds: float):
         self.duration = duration_seconds
         self.elapsed = 0.0
-        self.hud_font = pygame.font.Font(None, 24)
+        self.hud_font = pygame.font.Font(FONT, 24)
 
     def update(self, dt: float) -> None:
         self.elapsed += dt

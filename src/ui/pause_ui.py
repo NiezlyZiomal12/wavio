@@ -48,46 +48,37 @@ class PauseMenuUi:
             text="Resume",
             manager=self.manager,
             container=self.left_panel,
+            object_id="#button",
         )
         self.restart_button = UIButton(
             relative_rect=layout["restart_button"],
             text="Restart",
             manager=self.manager,
             container=self.left_panel,
+            object_id="#button",
         )
         self.options_button = UIButton(
             relative_rect=layout["options_button"],
             text="Options",
             manager=self.manager,
             container=self.left_panel,
+            object_id="#button",
         )
         self.menu_button = UIButton(
             relative_rect=layout["menu_button"],
             text="Menu",
             manager=self.manager,
             container=self.left_panel,
+            object_id="#button",
         )
 
-        self.stats_title = UILabel(
-            relative_rect=layout["stats_title"],
-            text="Stats Dashboard",
-            manager=self.manager,
-            container=self.right_panel,
-            object_id="#stats_title",
-        )
-        self.stats_hint = UILabel(
-            relative_rect=layout["stats_hint"],
-            text="Use mouse wheel to scroll",
-            manager=self.manager,
-            container=self.right_panel,
-            object_id="#stats_hint",
-        )
 
         self.stats_box = UITextBox(
             html_text="",
             relative_rect=layout["stats_box"],
             manager=self.manager,
             container=self.right_panel,
+            object_id="#textBox",
         )
 
         self.ui_elements = [
@@ -99,8 +90,6 @@ class PauseMenuUi:
             self.restart_button,
             self.options_button,
             self.menu_button,
-            self.stats_title,
-            self.stats_hint,
             self.stats_box,
         ]
         self._set_visible(False)
@@ -248,13 +237,11 @@ class PauseMenuUi:
         menu_button = pygame.Rect(left_content_pad, buttons_start_y + 3 * (button_height + gap), button_width, button_height)
 
         right_pad = max(12, int(right_panel.width * 0.06))
-        stats_title = pygame.Rect(right_pad, max(12, int(right_panel.height * 0.05)), right_panel.width - (2 * right_pad), 24)
-        stats_hint = pygame.Rect(right_pad, stats_title.bottom + 8, right_panel.width - (2 * right_pad), 20)
         stats_box = pygame.Rect(
             right_pad,
-            stats_hint.bottom + 8,
+            8,
             right_panel.width - (2 * right_pad),
-            right_panel.height - stats_hint.bottom - 20,
+            right_panel.height - 20,
         )
 
         return {
@@ -266,8 +253,6 @@ class PauseMenuUi:
             "restart_button": restart_button,
             "options_button": options_button,
             "menu_button": menu_button,
-            "stats_title": stats_title,
-            "stats_hint": stats_hint,
             "stats_box": stats_box,
         }
 
@@ -299,12 +284,6 @@ class PauseMenuUi:
 
         self.menu_button.set_dimensions((layout["menu_button"].width, layout["menu_button"].height))
         self.menu_button.set_relative_position((layout["menu_button"].x, layout["menu_button"].y))
-
-        self.stats_title.set_dimensions((layout["stats_title"].width, layout["stats_title"].height))
-        self.stats_title.set_relative_position((layout["stats_title"].x, layout["stats_title"].y))
-
-        self.stats_hint.set_dimensions((layout["stats_hint"].width, layout["stats_hint"].height))
-        self.stats_hint.set_relative_position((layout["stats_hint"].x, layout["stats_hint"].y))
 
         self.stats_box.set_dimensions((layout["stats_box"].width, layout["stats_box"].height))
         self.stats_box.set_relative_position((layout["stats_box"].x, layout["stats_box"].y))

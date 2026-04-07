@@ -4,6 +4,7 @@ import math
 from src.core import Animation
 from src.gameplay.weapons import WEAPON_CONFIG, Fireball, Boomerang, Sword, Spear, Sun, Meteor
 from .weapon_slots import WeaponSlots
+from .equippedWeapon import EquippedWeapon
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, spriteSheet:pygame.Surface, start_x:int, start_y:int) -> None:
@@ -62,19 +63,10 @@ class Player(pygame.sprite.Sprite):
 
         #Weapons
         self.weapon_slots = WeaponSlots(6)
-        self.weapon_timers = {}
         self.active_projectiles = pygame.sprite.Group()
-        self.weapon_sprites = {}
-        self.weapon_levels = {}
+        self.equipped_weapons: dict[str, EquippedWeapon] = {}
+
         self.upgrade_levels = {}
-        self.weapon_classes = {
-            "Fireball" : Fireball,
-            "Boomerang" : Boomerang,
-            "Sword" : Sword,
-            "Spear" : Spear,
-            "Sun" : Sun,
-            "Meteor" : Meteor,
-        }
 
         #Pickups
         self.prismat_active = False
@@ -155,23 +147,26 @@ class Player(pygame.sprite.Sprite):
             self.knockback_velocity = direction * 10
 
 
-    def add_weapon(self, weapon_name: str, sprite_sheet: pygame.Surface) -> bool:
-        if weapon_name not in WEAPON_CONFIG or weapon_name not in self.weapon_classes:
-            return False
+    def add_weapon(self, weapon_name: str) -> bool:
 
         added = self.weapon_slots.add_weapon(
             weapon_name,
-            sprite_sheet,
-            WEAPON_CONFIG[weapon_name]["animation"],
+            WEAPON_CONFIG[weapon_name],
         )
         if not added:
             return False
 
-        self.weapon_timers[weapon_name] = 0.0
-        self.weapon_sprites[weapon_name] = sprite_sheet
-        self.weapon_levels[weapon_name] = 1
+        self.equipped_weapons[weapon_name] = EquippedWeapon(
+            name=weapon_name,
+            weapon_class=eval(weapon_name),
+        )
 
         return True
+
+
+    @property
+    def weapon_levels(self) -> dict[str, int]:
+        return {name: weapon.level for name, weapon in self.equipped_weapons.items()}
 
 
     def add_gold(self, amount: int) -> None:
@@ -185,20 +180,21 @@ class Player(pygame.sprite.Sprite):
         return True
 
 
-    def buy_weapon(self, weapon_name: str, sprite_sheet: pygame.Surface, price: int = 0) -> tuple[bool, str]:
+    def buy_weapon(self, weapon_name: str, price: int = 0) -> tuple[bool, str]:
         if not self.spend_gold(price):
             return False, "not_enough_gold"
 
-        if weapon_name in self.weapon_levels:
-            max_level = WEAPON_CONFIG[weapon_name].get("shop", {}).get("max_level")
-            if self.weapon_levels[weapon_name] >= max_level:
+        if weapon_name in self.equipped_weapons:
+            max_level = WEAPON_CONFIG[weapon_name]["shop"]["max_level"]
+            weapon = self.equipped_weapons[weapon_name]
+            if not weapon.can_upgrade(max_level):
                 self.add_gold(price)
                 return False, "max_level"
 
-            self.weapon_levels[weapon_name] += 1
+            weapon.upgrade()
             return True, "upgraded"
 
-        added = self.add_weapon(weapon_name, sprite_sheet)
+        added = self.add_weapon(weapon_name)
         if not added:
             self.add_gold(price)
             return False, "slots_full"
@@ -206,17 +202,20 @@ class Player(pygame.sprite.Sprite):
         return True, "bought"
 
     
-    def shoot(self, dt:float, enemies: list) -> None:
-        if not enemies:
+    def shoot(self, dt:float, targets: list) -> None:
+        if not targets:
             return
         #loading weapon from config
         for weapon_name in self.weapon_slots.get_weapons():
-            self.weapon_timers[weapon_name] -= dt
+            weapon_state = self.equipped_weapons.get(weapon_name)
+            if weapon_state is None:
+                continue
+
+            weapon_state.tick(dt)
             config = WEAPON_CONFIG[weapon_name]
-            if self.weapon_timers[weapon_name] <= 0:
-                nearest_enemy = min(enemies, key=lambda e: (e.position - self.position).length())
-                weapon_class = self.weapon_classes[weapon_name]
-                sprite_sheet = self.weapon_sprites[weapon_name]
+            if weapon_state.ready():
+                nearest_target = min(targets, key=lambda e: (e.position - self.position).length())
+                weapon_class = weapon_state.weapon_class
 
                 total_projectiles = self.projectile_count
                 volley_rotation = random.uniform(0, math.tau)
@@ -224,10 +223,10 @@ class Player(pygame.sprite.Sprite):
 
                 for i in range(total_projectiles):
                     start_pos = self._get_projectile_spawn_pos(i, total_projectiles, volley_rotation)
-                    projectile = weapon_class(config, sprite_sheet, start_pos, nearest_enemy.position, self)
+                    projectile = weapon_class(config, start_pos, nearest_target.position, self)
                     self.active_projectiles.add(projectile)
 
-                self.weapon_timers[weapon_name] = projectile.cooldown
+                weapon_state.trigger_cooldown(projectile.cooldown)
 
 
     def _get_projectile_spawn_pos(self, index: int, total: int, rotation: float) -> pygame.Vector2:
@@ -261,13 +260,12 @@ class Player(pygame.sprite.Sprite):
             self.just_leveled_up = True
 
 
-    def update(self,dt:float, keys:pygame.key.ScancodeWrapper, enemies:list, collision_rects):
+    def update(self,dt:float, keys:pygame.key.ScancodeWrapper, targets:list, collision_rects):
         self.move(keys, collision_rects)
         self.update_lvl()
 
         #Weapon update
-        if enemies:
-            self.shoot(dt, enemies)
+        self.shoot(dt, targets)
 
         self.update_weapons(dt)
 

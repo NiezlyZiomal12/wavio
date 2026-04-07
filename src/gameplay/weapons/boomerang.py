@@ -2,8 +2,8 @@ import pygame
 from .weapon import Weapon
 
 class Boomerang(Weapon):
-    def __init__(self, config, sprite_sheet, start_pos,target_pos, player):
-        super().__init__(config, sprite_sheet, start_pos, player)
+    def __init__(self, config, start_pos,target_pos, player):
+        super().__init__(config, start_pos, player)
 
         self.start_pos = pygame.Vector2(start_pos)
         #player prop for returning to player 

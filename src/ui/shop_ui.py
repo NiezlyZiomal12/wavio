@@ -7,13 +7,12 @@ from src.shop import build_weapon_shop_items
 from src.core import Animation
 
 class ShopUi:
-    def __init__(self, window, width, height, player, weapon_sprites: dict[str, pygame.Surface]):
+    def __init__(self, window, width, height, player):
         self.window = window
         self.width = width
         self.height = height
         self.current_size = self.window.get_size()
         self.player = player
-        self.weapon_sprites = weapon_sprites
 
         self.roll_cost = 15
         self.roll_amount = 1
@@ -134,9 +133,7 @@ class ShopUi:
 
     def _buy_item(self, index: int) -> None:
         item = self.visible_shop_items[index]
-        sprite_sheet = self.weapon_sprites.get(item.item_id)
-
-        success, reason = self.player.buy_weapon(item.item_id, sprite_sheet, item.price)
+        success, reason = self.player.buy_weapon(item.item_id, item.price)
         if success:
             if reason == "upgraded":
                 level = self.player.weapon_levels.get(item.item_id)

@@ -5,7 +5,7 @@ from src.core import Animation
 from src.gameplay.weapons import WEAPON_CONFIG, Fireball, Boomerang, Sword, Spear, Sun, Meteor
 from .weapon_slots import WeaponSlots
 from .equippedWeapon import EquippedWeapon
-from config import FONT
+from config import FONT, LVL_TEXT_COLOR, GOLD_TEXT_COLOR
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, spriteSheet:pygame.Surface, start_x:int, start_y:int) -> None:
@@ -309,9 +309,9 @@ class Player(pygame.sprite.Sprite):
     
     def draw_xp_bar(self, surface:pygame.Surface) -> None:
         bar_width, _ =  pygame.display.get_window_size()
-        bar_width -= 80
+        bar_width -= 120
         bar_height = 10
-        x, y = 60, 10
+        x, y = 100, 10
 
         pygame.draw.rect(surface, (50, 50, 50), (x, y, bar_width, bar_height))
         xp_ratio = self.xp / self.xp_to_lvl_up
@@ -319,13 +319,13 @@ class Player(pygame.sprite.Sprite):
         pygame.draw.rect(surface, (255, 255, 255), (x, y, bar_width, bar_height), 2)
 
         font = pygame.font.Font(FONT, 24)
-        level_text = font.render(f"Lvl: {self.level}", True, (255,255,255))
+        level_text = font.render(f"Lvl: {self.level}", True, LVL_TEXT_COLOR)
         surface.blit(level_text, (10,8) )
 
 
     def draw_coins(self, surface:pygame.Surface) -> None:
         font = pygame.font.Font(FONT, 24)
-        coin_text = font.render(f"Gold: {self.gold}", None, (252, 186, 3))
+        coin_text = font.render(f"Gold: {self.gold}", None, GOLD_TEXT_COLOR)
         surface.blit(coin_text, (10,70))
 
 

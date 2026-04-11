@@ -20,5 +20,5 @@ class Timer:
         return f"{minutes:02d}:{seconds:02d}"
     
     def draw(self, window:pygame.Surface):
-        t_text = self.hud_font.render(self.formatted(), True, (255, 255, 255))
+        t_text = self.hud_font.render(self.formatted(), True, (255,255,255))
         window.blit(t_text, (window.get_width()//2 - 10, 30))

@@ -48,46 +48,37 @@ class PauseMenuUi:
             text="Resume",
             manager=self.manager,
             container=self.left_panel,
+            object_id="#button",
         )
         self.restart_button = UIButton(
             relative_rect=layout["restart_button"],
             text="Restart",
             manager=self.manager,
             container=self.left_panel,
+            object_id="#button",
         )
         self.options_button = UIButton(
             relative_rect=layout["options_button"],
             text="Options",
             manager=self.manager,
             container=self.left_panel,
+            object_id="#button",
         )
         self.menu_button = UIButton(
             relative_rect=layout["menu_button"],
             text="Menu",
             manager=self.manager,
             container=self.left_panel,
+            object_id="#button",
         )
 
-        self.stats_title = UILabel(
-            relative_rect=layout["stats_title"],
-            text="Stats Dashboard",
-            manager=self.manager,
-            container=self.right_panel,
-            object_id="#stats_title",
-        )
-        self.stats_hint = UILabel(
-            relative_rect=layout["stats_hint"],
-            text="Use mouse wheel to scroll",
-            manager=self.manager,
-            container=self.right_panel,
-            object_id="#stats_hint",
-        )
 
         self.stats_box = UITextBox(
             html_text="",
             relative_rect=layout["stats_box"],
             manager=self.manager,
             container=self.right_panel,
+            object_id="#textBox",
         )
 
         self.ui_elements = [
@@ -99,8 +90,6 @@ class PauseMenuUi:
             self.restart_button,
             self.options_button,
             self.menu_button,
-            self.stats_title,
-            self.stats_hint,
             self.stats_box,
         ]
         self._set_visible(False)
@@ -155,9 +144,7 @@ class PauseMenuUi:
         player = self.player
         rows = [
             ("Level", self._format_number(getattr(player, "level", 0))),
-            ("XP", f"{self._format_number(getattr(player, 'xp', 0))}/{self._format_number(getattr(player, 'xp_to_lvl_up', 0))}"),
             ("Gold", self._format_number(getattr(player, "gold", 0))),
-            ("Current HP", self._format_number(getattr(player, "current_health", 0))),
             ("Max HP", self._format_number(getattr(player, "max_health", 0))),
             ("Speed", self._format_number(getattr(player, "speed", 0))),
             ("Damage", self._format_number(getattr(player, "damage", 0))),
@@ -170,22 +157,42 @@ class PauseMenuUi:
             ("Luck", self._format_number(getattr(player, "luck", 0))),
             ("XP Gain", self._format_number(getattr(player, "xp_gain", 0))),
             ("Coin Gain", self._format_number(getattr(player, "coin_gain", 0))),
-            ("Weapons Equipped", self._format_number(len(getattr(player, "weapon_levels", {})))),
         ]
 
-        weapon_levels = getattr(player, "weapon_levels", {})
-        for weapon_name, level in weapon_levels.items():
-            rows.append((f"{weapon_name} Level", self._format_number(level)))
 
         return rows
+
+    def _get_icon(self, label: str) -> str:
+        default_icon = '<img src="src/assets/ui/icons/sword.png">'
+        icon_map = {
+            "Level": '<img src="src/assets/ui/icons/level.png">',
+            "Gold": '<img src="src/assets/ui/icons/gold.png">',
+            "Max HP":'<img src="src/assets/ui/icons/max_hp.png">',
+            "Speed": '<img src="src/assets/ui/icons/speed.png">',
+            "Damage": '<img src="src/assets/ui/icons/sword.png">',
+            "Armor": '<img src="src/assets/ui/icons/shield.png">',
+            "Crit Chance": '<img src="src/assets/ui/icons/crit_chance.png">',
+            "Projectile Count": '<img src="src/assets/ui/icons/projectile_count.png">',
+            "Cooldown Reduction": '<img src="src/assets/ui/icons/cdr.png">',
+            "Pickup Range": '<img src="src/assets/ui/icons/pickup_range.png">',
+            "Life Steal": '<img src="src/assets/ui/icons/lifesteal.png">',
+            "Luck":'<img src="src/assets/ui/icons/luck.png">',
+            "XP Gain": '<img src="src/assets/ui/icons/xp_gain.png">',
+            "Coin Gain": '<img src="src/assets/ui/icons/coin_gain.png">',
+        }
+
+
+        return icon_map[label]
+    
 
     def _refresh_stats_text(self, force: bool = False) -> None:
         rows = self._build_stats_rows()
         lines = []
         for label, value in rows:
+            icon_html = self._get_icon(label)
             safe_label = escape(label)
             safe_value = escape(value)
-            lines.append(f"<b>{safe_label}</b>: {safe_value}")
+            lines.append(f"{icon_html} <b>{safe_label}</b>: {safe_value}")
 
         stats_html = "<br>".join(lines)
         if force or stats_html != self._last_stats_text:
@@ -248,13 +255,11 @@ class PauseMenuUi:
         menu_button = pygame.Rect(left_content_pad, buttons_start_y + 3 * (button_height + gap), button_width, button_height)
 
         right_pad = max(12, int(right_panel.width * 0.06))
-        stats_title = pygame.Rect(right_pad, max(12, int(right_panel.height * 0.05)), right_panel.width - (2 * right_pad), 24)
-        stats_hint = pygame.Rect(right_pad, stats_title.bottom + 8, right_panel.width - (2 * right_pad), 20)
         stats_box = pygame.Rect(
             right_pad,
-            stats_hint.bottom + 8,
+            8,
             right_panel.width - (2 * right_pad),
-            right_panel.height - stats_hint.bottom - 20,
+            right_panel.height - 20,
         )
 
         return {
@@ -266,8 +271,6 @@ class PauseMenuUi:
             "restart_button": restart_button,
             "options_button": options_button,
             "menu_button": menu_button,
-            "stats_title": stats_title,
-            "stats_hint": stats_hint,
             "stats_box": stats_box,
         }
 
@@ -299,12 +302,6 @@ class PauseMenuUi:
 
         self.menu_button.set_dimensions((layout["menu_button"].width, layout["menu_button"].height))
         self.menu_button.set_relative_position((layout["menu_button"].x, layout["menu_button"].y))
-
-        self.stats_title.set_dimensions((layout["stats_title"].width, layout["stats_title"].height))
-        self.stats_title.set_relative_position((layout["stats_title"].x, layout["stats_title"].y))
-
-        self.stats_hint.set_dimensions((layout["stats_hint"].width, layout["stats_hint"].height))
-        self.stats_hint.set_relative_position((layout["stats_hint"].x, layout["stats_hint"].y))
 
         self.stats_box.set_dimensions((layout["stats_box"].width, layout["stats_box"].height))
         self.stats_box.set_relative_position((layout["stats_box"].x, layout["stats_box"].y))

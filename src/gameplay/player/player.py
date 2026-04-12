@@ -2,12 +2,19 @@ import pygame
 import random
 import math
 from src.core import Animation
-from src.gameplay.weapons import WEAPON_CONFIG, Fireball, Boomerang, Sword, Spear, Sun, Meteor
+from src.gameplay.weapons import WEAPON_CONFIG, Fireball, Boomerang, Sword, Spear, Typhoon, Meteor
 from .weapon_slots import WeaponSlots
 from .equippedWeapon import EquippedWeapon
+from config import FONT, LVL_TEXT_COLOR, GOLD_TEXT_COLOR
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, spriteSheet:pygame.Surface, start_x:int, start_y:int) -> None:
+    def __init__(
+        self,
+        spriteSheet: pygame.Surface,
+        start_x: int,
+        start_y: int,
+        animation_config: dict | None = None,
+    ) -> None:
         super().__init__()
         #Base stats
         self.speed = 5
@@ -37,14 +44,48 @@ class Player(pygame.sprite.Sprite):
         self.level = 1
         self.xp = 0
         self.position = pygame.math.Vector2(start_x, start_y)
-        self.sprite_size = 64
+        self.animation_config = animation_config or {}
+        self.frame_width, self.frame_height = self.animation_config.get("frame_size", (64, 64))
+        self.sprite_size = self.frame_width
         self.just_leveled_up = False
         self.gold = 200
 
         #Animations
-        self.idle_animation = Animation(spriteSheet, self.sprite_size, self.sprite_size, 0, 2, 0.5)
-        self.walk_animation = Animation(spriteSheet, self.sprite_size, self.sprite_size, 3, 8, 0.1)   
-        self.hurt_animation = Animation(spriteSheet, self.sprite_size, self.sprite_size, 6, 3, 0.1)     
+        default_animations = {
+            "idle": {"row": 0, "frame_count": 2, "speed": 0.5},
+            "walk": {"row": 3, "frame_count": 8, "speed": 0.1},
+            "hurt": {"row": 6, "frame_count": 3, "speed": 0.1},
+        }
+        animations = self.animation_config.get("animations", {})
+
+        idle_cfg = {**default_animations["idle"], **animations.get("idle", {})}
+        walk_cfg = {**default_animations["walk"], **animations.get("walk", {})}
+        hurt_cfg = {**default_animations["hurt"], **animations.get("hurt", {})}
+
+        self.idle_animation = Animation(
+            spriteSheet,
+            self.frame_width,
+            self.frame_height,
+            idle_cfg["row"],
+            idle_cfg["frame_count"],
+            idle_cfg["speed"],
+        )
+        self.walk_animation = Animation(
+            spriteSheet,
+            self.frame_width,
+            self.frame_height,
+            walk_cfg["row"],
+            walk_cfg["frame_count"],
+            walk_cfg["speed"],
+        )
+        self.hurt_animation = Animation(
+            spriteSheet,
+            self.frame_width,
+            self.frame_height,
+            hurt_cfg["row"],
+            hurt_cfg["frame_count"],
+            hurt_cfg["speed"],
+        )
         self.current_animation = self.idle_animation
         self.image = self.current_animation.get_current_frame()
         self.rect = self.image.get_rect(center=(start_x, start_y))
@@ -308,23 +349,23 @@ class Player(pygame.sprite.Sprite):
     
     def draw_xp_bar(self, surface:pygame.Surface) -> None:
         bar_width, _ =  pygame.display.get_window_size()
-        bar_width -= 80
+        bar_width -= 120
         bar_height = 10
-        x, y = 60, 10
+        x, y = 100, 10
 
         pygame.draw.rect(surface, (50, 50, 50), (x, y, bar_width, bar_height))
         xp_ratio = self.xp / self.xp_to_lvl_up
         pygame.draw.rect(surface, (0, 200, 255), (x, y, bar_width * xp_ratio, bar_height))
         pygame.draw.rect(surface, (255, 255, 255), (x, y, bar_width, bar_height), 2)
 
-        font = pygame.font.Font(None, 24)
-        level_text = font.render(f"Lvl: {self.level}", True, (255,255,255))
+        font = pygame.font.Font(FONT, 24)
+        level_text = font.render(f"Lvl: {self.level}", True, LVL_TEXT_COLOR)
         surface.blit(level_text, (10,8) )
 
 
     def draw_coins(self, surface:pygame.Surface) -> None:
-        font = pygame.font.Font(None, 24)
-        coin_text = font.render(f"Gold: {self.gold}", None, (252, 186, 3))
+        font = pygame.font.Font(FONT, 24)
+        coin_text = font.render(f"Gold: {self.gold}", None, GOLD_TEXT_COLOR)
         surface.blit(coin_text, (10,70))
 
 

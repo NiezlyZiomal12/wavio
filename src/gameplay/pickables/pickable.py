@@ -10,7 +10,7 @@ class Pickable(pygame.sprite.Sprite):
         self.velocity = pygame.Vector2(0,0)
         self.speed = 100
         self.player = player
-        self.collect_radius = 50
+        self.collect_radius = 100
         self.collected = False
 
 

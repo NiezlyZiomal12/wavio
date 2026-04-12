@@ -1,5 +1,5 @@
 import pygame
-
+from config import FONT
 
 class Button:
     def __init__(
@@ -21,7 +21,7 @@ class Button:
     ):
         self.rect = rect
         self.text = text
-        self.font = font or pygame.font.Font(None, 24)
+        self.font = font or pygame.font.Font(FONT, 24)
         self.on_click = on_click
         self.image = image
 

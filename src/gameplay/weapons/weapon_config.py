@@ -7,8 +7,8 @@ WEAPON_CONFIG = {
         "projectile_count" : 2,
         "sprite_path" : "src/assets/items/weapons/fireball.png",
         "animation" : {
-            "sprite_width" : 51,
-            "sprite_height": 32,
+            "sprite_width" : 32,
+            "sprite_height": 22,
             "start_row" : 0,
             "start_frames": 4,
             "animation_speed" : 0.1,
@@ -98,7 +98,7 @@ WEAPON_CONFIG = {
             "evolution_to": None,
         },
     },
-    "Sun" : {
+    "Typhoon" : {
         "type" : "mele",
         "damage" : 4,
         "speed" : 0,
@@ -109,8 +109,8 @@ WEAPON_CONFIG = {
             "sprite_width" : 192,
             "sprite_height": 192,
             "start_row" : 0,
-            "start_frames": 1,
-            "animation_speed" : 0.05,
+            "start_frames": 4,
+            "animation_speed" : 0.1,
         },
         "special" : {
             "attack_duration" : 1.0,
@@ -134,11 +134,11 @@ WEAPON_CONFIG = {
             "sprite_width" : 96,
             "sprite_height": 96,
             "start_row" : 0,
-            "start_frames": 1,
-            "animation_speed" : 0.05,
+            "start_frames": 4,
+            "animation_speed" : 0.1,
         },
         "special" : {
-            "attack_duration" : 0.65,
+            "attack_duration" : 0.4,
             "hit_cooldown" : 0.3,
             "scatter_factor" : 0.1,
             "min_scatter" : 12,

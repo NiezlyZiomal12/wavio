@@ -4,7 +4,7 @@ from .sword import Sword
 from .weapon import Weapon
 from .boomerang import Boomerang
 from .spear import Spear
-from .sun import Sun
+from .typhoon import Typhoon
 from .meteor import Meteor
 
 __all__ = [
@@ -14,6 +14,6 @@ __all__ = [
             "Sword",
             "Boomerang",
             "Spear",
-            "Sun",
+            "Typhoon",
             "Meteor"
            ]

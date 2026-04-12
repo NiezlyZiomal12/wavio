@@ -8,7 +8,15 @@ character_config = CHARACTERS["Warrior"]
 class Warrior(Player):
 	def __init__(self, start_x: int, start_y: int) -> None:
 		sprite_sheet = pygame.image.load("src/assets/player/playerSpriteSheet.png").convert_alpha()
-		super().__init__(sprite_sheet, start_x, start_y)
+		animation_config = {
+			"frame_size": (64, 64),
+			"animations": {
+				"idle": {"row": 0, "frame_count": 2, "speed": 0.5},
+				"walk": {"row": 3, "frame_count": 8, "speed": 0.1},
+				"hurt": {"row": 6, "frame_count": 3, "speed": 0.1},
+			},
+		}
+		super().__init__(sprite_sheet, start_x, start_y, animation_config=animation_config)
 		self.class_name = "Warrior"
 		self.unlocked = True
 		

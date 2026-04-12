@@ -8,7 +8,13 @@ from .equippedWeapon import EquippedWeapon
 from config import FONT, LVL_TEXT_COLOR, GOLD_TEXT_COLOR
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, spriteSheet:pygame.Surface, start_x:int, start_y:int) -> None:
+    def __init__(
+        self,
+        spriteSheet: pygame.Surface,
+        start_x: int,
+        start_y: int,
+        animation_config: dict | None = None,
+    ) -> None:
         super().__init__()
         #Base stats
         self.speed = 5
@@ -38,14 +44,48 @@ class Player(pygame.sprite.Sprite):
         self.level = 1
         self.xp = 0
         self.position = pygame.math.Vector2(start_x, start_y)
-        self.sprite_size = 64
+        self.animation_config = animation_config or {}
+        self.frame_width, self.frame_height = self.animation_config.get("frame_size", (64, 64))
+        self.sprite_size = self.frame_width
         self.just_leveled_up = False
         self.gold = 200
 
         #Animations
-        self.idle_animation = Animation(spriteSheet, self.sprite_size, self.sprite_size, 0, 2, 0.5)
-        self.walk_animation = Animation(spriteSheet, self.sprite_size, self.sprite_size, 3, 8, 0.1)   
-        self.hurt_animation = Animation(spriteSheet, self.sprite_size, self.sprite_size, 6, 3, 0.1)     
+        default_animations = {
+            "idle": {"row": 0, "frame_count": 2, "speed": 0.5},
+            "walk": {"row": 3, "frame_count": 8, "speed": 0.1},
+            "hurt": {"row": 6, "frame_count": 3, "speed": 0.1},
+        }
+        animations = self.animation_config.get("animations", {})
+
+        idle_cfg = {**default_animations["idle"], **animations.get("idle", {})}
+        walk_cfg = {**default_animations["walk"], **animations.get("walk", {})}
+        hurt_cfg = {**default_animations["hurt"], **animations.get("hurt", {})}
+
+        self.idle_animation = Animation(
+            spriteSheet,
+            self.frame_width,
+            self.frame_height,
+            idle_cfg["row"],
+            idle_cfg["frame_count"],
+            idle_cfg["speed"],
+        )
+        self.walk_animation = Animation(
+            spriteSheet,
+            self.frame_width,
+            self.frame_height,
+            walk_cfg["row"],
+            walk_cfg["frame_count"],
+            walk_cfg["speed"],
+        )
+        self.hurt_animation = Animation(
+            spriteSheet,
+            self.frame_width,
+            self.frame_height,
+            hurt_cfg["row"],
+            hurt_cfg["frame_count"],
+            hurt_cfg["speed"],
+        )
         self.current_animation = self.idle_animation
         self.image = self.current_animation.get_current_frame()
         self.rect = self.image.get_rect(center=(start_x, start_y))

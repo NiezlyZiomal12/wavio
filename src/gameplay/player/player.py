@@ -2,7 +2,7 @@ import pygame
 import random
 import math
 from src.core import Animation
-from src.gameplay.weapons import WEAPON_CONFIG, Fireball, Boomerang, Sword, Spear, Sun, Meteor
+from src.gameplay.weapons import WEAPON_CONFIG, Fireball, Boomerang, Sword, Spear, Typhoon, Meteor
 from .weapon_slots import WeaponSlots
 from .equippedWeapon import EquippedWeapon
 from config import FONT, LVL_TEXT_COLOR, GOLD_TEXT_COLOR

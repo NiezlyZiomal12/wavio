@@ -2,7 +2,7 @@ import pygame
 from .weapon import Weapon
 
 
-class Sun(Weapon):
+class Typhoon(Weapon):
     def __init__(self, config, start_pos, target_pos: pygame.Vector2, player):
         super().__init__(config, start_pos, player)
 

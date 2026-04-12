@@ -144,9 +144,7 @@ class PauseMenuUi:
         player = self.player
         rows = [
             ("Level", self._format_number(getattr(player, "level", 0))),
-            ("XP", f"{self._format_number(getattr(player, 'xp', 0))}/{self._format_number(getattr(player, 'xp_to_lvl_up', 0))}"),
             ("Gold", self._format_number(getattr(player, "gold", 0))),
-            ("Current HP", self._format_number(getattr(player, "current_health", 0))),
             ("Max HP", self._format_number(getattr(player, "max_health", 0))),
             ("Speed", self._format_number(getattr(player, "speed", 0))),
             ("Damage", self._format_number(getattr(player, "damage", 0))),
@@ -159,22 +157,42 @@ class PauseMenuUi:
             ("Luck", self._format_number(getattr(player, "luck", 0))),
             ("XP Gain", self._format_number(getattr(player, "xp_gain", 0))),
             ("Coin Gain", self._format_number(getattr(player, "coin_gain", 0))),
-            ("Weapons Equipped", self._format_number(len(getattr(player, "weapon_levels", {})))),
         ]
 
-        weapon_levels = getattr(player, "weapon_levels", {})
-        for weapon_name, level in weapon_levels.items():
-            rows.append((f"{weapon_name} Level", self._format_number(level)))
 
         return rows
+
+    def _get_icon(self, label: str) -> str:
+        default_icon = '<img src="src/assets/ui/icons/sword.png">'
+        icon_map = {
+            "Level": '<img src="src/assets/ui/icons/level.png">',
+            "Gold": '<img src="src/assets/ui/icons/gold.png">',
+            "Max HP":'<img src="src/assets/ui/icons/max_hp.png">',
+            "Speed": '<img src="src/assets/ui/icons/speed.png">',
+            "Damage": '<img src="src/assets/ui/icons/sword.png">',
+            "Armor": '<img src="src/assets/ui/icons/shield.png">',
+            "Crit Chance": '<img src="src/assets/ui/icons/crit_chance.png">',
+            "Projectile Count": '<img src="src/assets/ui/icons/projectile_count.png">',
+            "Cooldown Reduction": '<img src="src/assets/ui/icons/cdr.png">',
+            "Pickup Range": '<img src="src/assets/ui/icons/pickup_range.png">',
+            "Life Steal": '<img src="src/assets/ui/icons/lifesteal.png">',
+            "Luck":'<img src="src/assets/ui/icons/luck.png">',
+            "XP Gain": '<img src="src/assets/ui/icons/xp_gain.png">',
+            "Coin Gain": '<img src="src/assets/ui/icons/coin_gain.png">',
+        }
+
+
+        return icon_map[label]
+    
 
     def _refresh_stats_text(self, force: bool = False) -> None:
         rows = self._build_stats_rows()
         lines = []
         for label, value in rows:
+            icon_html = self._get_icon(label)
             safe_label = escape(label)
             safe_value = escape(value)
-            lines.append(f"<b>{safe_label}</b>: {safe_value}")
+            lines.append(f"{icon_html} <b>{safe_label}</b>: {safe_value}")
 
         stats_html = "<br>".join(lines)
         if force or stats_html != self._last_stats_text:

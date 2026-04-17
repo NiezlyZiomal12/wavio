@@ -17,7 +17,7 @@ CHARACTER_CLASSES = {
 }
 
 class GameScene:
-    def __init__(self, window: pygame.Surface, selected_character: str):
+    def __init__(self, window: pygame.Surface, selected_character: str, selected_level:str):
         self.window = window
         self.running = True
         self.paused = False
@@ -29,9 +29,7 @@ class GameScene:
         stinky_fish = pygame.image.load("src/assets/items/pickable/stinky_fish.png").convert_alpha()
 
         # Tilemap
-        self.level1 = pytmx.load_pygame("src/assets/tilemaps/tmx/level1_new.tmx")
-        self.desert = pytmx.load_pygame("src/assets/tilemaps/tmx/desert.tmx")
-        self.tundra = pytmx.load_pygame("src/assets/tilemaps/tmx/tundra.tmx")
+        self.level = pytmx.load_pygame(selected_level["tmx_path"])
 
         # Dropable
         self.xp_group = pygame.sprite.Group()
@@ -52,10 +50,10 @@ class GameScene:
         self.level_timer = Timer(20 * 60)
 
         # World
-        map_world_width = self.level1.width * self.level1.tilewidth
-        map_world_height = self.level1.height * self.level1.tileheight
+        map_world_width = self.level.width * self.level.tilewidth
+        map_world_height = self.level.height * self.level.tileheight
         self.world = World(map_world_width, map_world_height, self.window)
-        self.world.load_collisions(self.level1)
+        self.world.load_collisions(self.level)
 
         # Load objects
         selected_player_class = CHARACTER_CLASSES[selected_character]
@@ -218,7 +216,7 @@ class GameScene:
     def render(self) -> None:
         self.window.fill(BG_COLOR)
 
-        self.world.draw_tilemap(self.camera, self.level1, self.window)
+        self.world.draw_tilemap(self.camera, self.level, self.window)
 
         for xp_orb in self.xp_group:
             xp_orb.draw(self.window, self.camera)

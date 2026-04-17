@@ -29,7 +29,9 @@ class GameScene:
         stinky_fish = pygame.image.load("src/assets/items/pickable/stinky_fish.png").convert_alpha()
 
         # Tilemap
-        self.level1 = pytmx.load_pygame("src/assets/tilemaps/tmx/level2.tmx")
+        self.level1 = pytmx.load_pygame("src/assets/tilemaps/tmx/level1_new.tmx")
+        self.desert = pytmx.load_pygame("src/assets/tilemaps/tmx/desert.tmx")
+        self.tundra = pytmx.load_pygame("src/assets/tilemaps/tmx/tundra.tmx")
 
         # Dropable
         self.xp_group = pygame.sprite.Group()

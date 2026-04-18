@@ -140,23 +140,31 @@ class PauseMenuUi:
             return f"{value:.2f}".rstrip("0").rstrip(".")
         return str(value)
 
+    def _format_stat_value(self, label: str, value) -> str:
+        if label in ("Armor", "Cooldown Reduction", "Life Steal"):
+            try:
+                return f"{float(value) * 100:.0f}%"
+            except (TypeError, ValueError):
+                return "0%"
+        return self._format_number(value)
+
     def _build_stats_rows(self) -> list[tuple[str, str]]:
         player = self.player
         rows = [
-            ("Level", self._format_number(getattr(player, "level", 0))),
-            ("Gold", self._format_number(getattr(player, "gold", 0))),
-            ("Max HP", self._format_number(getattr(player, "max_health", 0))),
-            ("Speed", self._format_number(getattr(player, "speed", 0))),
-            ("Damage", self._format_number(getattr(player, "damage", 0))),
-            ("Armor", self._format_number(getattr(player, "armor", 0))),
-            ("Crit Chance", self._format_number(getattr(player, "crit_chance", 0))),
-            ("Projectile Count", self._format_number(getattr(player, "projectile_count", 0))),
-            ("Cooldown Reduction", self._format_number(getattr(player, "reduce_cooldown", 0))),
-            ("Pickup Range", self._format_number(getattr(player, "pickup_range", 0))),
-            ("Life Steal", self._format_number(getattr(player, "lifesteal", 0))),
-            ("Luck", self._format_number(getattr(player, "luck", 0))),
-            ("XP Gain", self._format_number(getattr(player, "xp_gain", 0))),
-            ("Coin Gain", self._format_number(getattr(player, "coin_gain", 0))),
+            ("Level", self._format_stat_value("Level", getattr(player, "level", 0))),
+            ("Gold", self._format_stat_value("Gold", getattr(player, "gold", 0))),
+            ("Max HP", self._format_stat_value("Max HP", getattr(player, "max_health", 0))),
+            ("Speed", self._format_stat_value("Speed", getattr(player, "speed", 0))),
+            ("Damage", self._format_stat_value("Damage", getattr(player, "damage", 0))),
+            ("Armor", self._format_stat_value("Armor", getattr(player, "armor", 0))),
+            ("Crit Chance", self._format_stat_value("Crit Chance", getattr(player, "crit_chance", 0))),
+            ("Projectile Count", self._format_stat_value("Projectile Count", getattr(player, "projectile_count", 0))),
+            ("Cooldown Reduction", self._format_stat_value("Cooldown Reduction", getattr(player, "reduce_cooldown", 0))),
+            ("Pickup Range", self._format_stat_value("Pickup Range", getattr(player, "pickup_range", 0))),
+            ("Life Steal", self._format_stat_value("Life Steal", getattr(player, "lifesteal", 0))),
+            ("Luck", self._format_stat_value("Luck", getattr(player, "luck", 0))),
+            ("XP Gain", self._format_stat_value("XP Gain", getattr(player, "xp_gain", 0))),
+            ("Coin Gain", self._format_stat_value("Coin Gain", getattr(player, "coin_gain", 0))),
         ]
 
 

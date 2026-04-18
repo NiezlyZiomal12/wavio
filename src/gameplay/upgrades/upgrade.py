@@ -27,22 +27,29 @@ class Upgrade(pygame.sprite.Sprite):
             return False
 
         if self.name == "Order":
-            player.damage *= (1 +self.effect["damage"]) * player.dmg_mult
+            delta = self.effect["damage"] * player.dmg_mult
+            player.damage = max(1, int(round(player.damage + delta)))
 
         elif self.name == "Boots":
-            player.speed *= (1 +self.effect['speed']) * player.speed_mult
+            delta = self.effect['speed'] * player.speed_mult
+            player.speed = max(1, int(round(player.speed + delta)))
 
         elif self.name == "Heart":
-            player.max_health *= (1 + self.effect["max_health"]) * player.hp_mult
+            delta = int(round(self.effect["max_health"] * player.hp_mult))
+            player.max_health = max(1, int(player.max_health + delta))
+            # Keep current hp in step with max hp growth for better game feel.
+            player.current_health = min(player.max_health, player.current_health + delta)
 
         elif self.name == "Armor":
-            player.armor *= (1 + self.effect['armor']) * player.armor_mult
+            delta = self.effect['armor'] * player.armor_mult
+            player.armor = max(0.0, min(0.8, player.armor + delta))
 
         elif self.name == "Pearl":
-            player.projectile_count += self.effect['projectile_count']
+            player.projectile_count = int(player.projectile_count + self.effect['projectile_count'])
 
         elif self.name == "Scroll":
-            player.reduce_cooldown *= (1 + self.effect['reduce_cooldown']) * player.cd_mult
+            delta = self.effect['reduce_cooldown'] * player.cd_mult
+            player.reduce_cooldown = max(0.0, min(0.8, player.reduce_cooldown + delta))
 
         player.upgrade_levels[self.name] = current_level + 1
         return True

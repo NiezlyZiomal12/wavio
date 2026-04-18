@@ -1,6 +1,6 @@
 import pygame
 import random
-from src.core import Animation, Flash
+from src.core import Animation, Flash, dmgIndicator
 from src.gameplay.dropable import Xp, Coin
 
 class Enemy(pygame.sprite.Sprite):
@@ -57,6 +57,7 @@ class Enemy(pygame.sprite.Sprite):
         self.xp_group = None
         self.coin_sprite = None
         self.coin_group = None
+        self.damage_indicator = dmgIndicator(font_size=24, lifetime=0.65)
 
 
     def _get_separation_force(self, other_enemies: list) -> pygame.Vector2:
@@ -146,6 +147,8 @@ class Enemy(pygame.sprite.Sprite):
 
         self.hp -= damage
         self.hit_flash.start()
+        popup_pos = pygame.Vector2(self.position.x, self.position.y - (self.sprite_height * 0.45))
+        self.damage_indicator.add(damage, popup_pos)
         
         #lifesteal for player
         heal = damage * self.player.lifesteal
@@ -197,6 +200,7 @@ class Enemy(pygame.sprite.Sprite):
             self.move(player.position, other_enemies, collision_rects)
         
         self.hit_flash.update(dt)
+        self.damage_indicator.update(dt)
         self.update_animation(dt)
 
         #Collision with other enemies
@@ -206,3 +210,4 @@ class Enemy(pygame.sprite.Sprite):
 
     def draw(self, surface: pygame.Surface, camera: object):
         surface.blit(self.image, camera.apply(self.rect))
+        self.damage_indicator.draw(surface, camera)

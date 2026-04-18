@@ -44,7 +44,7 @@ class GameScene:
         self.pickable_list = pickable_list
         self.pickables = pygame.sprite.Group()
         self.present_spawn_timer = 0.0
-        self.present_spawn_interval = 10.0
+        self.present_spawn_interval = 60.0
 
         # Timer
         self.level_timer = Timer(20 * 60)

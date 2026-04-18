@@ -1,8 +1,7 @@
 import pygame
-from src.core import Flash
+from src.core import Flash, Animation, dmgIndicator
 from src.gameplay.pickables import Pickable
 import random
-from src.core import Animation
 
 class Present(pygame.sprite.Sprite):
     def __init__(self, pos: pygame.Vector2, drop_image:pygame.Surface, drop_eff: str, pickables:pygame.sprite.Group, player: object):
@@ -24,6 +23,7 @@ class Present(pygame.sprite.Sprite):
         self.spawn_duration = 0.3
         self.pickables = pickables
         self.player = player
+        self.damage_indicator = dmgIndicator(font_size=24, lifetime=0.65)
 
     
     def take_damage(self, weapon: object) -> None:
@@ -38,6 +38,8 @@ class Present(pygame.sprite.Sprite):
 
         self.health -= 1
         self.hit_flash.start()
+        popup_pos = pygame.Vector2(self.position.x, self.position.y - 16)
+        self.damage_indicator.add(1, popup_pos)
         if self.health <= 0:
             if self.spawned_pickable == False:
                 self.spawn_pickable()
@@ -67,6 +69,7 @@ class Present(pygame.sprite.Sprite):
             self.take_damage(weapon)
         
         self.hit_flash.update(dt)
+        self.damage_indicator.update(dt)
 
 
     def draw(self, surface:pygame.Surface, camera:object) -> None:
@@ -76,6 +79,7 @@ class Present(pygame.sprite.Sprite):
         else:
             img = self.hit_flash.apply(self.image)
         surface.blit(img, screen_rect)
+        self.damage_indicator.draw(surface, camera)
 
 
 

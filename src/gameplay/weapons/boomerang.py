@@ -1,5 +1,6 @@
 import pygame
 from .weapon import Weapon
+from src.core.utils import build_random_pitch_sounds
 
 class Boomerang(Weapon):
     def __init__(self, config, start_pos,target_pos, player):
@@ -29,6 +30,9 @@ class Boomerang(Weapon):
         self.recent_hits = {}
         self.life = 0
         self.lifetime = config['special']['lifetime']
+
+        Boomerang._shoot_sounds = build_random_pitch_sounds("src/assets/sounds/game/weapons/boomerang.wav", volume=0.10)
+        self.shoot_sound = Boomerang._shoot_sounds
 
 
     def update(self, dt:float) -> None:

@@ -1,6 +1,7 @@
 import math
 import pygame
 from .weapon import Weapon
+from src.core.utils import build_random_pitch_sounds
 
 
 class Spear(Weapon):
@@ -16,6 +17,9 @@ class Spear(Weapon):
         self.should_destroy_on_hit = False
         self.hitbox_width = int(config["special"]["hitbox_width"])
         self.hitbox_length = int(config["special"]["hitbox_length"])
+
+        Spear._shoot_sounds = build_random_pitch_sounds("src/assets/sounds/game/weapons/spear.wav", volume=0.10)
+        self.shoot_sound = Spear._shoot_sounds
 
         self.direction = target_pos - pygame.Vector2(player.rect.center)
         if self.direction.length_squared() == 0:

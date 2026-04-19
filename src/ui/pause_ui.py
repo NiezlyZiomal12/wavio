@@ -14,6 +14,8 @@ class PauseMenuUi:
         self._last_stats_text = ""
         layout = self._compute_layout()
         self.popup_rect = layout["popup"]
+        self.click_sound = pygame.mixer.Sound("src/assets/sounds/gui/click.wav")
+        self.open_sound = pygame.mixer.Sound("src/assets/sounds/gui/open.wav")
 
         self.popup_panel = UIPanel(
             relative_rect=self.popup_rect,
@@ -96,10 +98,12 @@ class PauseMenuUi:
 
     def show(self) -> None:
         self.active = True
+        self.open_sound.play()
         self._set_visible(True)
         self._refresh_stats_text(force=True)
 
     def hide(self) -> None:
+        self.open_sound.play()
         self.active = False
         self._set_visible(False)
 
@@ -123,6 +127,7 @@ class PauseMenuUi:
         self.manager.process_events(event)
 
         if event.type == pygame_gui.UI_BUTTON_PRESSED:
+            self.click_sound.play()
             if event.ui_element == self.resume_button:
                 self.hide()
 

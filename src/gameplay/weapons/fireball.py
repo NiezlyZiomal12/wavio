@@ -1,7 +1,9 @@
 import pygame
 from .weapon import Weapon
+from src.core.utils import build_random_pitch_sounds
 
 class Fireball(Weapon):
+    _shoot_sounds: list[pygame.mixer.Sound] = None
     def __init__(self, config, start_pos, target_pos: pygame.Vector2, player: object):
         super().__init__(config, start_pos, player)
 
@@ -15,6 +17,9 @@ class Fireball(Weapon):
     
         self.lifetime = config['special']['lifetime']
         self.time_alive = 0.0
+
+        Fireball._shoot_sounds = build_random_pitch_sounds("src/assets/sounds/game/weapons/fireball.wav", volume=0.05)
+        self.shoot_sound = Fireball._shoot_sounds
 
     def update(self, dt:float):
         super().update(dt) 

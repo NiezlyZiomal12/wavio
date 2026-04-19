@@ -116,6 +116,10 @@ class Player(pygame.sprite.Sprite):
         self.pending_effect = None
         self.starting_weapon_name = None
 
+        #sounds
+        self.hurt_sound = pygame.mixer.Sound("src/assets/sounds/game/hurt.wav")
+        self.hurt_sound.set_volume(0.2)
+
 
     def move(self, keys: pygame.key.ScancodeWrapper, collision_rects= None) -> None:
         # Create movement vector
@@ -173,6 +177,7 @@ class Player(pygame.sprite.Sprite):
     def take_damage(self, amount:int, enemy_pos: pygame.math.Vector2) -> None:
         #Invisibility frames
         if not self.invicible:
+            self.hurt_sound.play()
             self.current_health -= (amount - amount * self.armor)
             self.current_health = max(0, self.current_health)
             self.invicible = True
@@ -265,6 +270,10 @@ class Player(pygame.sprite.Sprite):
                 for i in range(total_projectiles):
                     start_pos = self._get_projectile_spawn_pos(i, total_projectiles, volley_rotation)
                     projectile = weapon_class(config, start_pos, nearest_target.position, self)
+                    
+                    if getattr(projectile, "shoot_sound", None):
+                        random.choice(projectile.shoot_sound).play()
+                    
                     self.active_projectiles.add(projectile)
 
                 weapon_state.trigger_cooldown(projectile.cooldown)

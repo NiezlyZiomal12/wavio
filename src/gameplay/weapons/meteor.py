@@ -2,6 +2,7 @@ import pygame
 import random
 import math
 from .weapon import Weapon
+from src.core.utils import build_random_pitch_sounds
 
 
 class Meteor(Weapon):
@@ -14,6 +15,9 @@ class Meteor(Weapon):
         self.scatter_factor = config["special"]["scatter_factor"]
         self.min_scatter = config["special"]["min_scatter"]
         self.max_scatter = config["special"]["max_scatter"]
+
+        Meteor._shoot_sounds = build_random_pitch_sounds("src/assets/sounds/game/weapons/explosion.wav", volume=0.05)
+        self.shoot_sound = Meteor._shoot_sounds
 
         if self.max_spawn_range < 0:
             self.max_spawn_range = 0.0

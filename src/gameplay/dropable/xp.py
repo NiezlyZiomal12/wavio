@@ -1,12 +1,21 @@
 import pygame
+import random
+from src.core import build_random_pitch_sounds
 
 class Xp(pygame.sprite.Sprite):
+    _pickup_sounds: list[pygame.mixer.Sound] | None = None
+
     def __init__(self, image: pygame.Surface, x:int, y:int, amount: int, player: object):
         super().__init__()
         self.player = player
         self.xp_amount = amount * self.player.xp_gain
         self.image = image
         self.rect = self.image.get_rect(center=(x,y))
+
+        if Xp._pickup_sounds is None:
+            Xp._pickup_sounds = build_random_pitch_sounds("src/assets/sounds/game/pickupCoin.wav", volume=0.10)
+
+        self.pickup_sounds = Xp._pickup_sounds
 
         self.position = pygame.Vector2(x,y)
         self.velocity = pygame.Vector2(0,0)
@@ -41,6 +50,7 @@ class Xp(pygame.sprite.Sprite):
         self.rect.center = (int(self.position.x), int(self.position.y))
         
         if distance_to_player < 15:
+            random.choice(self.pickup_sounds).play()
             self.collected = True
             player.xp += self.xp_amount
             self.kill()

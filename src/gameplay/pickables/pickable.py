@@ -13,13 +13,23 @@ class Pickable(pygame.sprite.Sprite):
         self.collect_radius = 100
         self.collected = False
 
+        self.explosion_sound = pygame.mixer.Sound("src/assets/sounds/game/weapons/explosion.wav")
+        self.explosion_sound.set_volume(0.2)
+        self.heal_sound = pygame.mixer.Sound("src/assets/sounds/game/heal.wav")
+        self.heal_sound.set_volume(0.2)
+        self.magnet_sound = pygame.mixer.Sound("src/assets/sounds/game/magnet.wav")
+        self.magnet_sound.set_volume(0.2)
+
 
     def apply_effect(self):
         if self.effect == "bomb":
+            self.explosion_sound.play()
             self.player.pending_effect = "bomb"
         elif self.effect == "prismat":
+            self.magnet_sound.play()
             self.prismat_effect()
         elif self.effect == "stinky_fish":
+            self.heal_sound.play()
             self.stinky_fish_effect()
 
 

@@ -4,7 +4,7 @@ import random
 from pygame_gui.elements import UIButton
 from src.gameplay.weapons import WEAPON_CONFIG
 from src.shop import build_weapon_shop_items
-from src.core import Animation, wrap_text
+from src.core import Animation, wrap_text, build_random_pitch_sounds
 from config import FONT, NAME_TEXT_COLOR, DESC_TEXT_COLOR, LVL_TEXT_COLOR, GOLD_TEXT_COLOR
 
 class ShopUi:
@@ -20,6 +20,12 @@ class ShopUi:
 
         self.active = False
         self.font = pygame.font.Font(FONT, 24)
+
+        self.click_sound = pygame.mixer.Sound("src/assets/sounds/gui/click.wav")
+        self.power_up_sound = pygame.mixer.Sound("src/assets/sounds/game/power_up.wav")
+        self.power_up_sound.set_volume(0.1)
+        _roll_sounds = build_random_pitch_sounds("src/assets/sounds/gui/roll.wav", volume=0.10)
+        self.roll_sound = _roll_sounds
 
         self.manager = pygame_gui.UIManager(self.current_size, theme_path="src/assets/pygame_gui_styles/pause_theme.json")
         self.popup_rect = self._compute_popup_rect()
@@ -144,9 +150,11 @@ class ShopUi:
 
         if event.type == pygame_gui.UI_BUTTON_PRESSED:
             if event.ui_element == self.close_button:
+                self.click_sound.play()
                 self.hide()
                 return
             if event.ui_element == self.reroll_button:
+                random.choice(self.roll_sound).play()
                 self.reroll_items()
                 return
 
@@ -154,6 +162,7 @@ class ShopUi:
             mx, my = event.pos
             for i, rect in enumerate(self.item_rects):
                 if rect.collidepoint(mx, my):
+                    self.power_up_sound.play()
                     self._buy_item(i)
                     break
 

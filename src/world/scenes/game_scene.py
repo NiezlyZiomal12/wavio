@@ -67,7 +67,7 @@ class GameScene:
         )
         self.presents = pygame.sprite.Group()
         spawn_random_presents(
-            5,
+            50,
             self.presents,
             self.pickables,
             self.world.width,
@@ -82,6 +82,10 @@ class GameScene:
         self.shop_ui = ShopUi(self.window, WIDTH, HEIGHT, self.player)
         self.pause_ui = PauseMenuUi(self.window, self.player)
         self.shop_timer = 1
+
+        # FPS overlay
+        self.fps_font = pygame.font.Font(None, 24)
+        self.fps_smoothed = 0.0
 
         # Starter weapon based on selected character.
         starter_weapon = self.player.starting_weapon_name
@@ -121,6 +125,13 @@ class GameScene:
 
 
     def update(self, dt: float) -> None:
+        if dt > 0:
+            current_fps = 1.0 / dt
+            if self.fps_smoothed == 0.0:
+                self.fps_smoothed = current_fps
+            else:
+                self.fps_smoothed = (self.fps_smoothed * 0.9) + (current_fps * 0.1)
+
         self.pause_ui.update(dt)
         if self.pause_ui.active:
             self.paused = True
@@ -250,5 +261,13 @@ class GameScene:
             flash_surface = pygame.Surface(self.window.get_size(), pygame.SRCALPHA)
             flash_surface.fill((255, 255, 255, alpha))
             self.window.blit(flash_surface, (0, 0))
+
+        fps_text = self.fps_font.render(f"FPS: {int(self.fps_smoothed)}", True, (255, 255, 255))
+        fps_bg = pygame.Surface((fps_text.get_width() + 10, fps_text.get_height() + 6), pygame.SRCALPHA)
+        fps_bg.fill((0, 0, 0, 140))
+        fps_x = self.window.get_width() - fps_bg.get_width() - 10
+        fps_y = 10
+        self.window.blit(fps_bg, (fps_x, fps_y))
+        self.window.blit(fps_text, (fps_x + 5, fps_y + 3))
 
         pygame.display.update()

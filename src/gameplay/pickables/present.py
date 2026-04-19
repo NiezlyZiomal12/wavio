@@ -1,9 +1,11 @@
 import pygame
-from src.core import Flash, Animation, dmgIndicator
+from src.core import Flash, Animation, dmgIndicator, build_random_pitch_sounds
 from src.gameplay.pickables import Pickable
 import random
 
 class Present(pygame.sprite.Sprite):
+    _hurt_sounds: list[pygame.mixer.Sound] = None
+    
     def __init__(self, pos: pygame.Vector2, drop_image:pygame.Surface, drop_eff: str, pickables:pygame.sprite.Group, player: object):
         super().__init__()
         spawn_sheet = pygame.image.load('src/assets/items/pickable/item_spawn_animation_sheet.png').convert_alpha()
@@ -25,6 +27,10 @@ class Present(pygame.sprite.Sprite):
         self.player = player
         self.damage_indicator = dmgIndicator(font_size=24, lifetime=0.65)
 
+        if Present._hurt_sounds is None:
+            Present._pickup_sounds = build_random_pitch_sounds("src/assets/sounds/game/hurt.wav", volume=0.22)
+
+        self.hurt_sound = Present._pickup_sounds
     
     def take_damage(self, weapon: object) -> None:
         if self.spawning:
@@ -37,6 +43,7 @@ class Present(pygame.sprite.Sprite):
                 return
 
         self.health -= 1
+        random.choice(self.hurt_sound).play()
         self.hit_flash.start()
         popup_pos = pygame.Vector2(self.position.x, self.position.y - 16)
         self.damage_indicator.add(1, popup_pos)

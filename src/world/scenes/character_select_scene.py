@@ -10,6 +10,7 @@ class Character_select_scene:
         self.running = True
         self.start_game = False
         self.selected_character = "Mage"
+        self.click_sound = pygame.mixer.Sound("src/assets/sounds/gui/click.wav")
 
         self.current_size = self.window.get_size()
         self.manager = pygame_gui.UIManager(self.current_size, theme_path="src/assets/pygame_gui_styles/pause_theme.json")
@@ -124,6 +125,7 @@ class Character_select_scene:
             self.manager.process_events(event)
 
             if event.type == pygame_gui.UI_BUTTON_PRESSED:
+                self.click_sound.play()
                 if event.ui_element == self.start_button:
                     self.start_game = True
 

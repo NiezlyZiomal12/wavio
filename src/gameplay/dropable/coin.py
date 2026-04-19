@@ -1,7 +1,10 @@
 import pygame
-from src.core import Animation
+import random
+from src.core import Animation, build_random_pitch_sounds
 
 class Coin(pygame.sprite.Sprite):
+    _pickup_sounds: list[pygame.mixer.Sound] | None = None
+
     def __init__(self, sprite_sheet: pygame.sprite.Sprite, x:int, y:int, amount: int, player: object):
         super().__init__()
         self.player = player
@@ -11,6 +14,11 @@ class Coin(pygame.sprite.Sprite):
         )
         self.image = self.animation.get_current_frame()
         self.rect = self.image.get_rect(center=(x,y))
+
+        if Coin._pickup_sounds is None:
+            Coin._pickup_sounds = build_random_pitch_sounds("src/assets/sounds/game/pickupCoin.wav", volume=0.10)
+
+        self.pickup_sounds = Coin._pickup_sounds
 
         self.position = pygame.Vector2(x,y)
         self.velocity = pygame.Vector2(0,0)
@@ -54,6 +62,7 @@ class Coin(pygame.sprite.Sprite):
         self.rect.center = (int(self.position.x), int(self.position.y))
         
         if distance_to_player < 15:
+            random.choice(self.pickup_sounds).play()
             self.collected = True
             player.gold += self.gold_amount
             self.kill()

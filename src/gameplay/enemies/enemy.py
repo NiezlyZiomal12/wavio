@@ -1,9 +1,11 @@
 import pygame
 import random
-from src.core import Animation, Flash, dmgIndicator
+from src.core import Animation, Flash, dmgIndicator, build_random_pitch_sounds
 from src.gameplay.dropable import Xp, Coin
 
 class Enemy(pygame.sprite.Sprite):
+    _hurt_sounds: list[pygame.mixer.Sound] = None
+
     def __init__(self, sprite_sheet:pygame.Surface, x:int, y:int, spawn_sheet:pygame.Surface, config:dict, player:object):
         super().__init__()
         self.config = config
@@ -58,6 +60,11 @@ class Enemy(pygame.sprite.Sprite):
         self.coin_sprite = None
         self.coin_group = None
         self.damage_indicator = dmgIndicator(font_size=24, lifetime=0.65)
+
+        if Enemy._hurt_sounds is None:
+            Enemy._pickup_sounds = build_random_pitch_sounds("src/assets/sounds/game/hurt.wav", volume=0.22)
+
+        self.hurt_sound = Enemy._pickup_sounds
 
 
     def _get_separation_force(self, other_enemies: list) -> pygame.Vector2:
@@ -146,6 +153,7 @@ class Enemy(pygame.sprite.Sprite):
                     return
 
         self.hp -= damage
+        random.choice(self.hurt_sound).play()
         self.hit_flash.start()
         popup_pos = pygame.Vector2(self.position.x, self.position.y - (self.sprite_height * 0.45))
         self.damage_indicator.add(damage, popup_pos)

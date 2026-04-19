@@ -1,7 +1,7 @@
 import pygame
 import pygame_gui
 from pygame_gui.elements import UIButton
-from src.core import Animation, wrap_text
+from src.core.utils import Animation, wrap_text, build_random_pitch_sounds
 from src.gameplay.upgrades import loadUpgrades
 import random
 from config import FONT, NAME_TEXT_COLOR, LVL_TEXT_COLOR, DESC_TEXT_COLOR
@@ -24,6 +24,12 @@ class LevelUpUi:
         self.options = []
         self.option_levels = {}
         self.selected = None
+
+        self.click_sound = pygame.mixer.Sound("src/assets/sounds/gui/click.wav")
+        self.power_up_sound = pygame.mixer.Sound("src/assets/sounds/game/power_up.wav")
+        self.power_up_sound.set_volume(0.1)
+        _roll_sounds = build_random_pitch_sounds("src/assets/sounds/gui/roll.wav", volume=0.10)
+        self.roll_sound = _roll_sounds
 
         self.manager = pygame_gui.UIManager(self.current_size, theme_path="src/assets/pygame_gui_styles/pause_theme.json")
         self.popup_rect = self._compute_popup_rect()
@@ -142,9 +148,11 @@ class LevelUpUi:
 
         if event.type == pygame_gui.UI_BUTTON_PRESSED:
             if event.ui_element == self.close_button:
+                self.click_sound.play()
                 self.hide()
                 return None
             if event.ui_element == self.reroll_button:
+                random.choice(self.roll_sound).play()
                 self.reroll_items()
                 return None
         
@@ -152,6 +160,7 @@ class LevelUpUi:
             mx, my = event.pos
             for i, rect in enumerate(self.option_rects):
                 if rect.collidepoint(mx,my):
+                    self.power_up_sound.play()
                     self.selected = i
                     self.roll_amount = 1
                     return i

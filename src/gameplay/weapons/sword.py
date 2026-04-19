@@ -1,7 +1,9 @@
 import pygame
 from .weapon import Weapon
+from src.core.utils import build_random_pitch_sounds
 
 class Sword(Weapon):
+    _shoot_sounds: list[pygame.mixer.Sound] = None
     def __init__(self, config, start_pos, target_pos : pygame.Vector2, player):
         super().__init__(config, start_pos, player)
 
@@ -16,6 +18,9 @@ class Sword(Weapon):
         self.recent_hits = set()
 
         self.offset_distance = self.attack_radius * 0.5
+
+        Sword._shoot_sounds = build_random_pitch_sounds("src/assets/sounds/game/weapons/slash.wav", volume=0.10)
+        self.shoot_sound = Sword._shoot_sounds
 
     
     def update(self, dt:float) -> None:

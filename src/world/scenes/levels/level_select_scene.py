@@ -13,6 +13,8 @@ class Level_select_scene:
         self.start_game = False
         self.current_size = self.window.get_size()
 
+        self.click_sound = pygame.mixer.Sound("src/assets/sounds/gui/click.wav")
+
         self.selected_level = LEVELS[0]
         self.selected_difficulty = "Normal"
         self.preview_images_cache: dict[str, pygame.Surface] = {}
@@ -311,6 +313,7 @@ class Level_select_scene:
             self.manager.process_events(event)
 
             if event.type == pygame_gui.UI_BUTTON_PRESSED:
+                self.click_sound.play()
                 if event.ui_element == self.start_button:
                     self.start_game = True
                     continue

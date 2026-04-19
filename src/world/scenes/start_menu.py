@@ -17,6 +17,8 @@ class StartMenuScene:
         self.current_size = self.window.get_size()
         self.manager = pygame_gui.UIManager(self.current_size, theme_path="src/assets/pygame_gui_styles/pause_theme.json")
 
+        self.click_sound = pygame.mixer.Sound("src/assets/sounds/gui/click.wav")
+
         self.background = pygame.image.load("src/assets/ui/mainBackground.png").convert()
         self.background_image = pygame.transform.scale(self.background, self.current_size)
 
@@ -87,6 +89,7 @@ class StartMenuScene:
                 continue
 
             if event.type == pygame_gui.UI_BUTTON_PRESSED and event.ui_element == self.start_button:
+                self.click_sound.play()
                 self.start_requested = True
 
 

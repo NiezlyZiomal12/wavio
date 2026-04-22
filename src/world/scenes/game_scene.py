@@ -16,13 +16,42 @@ CHARACTER_CLASSES = {
     "Rogue": Rogue,
 }
 
+DIFFICULTY_SETTINGS = {
+    "Normal": {
+        "enemy_hp_mult": 1.0,
+        "enemy_damage_mult": 1.0,
+        "enemy_speed_mult": 1.0,
+        "xp_gain_mult": 1.0,
+        "shop_price_mult": 1.0,
+        "spawn_rate_mult": 1.0,
+    },
+    "Hard": {
+        "enemy_hp_mult": 1.35,
+        "enemy_damage_mult": 1.25,
+        "enemy_speed_mult": 1.1,
+        "xp_gain_mult": 0.85,
+        "shop_price_mult": 1.25,
+        "spawn_rate_mult": 1.15,
+    },
+    "Nightmare": {
+        "enemy_hp_mult": 1.8,
+        "enemy_damage_mult": 1.55,
+        "enemy_speed_mult": 1.2,
+        "xp_gain_mult": 0.7,
+        "shop_price_mult": 1.5,
+        "spawn_rate_mult": 1.3,
+    },
+}
+
 class GameScene:
-    def __init__(self, window: pygame.Surface, selected_character: str, selected_level:str):
+    def __init__(self, window: pygame.Surface, selected_character: str, selected_level:str, selected_difficulty: str = "Normal"):
         self.window = window
         self.running = True
         self.paused = False
         self.current_size = self.window.get_size()
         self.width, self.height = self.current_size
+        self.selected_difficulty = selected_difficulty
+        self.difficulty = DIFFICULTY_SETTINGS[self.selected_difficulty]
 
         bomb_image = pygame.image.load("src/assets/items/pickable/bomb.png").convert_alpha()
         prismat_image = pygame.image.load("src/assets/items/pickable/prismat.png").convert_alpha()
@@ -58,12 +87,16 @@ class GameScene:
         # Load objects
         selected_player_class = CHARACTER_CLASSES[selected_character]
         self.player = selected_player_class(self.width // 2, self.height // 2)
+        self.player.xp_gain *= self.difficulty["xp_gain_mult"]
         self.camera = Camera(self.height, self.width, self.world)
         self.spawner = EnemySpawner(
             self.xp_group,
             self.coin_group,
             self.player,
             self.camera,
+            enemy_hp_multiplier=self.difficulty["enemy_hp_mult"],
+            enemy_damage_multiplier=self.difficulty["enemy_damage_mult"],
+            enemy_speed_multiplier=self.difficulty["enemy_speed_mult"],
         )
         self.presents = pygame.sprite.Group()
         spawn_random_presents(
@@ -79,7 +112,13 @@ class GameScene:
 
         # UI
         self.level_up_ui = LevelUpUi(self.window, WIDTH, HEIGHT, self.player)
-        self.shop_ui = ShopUi(self.window, WIDTH, HEIGHT, self.player)
+        self.shop_ui = ShopUi(
+            self.window,
+            WIDTH,
+            HEIGHT,
+            self.player,
+            price_multiplier=self.difficulty["shop_price_mult"],
+        )
         self.pause_ui = PauseMenuUi(self.window, self.player)
         self.shop_timer = 1
 
@@ -173,7 +212,7 @@ class GameScene:
         self.camera.follow(self.player)
         self.camera.update(dt)
 
-        difficulty = 1.0 + (self.level_timer.elapsed // 60)
+        difficulty = self.difficulty["spawn_rate_mult"] * (1.0 + (self.level_timer.elapsed // 60))
         self.spawner.update(
             dt,
             self.player,

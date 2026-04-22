@@ -8,12 +8,13 @@ from src.core import Animation, wrap_text, build_random_pitch_sounds
 from config import FONT, NAME_TEXT_COLOR, DESC_TEXT_COLOR, LVL_TEXT_COLOR, GOLD_TEXT_COLOR
 
 class ShopUi:
-    def __init__(self, window, width, height, player):
+    def __init__(self, window, width, height, player, price_multiplier: float):
         self.window = window
         self.width = width
         self.height = height
         self.current_size = self.window.get_size()
         self.player = player
+        self.price_multiplier = max(0.1, price_multiplier)
 
         self.roll_cost = 15
         self.roll_amount = 1
@@ -169,8 +170,13 @@ class ShopUi:
 
     def _buy_item(self, index: int) -> None:
         item = self.visible_shop_items[index]
-        success, reason = self.player.buy_weapon(item.item_id, item.price)
+        item_price = self._get_item_price(item)
+        success, reason = self.player.buy_weapon(item.item_id, item_price)
 
+
+
+    def _get_item_price(self, item) -> int:
+        return max(1, int(round(item.price * self.price_multiplier)))
 
 
     def update_animation(self, dt:float) -> None:
@@ -218,7 +224,8 @@ class ShopUi:
 
 
     def _current_roll_cost(self) -> int:
-        return self.roll_cost + 5 * self.roll_amount
+        base_cost = self.roll_cost + 5 * self.roll_amount
+        return max(1, int(round(base_cost * self.price_multiplier)))
 
 
     def reroll_items(self) -> None:
@@ -293,7 +300,8 @@ class ShopUi:
             self.window.blit(icon, (icon_x, icon_y))
 
             weapon_level = self.player.weapon_levels.get(item.item_id, 0)
-            affordable = self.player.gold >= item.price
+            item_price = self._get_item_price(item)
+            affordable = self.player.gold >= item_price
 
             name_x = icon_x + icon.get_width() + max(8, int(rect.width * 0.03))
             name_y = rect.y + max(4, int(rect.height * 0.08))
@@ -307,7 +315,7 @@ class ShopUi:
             self.window.blit(level_surface, (level_x, name_y))
 
             price_color = (145, 220, 128) if affordable else (236, 122, 122)
-            price_surface = self.font.render(f"{item.price}g", True, price_color)
+            price_surface = self.font.render(f"{item_price}g", True, price_color)
             price_x = rect.right - price_surface.get_width() - max(8, int(rect.width * 0.03))
             price_y = name_y + level_surface.get_height()
             self.window.blit(price_surface, (price_x, price_y))

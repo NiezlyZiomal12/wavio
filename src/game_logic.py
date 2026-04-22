@@ -86,6 +86,7 @@ class EnemySpawner:
             x, y = self._spawn_outside_camera(config, collision_rects, margin=200)
             
             enemy = enemy_class(sprite, x, y, self.spawn_sprite, config, self.player)
+            enemy.apply_time_scaling(self.game_time)
             enemy.xp_group = self.xp_group
             enemy.xp_sprite = self.xp_sprite
             enemy.coin_group = self.coin_group
@@ -104,6 +105,7 @@ class EnemySpawner:
             x, y = self._spawn_outside_camera(config, collision_rects, margin=260)
             
             boss = boss_class(sprite, x, y, self.spawn_sprite, config, self.player)
+            # boss.apply_time_scaling(self.game_time)
             boss.xp_group = self.xp_group
             boss.xp_sprite = self.xp_sprite
             boss.coin_group = self.coin_group

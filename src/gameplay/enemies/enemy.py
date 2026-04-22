@@ -5,6 +5,8 @@ from src.gameplay.dropable import Xp, Coin
 
 class Enemy(pygame.sprite.Sprite):
     _hurt_sounds: list[pygame.mixer.Sound] = None
+    HP_SCALING_PER_MINUTE = 2.0
+    DAMAGE_SCALING_PER_MINUTE = 0.2
 
     def __init__(self, sprite_sheet:pygame.Surface, x:int, y:int, spawn_sheet:pygame.Surface, config:dict, player:object):
         super().__init__()
@@ -21,6 +23,8 @@ class Enemy(pygame.sprite.Sprite):
         self.xp_value = config["Dropable"]["xp"]
         self.coin_value = config["Dropable"]["coin"]
         self.damage = config["damage"]
+        self.base_hp = self.max_hp
+        self.base_damage = self.damage
 
         #Animations
         self.spawn_animation = Animation(spawn_sheet, 64, 64, 0, 3, 0.1)
@@ -65,6 +69,24 @@ class Enemy(pygame.sprite.Sprite):
             Enemy._pickup_sounds = build_random_pitch_sounds("src/assets/sounds/game/hurt.wav", volume=0.22)
 
         self.hurt_sound = Enemy._pickup_sounds
+
+
+    def apply_time_scaling(self, elapsed_time: float) -> None:
+        """Scale enemy HP and damage based on total elapsed game time."""
+        minutes = max(0.0, elapsed_time) / 60.0
+        hp_multiplier = 1.0 + (minutes * self.HP_SCALING_PER_MINUTE)
+        damage_multiplier = 1.0 + (minutes * self.DAMAGE_SCALING_PER_MINUTE)
+
+        scaled_max_hp = max(1, int(round(self.base_hp * hp_multiplier)))
+        hp_ratio = self.hp / self.max_hp if self.max_hp > 0 else 1.0
+
+        self.max_hp = scaled_max_hp
+        self.hp = max(1, int(round(self.max_hp * hp_ratio)))
+        self.damage = max(1, int(round(self.base_damage * damage_multiplier)))
+
+        # Keep boss-specific combat logic in sync with scaled base damage.
+        if hasattr(self, "shot_damage"):
+            self.shot_damage = self.damage
 
 
     def _get_separation_force(self, other_enemies: list) -> pygame.Vector2:

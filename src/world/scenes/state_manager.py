@@ -69,14 +69,20 @@ class StateManager:
                     self.game = GameScene(
                         self.window,
                         self.character_select_scene.get_selected_character(),
-                        self.level_select_scene.get_selected_level()
+                        self.level_select_scene.get_selected_level(),
+                        self.level_select_scene.get_selected_difficulty(),
                     )
                     self.state = "game"
                 continue
 
             if self.state == "game":
                 if self.game is None:
-                    self.game = GameScene(self.window)
+                    self.game = GameScene(
+                        self.window,
+                        self.character_select_scene.get_selected_character(),
+                        self.level_select_scene.get_selected_level(),
+                        self.level_select_scene.get_selected_difficulty(),
+                    )
 
                 self.game.handle_events(events)
                 if not self.game.running:

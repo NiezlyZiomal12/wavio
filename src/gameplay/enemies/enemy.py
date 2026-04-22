@@ -7,6 +7,7 @@ class Enemy(pygame.sprite.Sprite):
     _hurt_sounds: list[pygame.mixer.Sound] = None
     HP_SCALING_PER_MINUTE = 2.0
     DAMAGE_SCALING_PER_MINUTE = 0.2
+    SPEED_SCALING_PER_MINUTE = 0.03
 
     def __init__(self, sprite_sheet:pygame.Surface, x:int, y:int, spawn_sheet:pygame.Surface, config:dict, player:object):
         super().__init__()
@@ -23,6 +24,10 @@ class Enemy(pygame.sprite.Sprite):
         self.xp_value = config["Dropable"]["xp"]
         self.coin_value = config["Dropable"]["coin"]
         self.damage = config["damage"]
+        self.initial_speed = self.speed
+        self.initial_hp = self.max_hp
+        self.initial_damage = self.damage
+        self.base_speed = self.speed
         self.base_hp = self.max_hp
         self.base_damage = self.damage
 
@@ -71,18 +76,31 @@ class Enemy(pygame.sprite.Sprite):
         self.hurt_sound = Enemy._pickup_sounds
 
 
-    def apply_time_scaling(self, elapsed_time: float) -> None:
-        """Scale enemy HP and damage based on total elapsed game time."""
+    def apply_time_scaling(
+        self,
+        elapsed_time: float,
+        hp_multiplier: float,
+        damage_multiplier: float,
+        speed_multiplier: float,
+    ) -> None:
+        """Scale enemy HP, damage, and speed based on elapsed game time."""
         minutes = max(0.0, elapsed_time) / 60.0
-        hp_multiplier = 1.0 + (minutes * self.HP_SCALING_PER_MINUTE)
-        damage_multiplier = 1.0 + (minutes * self.DAMAGE_SCALING_PER_MINUTE)
+        time_hp_multiplier = 1.0 + (minutes * self.HP_SCALING_PER_MINUTE)
+        time_damage_multiplier = 1.0 + (minutes * self.DAMAGE_SCALING_PER_MINUTE)
+        time_speed_multiplier = 1.0 + (minutes * self.SPEED_SCALING_PER_MINUTE)
 
-        scaled_max_hp = max(1, int(round(self.base_hp * hp_multiplier)))
+        scaled_max_hp = max(1, int(round(self.initial_hp * time_hp_multiplier * max(0.1, hp_multiplier))))
         hp_ratio = self.hp / self.max_hp if self.max_hp > 0 else 1.0
+        scaled_damage = max(1, int(round(self.initial_damage * time_damage_multiplier * max(0.1, damage_multiplier))))
+        scaled_speed = max(1, int(round(self.initial_speed * time_speed_multiplier * max(0.1, speed_multiplier))))
 
         self.max_hp = scaled_max_hp
         self.hp = max(1, int(round(self.max_hp * hp_ratio)))
-        self.damage = max(1, int(round(self.base_damage * damage_multiplier)))
+        self.base_speed = scaled_speed
+        self.speed = scaled_speed
+        self.base_hp = self.max_hp
+        self.base_damage = scaled_damage
+        self.damage = scaled_damage
 
         # Keep boss-specific combat logic in sync with scaled base damage.
         if hasattr(self, "shot_damage"):

@@ -8,7 +8,7 @@ class Xp(pygame.sprite.Sprite):
     def __init__(self, image: pygame.Surface, x:int, y:int, amount: int, player: object):
         super().__init__()
         self.player = player
-        self.xp_amount = amount * self.player.xp_gain
+        self.xp_amount = max(1, int(round(amount * self.player.xp_gain)))
         self.image = image
         self.rect = self.image.get_rect(center=(x,y))
 

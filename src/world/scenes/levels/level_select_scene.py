@@ -3,7 +3,7 @@ import pygame_gui
 from pygame_gui.elements import UIButton, UIPanel, UILabel
 from .level_config import LEVELS
 
-DIFFICULTIES = ["Easy", "Normal", "Hard"]
+DIFFICULTIES = ["Normal", "Hard", "Nightmare"]
 
 
 class Level_select_scene:

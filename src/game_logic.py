@@ -5,7 +5,16 @@ from src.gameplay.enemies.bosses import *
 from config import SPAWN_TIMER, BOSS_SPAWN_TIMER
 
 class EnemySpawner:
-    def __init__(self, xp_group:pygame.sprite.Group, coin_group:pygame.sprite.Group, player:object, camera:object) -> None:
+    def __init__(
+        self,
+        xp_group:pygame.sprite.Group,
+        coin_group:pygame.sprite.Group,
+        player:object,
+        camera:object,
+        enemy_hp_multiplier: float,
+        enemy_damage_multiplier: float,
+        enemy_speed_multiplier: float,
+    ) -> None:
         self.spawn_sprite = pygame.image.load("src/assets/entities/enemies/spawn_animation_sheet.png").convert_alpha()
         self.xp_sprite = pygame.image.load("src/assets/items/dropable/xp.png").convert_alpha()
         self.coin_sprite = pygame.image.load("src/assets/items/dropable/coin.png").convert_alpha()
@@ -18,6 +27,9 @@ class EnemySpawner:
         self.coin_group = coin_group
         self.player = player
         self.camera = camera
+        self.enemy_hp_multiplier = enemy_hp_multiplier
+        self.enemy_damage_multiplier = enemy_damage_multiplier
+        self.enemy_speed_multiplier = enemy_speed_multiplier
 
         #loading enemy sprites
         self.enemy_sprites = {}
@@ -86,7 +98,12 @@ class EnemySpawner:
             x, y = self._spawn_outside_camera(config, collision_rects, margin=200)
             
             enemy = enemy_class(sprite, x, y, self.spawn_sprite, config, self.player)
-            enemy.apply_time_scaling(self.game_time)
+            enemy.apply_time_scaling(
+                self.game_time,
+                hp_multiplier=self.enemy_hp_multiplier,
+                damage_multiplier=self.enemy_damage_multiplier,
+                speed_multiplier=self.enemy_speed_multiplier,
+            )
             enemy.xp_group = self.xp_group
             enemy.xp_sprite = self.xp_sprite
             enemy.coin_group = self.coin_group
@@ -105,7 +122,12 @@ class EnemySpawner:
             x, y = self._spawn_outside_camera(config, collision_rects, margin=260)
             
             boss = boss_class(sprite, x, y, self.spawn_sprite, config, self.player)
-            # boss.apply_time_scaling(self.game_time)
+            # boss.apply_time_scaling(
+            #     self.game_time,
+            #     hp_multiplier=self.enemy_hp_multiplier,
+            #     damage_multiplier=self.enemy_damage_multiplier,
+            #     speed_multiplier=self.enemy_speed_multiplier,
+            # )
             boss.xp_group = self.xp_group
             boss.xp_sprite = self.xp_sprite
             boss.coin_group = self.coin_group

@@ -51,6 +51,28 @@ class Upgrade(pygame.sprite.Sprite):
             delta = self.effect['reduce_cooldown'] * player.cd_mult
             player.reduce_cooldown = max(0.0, min(0.8, player.reduce_cooldown + delta))
 
+        elif self.name == "Nightstar":
+            delta = self.effect['xp_gain'] * player.xp_gain
+            player.xp_gain +=  delta
+        
+        elif self.name == "Greed's eye":
+            delta = self.effect['coin_gain']
+            player.coin_gain = max(0.0, player.coin_gain + delta)
+        
+        elif self.name == "Sharpener":
+            delta = self.effect['crit_chance']
+            if isinstance(delta, (int, float)) and 0 <= delta <= 1:
+                delta *= 100
+            player.crit_chance = max(0.0, min(100.0, player.crit_chance + delta))
+
+        elif self.name == "Bloody sword":
+            delta = self.effect['lifesteal']
+            player.lifesteal +=  delta
+
+        elif self.name == "Goldfish":
+            delta = self.effect['luck']
+            player.luck = max(1, int(round(player.luck + delta)))
+
         player.upgrade_levels[self.name] = current_level + 1
         return True
 

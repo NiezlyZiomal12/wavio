@@ -151,6 +151,14 @@ class PauseMenuUi:
                 return f"{float(value) * 100:.0f}%"
             except (TypeError, ValueError):
                 return "0%"
+        if label == "Crit Chance":
+            try:
+                crit_value = float(value)
+                if 0 <= crit_value <= 1:
+                    crit_value *= 100
+                return f"{max(0.0, min(100.0, crit_value)):.0f}%"
+            except (TypeError, ValueError):
+                return "0%"
         return self._format_number(value)
 
     def _build_stats_rows(self) -> list[tuple[str, str]]:

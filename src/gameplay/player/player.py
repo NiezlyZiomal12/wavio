@@ -27,7 +27,7 @@ class Player(pygame.sprite.Sprite):
         self.projectile_count = 1
         self.luck = 1
         self.armor = 0.0
-        self.crit_chance = 0.0
+        self.crit_chance = 10.0
         self.reduce_cooldown = 0.0
         self.pickup_range = 0.0
         self.lifesteal = 0.0
@@ -216,7 +216,7 @@ class Player(pygame.sprite.Sprite):
 
 
     def add_gold(self, amount: int) -> None:
-        self.gold += amount
+        self.gold += int(round(amount))
 
 
     def spend_gold(self, cost: int) -> bool:

@@ -43,5 +43,40 @@ UPGRADE_CONFIG = {
         "effect" : {"reduce_cooldown" : 0.05},
         "max_level": 5,
     },
+    "Nightstar": {
+        "name" : "Nightstar",
+        "description": "+5% xp gain",
+        "image" : "src/assets/items/upgrades/nightstar.png",
+        "effect" : {"xp_gain" : 0.05},
+        "max_level": 5,
+    },
+    "Goldfish": {
+        "name" : "Goldfish",
+        "description": "+1 luck",
+        "image" : "src/assets/items/upgrades/goldfish.png",
+        "effect" : {"luck" : 1},
+        "max_level": 5,
+    },
+    "Greed's eye": {
+        "name" : "Greed's eye",
+        "description": "+5% coin gain",
+        "image" : "src/assets/items/upgrades/greeds_eye.png",
+        "effect" : {"coin_gain" : 0.05},
+        "max_level": 5,
+    },
+    "Sharpener": {
+        "name" : "Sharpener",
+        "description": "+5% crit chance",
+        "image" : "src/assets/items/upgrades/sharpener.png",
+        "effect" : {"crit_chance" : 0.05},
+        "max_level": 10,
+    },
+    "Bloody_sword": {
+        "name" : "Bloody sword",
+        "description": "+5% lifesteal",
+        "image" : "src/assets/items/upgrades/bloody_sword.png",
+        "effect" : {"lifesteal" : 0.05},
+        "max_level": 10,
+    },
     
 }

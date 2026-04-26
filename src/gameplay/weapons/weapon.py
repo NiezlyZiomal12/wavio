@@ -18,7 +18,8 @@ class Weapon(pygame.sprite.Sprite):
         self.damage = config['damage'] * self.player.damage
         self.sprite_sheet = pygame.image.load(config['sprite_path']).convert_alpha()
 
-        crit = random.random() < (self.player.crit_chance)
+        crit_chance = max(0.0, min(100.0, float(self.player.crit_chance)))
+        crit = random.random() < (crit_chance / 100.0)
         if crit:
             self.damage *= 2
 

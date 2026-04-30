@@ -1,4 +1,3 @@
-import pygame
 
 UPGRADE_CONFIG = {
     "Order": {

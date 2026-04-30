@@ -2,7 +2,7 @@ import pygame
 import pygame_gui
 from pygame_gui.elements import UIButton
 from src.core.utils import Animation, wrap_text, build_random_pitch_sounds
-from src.gameplay.upgrades import loadUpgrades
+from src.gameplay.items.upgrades import loadUpgrades
 import random
 from config import FONT, NAME_TEXT_COLOR, LVL_TEXT_COLOR, DESC_TEXT_COLOR
 

@@ -1,39 +1,20 @@
-from dataclasses import dataclass
-
-
-@dataclass
-class ShopItem:
-    item_id: str
-    name: str
-    category: str
-    price: int
-    max_level: int
-    evolution_to: str | None
-    description: str
-
+from src.gameplay.items.shop_upgrades.shop_item import ShopItem
+from src.gameplay.items.shop_upgrades.shop_items_config import SHOP_ITEMS_CONFIG
 
 def build_weapon_shop_items(weapon_config: dict) -> list[ShopItem]:
     items: list[ShopItem] = []
 
     for weapon_name, config in weapon_config.items():
-        shop_data = config.get("shop")
-        price = int(shop_data.get("price"))
-        max_level = int(shop_data.get("max_level"))
-        evolution_to = shop_data.get("evolution_to")
-        weapon_type = config.get("type")
-        damage = config.get("damage")
-        cooldown = config.get("cooldown")
+        items.append(ShopItem.from_weapon_config(weapon_name, config))
 
-        items.append(
-            ShopItem(
-                item_id=weapon_name,
-                name=weapon_name,
-                category="weapon",
-                price=price,
-                max_level=max_level,
-                evolution_to=evolution_to,
-                description=f"{weapon_type} | dmg {damage} | cd {cooldown}s",
-            )
-        )
+    return items
+
+
+def build_shop_items(weapon_config: dict, shop_item_config: dict | None = None) -> list[ShopItem]:
+    items = build_weapon_shop_items(weapon_config)
+    active_shop_config = shop_item_config or SHOP_ITEMS_CONFIG
+
+    for item_id, config in active_shop_config.items():
+        items.append(ShopItem.from_shop_config(item_id, config))
 
     return items

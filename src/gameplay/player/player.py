@@ -3,6 +3,7 @@ import random
 import math
 from src.core import Animation
 from src.gameplay.weapons import WEAPON_CONFIG, Fireball, Boomerang, Sword, Spear, Typhoon, Meteor
+from src.gameplay.items.shop_upgrades.shop_items_config import SHOP_ITEMS_CONFIG
 from .weapon_slots import WeaponSlots
 from .equippedWeapon import EquippedWeapon
 from config import FONT, LVL_TEXT_COLOR, GOLD_TEXT_COLOR
@@ -108,6 +109,7 @@ class Player(pygame.sprite.Sprite):
         self.equipped_weapons: dict[str, EquippedWeapon] = {}
 
         self.upgrade_levels = {}
+        self.shop_item_levels = {}
 
         #Pickups
         self.prismat_active = False
@@ -245,6 +247,21 @@ class Player(pygame.sprite.Sprite):
             self.add_gold(price)
             return False, "slots_full"
         
+        return True, "bought"
+
+
+    def buy_shop_item(self, item_id: str, price: int = 0) -> tuple[bool, str]:
+        if not self.spend_gold(price):
+            return False, "not_enough_gold"
+
+        current_level = self.shop_item_levels.get(item_id, 0)
+        max_level = int(SHOP_ITEMS_CONFIG.get(item_id, {}).get("max_level", 1))
+
+        if current_level >= max_level:
+            self.add_gold(price)
+            return False, "max_level"
+
+        self.shop_item_levels[item_id] = current_level + 1
         return True, "bought"
 
     

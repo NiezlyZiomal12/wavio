@@ -3,7 +3,7 @@ import pygame_gui
 import random
 from pygame_gui.elements import UIButton
 from src.gameplay.weapons import WEAPON_CONFIG
-from src.shop import build_weapon_shop_items
+from src.shop import build_shop_items
 from src.core import Animation, wrap_text, build_random_pitch_sounds
 from config import FONT, NAME_TEXT_COLOR, DESC_TEXT_COLOR, LVL_TEXT_COLOR, GOLD_TEXT_COLOR
 
@@ -53,9 +53,7 @@ class ShopUi:
         self._set_ui_visible(False)
         self._responsive_ui(force=True)
 
-
-
-        self.shop_items = build_weapon_shop_items(WEAPON_CONFIG)
+        self.shop_items = build_shop_items(WEAPON_CONFIG)
         self.max_visible_items = 3
         self.visible_shop_items = []
 
@@ -71,19 +69,23 @@ class ShopUi:
 
     def _get_item_icon(self, item_id: str, target_size: int) -> pygame.Surface:
         if item_id not in self.item_icon_cache:
-            config = WEAPON_CONFIG.get(item_id, {})
-            sprite_path = config.get("sprite_path")
+            item = next((shop_item for shop_item in self.shop_items if shop_item.item_id == item_id), None)
+            sprite_path = item.icon_path if item else None
             icon_surface = None
 
             if sprite_path:
                 try:
                     loaded = pygame.image.load(sprite_path).convert_alpha()
-                    anim = config.get("animation", {})
-                    frame_w = int(anim.get("sprite_width", loaded.get_width()))
-                    frame_h = int(anim.get("sprite_height", loaded.get_height()))
-                    frame_w = max(1, min(frame_w, loaded.get_width()))
-                    frame_h = max(1, min(frame_h, loaded.get_height()))
-                    icon_surface = loaded.subsurface((0, 0, frame_w, frame_h)).copy()
+                    if item and item.category == "weapon":
+                        config = WEAPON_CONFIG.get(item_id, {})
+                        anim = config.get("animation", {})
+                        frame_w = int(anim.get("sprite_width", loaded.get_width()))
+                        frame_h = int(anim.get("sprite_height", loaded.get_height()))
+                        frame_w = max(1, min(frame_w, loaded.get_width()))
+                        frame_h = max(1, min(frame_h, loaded.get_height()))
+                        icon_surface = loaded.subsurface((0, 0, frame_w, frame_h)).copy()
+                    else:
+                        icon_surface = loaded
                 except (pygame.error, FileNotFoundError):
                     icon_surface = None
 
@@ -171,7 +173,10 @@ class ShopUi:
     def _buy_item(self, index: int) -> None:
         item = self.visible_shop_items[index]
         item_price = self._get_item_price(item)
-        success, reason = self.player.buy_weapon(item.item_id, item_price)
+        if item.category == "weapon":
+            success, reason = self.player.buy_weapon(item.item_id, item_price)
+        else:
+            success, reason = self.player.buy_shop_item(item.item_id, item_price)
 
 
 
@@ -189,7 +194,7 @@ class ShopUi:
         eligible_items = [
             item
             for item in self.shop_items
-            if self.player.weapon_levels.get(item.item_id, 0) < item.max_level
+            if self._get_item_level(item) < item.max_level
         ]
 
         if not eligible_items:
@@ -243,6 +248,12 @@ class ShopUi:
         self._refresh_visible_items()
         if self.active:
             self.manager.update(dt)
+
+
+    def _get_item_level(self, item) -> int:
+        if item.category == "weapon":
+            return self.player.weapon_levels.get(item.item_id, 0)
+        return self.player.shop_item_levels.get(item.item_id, 0)
 
 
     def draw(self):
@@ -299,7 +310,7 @@ class ShopUi:
             icon_y = rect.centery - icon.get_height() // 2
             self.window.blit(icon, (icon_x, icon_y))
 
-            weapon_level = self.player.weapon_levels.get(item.item_id, 0)
+            item_level = self._get_item_level(item)
             item_price = self._get_item_price(item)
             affordable = self.player.gold >= item_price
 
@@ -309,7 +320,7 @@ class ShopUi:
             name_surface = self.font.render(item.name, True, NAME_TEXT_COLOR)
             self.window.blit(name_surface, (name_x, name_y))
 
-            level_text = f"Lv.{weapon_level}/{item.max_level}"
+            level_text = f"Lv.{item_level}/{item.max_level}"
             level_surface = self.font.render(level_text, True, LVL_TEXT_COLOR)
             level_x = rect.right - level_surface.get_width() - max(8, int(rect.width * 0.03))
             self.window.blit(level_surface, (level_x, name_y))

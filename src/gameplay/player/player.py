@@ -4,6 +4,7 @@ import math
 from src.core import Animation
 from src.gameplay.weapons import WEAPON_CONFIG, Fireball, Boomerang, Sword, Spear, Typhoon, Meteor
 from src.gameplay.items.shop_upgrades.shop_items_config import SHOP_ITEMS_CONFIG
+from src.gameplay.items.upgrades import apply_shop_item_effects
 from .weapon_slots import WeaponSlots
 from .equippedWeapon import EquippedWeapon
 from config import FONT, LVL_TEXT_COLOR, GOLD_TEXT_COLOR
@@ -262,6 +263,7 @@ class Player(pygame.sprite.Sprite):
             return False, "max_level"
 
         self.shop_item_levels[item_id] = current_level + 1
+        apply_shop_item_effects(self, item_id, 1)
         return True, "bought"
 
     

@@ -112,4 +112,3 @@ class StartMenuScene:
         self.window.blit(self.background_image, (0,0))
         self._draw_pixel_fade_overlay()
         self.manager.draw_ui(self.window)
-        pygame.display.update()

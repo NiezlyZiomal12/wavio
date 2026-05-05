@@ -309,4 +309,3 @@ class GameScene:
         self.window.blit(fps_bg, (fps_x, fps_y))
         self.window.blit(fps_text, (fps_x + 5, fps_y + 3))
 
-        pygame.display.update()

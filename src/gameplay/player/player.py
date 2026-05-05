@@ -50,7 +50,7 @@ class Player(pygame.sprite.Sprite):
         self.frame_width, self.frame_height = self.animation_config.get("frame_size", (64, 64))
         self.sprite_size = self.frame_width
         self.just_leveled_up = False
-        self.gold = 200
+        self.gold = 200000
 
         #Animations
         default_animations = {

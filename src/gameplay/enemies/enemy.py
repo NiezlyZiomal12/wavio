@@ -2,6 +2,7 @@ import pygame
 import random
 from src.core import Animation, Flash, dmgIndicator, build_random_pitch_sounds
 from src.gameplay.dropable import Xp, Coin
+from src.gameplay.items.upgrades.item_applier import on_hit
 
 class Enemy(pygame.sprite.Sprite):
     _hurt_sounds: list[pygame.mixer.Sound] = None
@@ -198,10 +199,7 @@ class Enemy(pygame.sprite.Sprite):
         popup_pos = pygame.Vector2(self.position.x, self.position.y - (self.sprite_height * 0.45))
         self.damage_indicator.add(damage, popup_pos)
         
-        #lifesteal for player
-        heal = damage * self.player.lifesteal
-        self.player.current_health = min(self.player.max_health, self.player.current_health + heal)
-
+        on_hit(self.player, self, damage)
         if self.hp <= 0:
             self.die()
 
@@ -219,6 +217,40 @@ class Enemy(pygame.sprite.Sprite):
             coin = Coin(self.coin_sprite, int(self.position.x), int(self.position.y), self.coin_value, self.player)
             self.coin_group.add(coin)
             
+
+    def apply_poison(self, stacks: int, damage: float, duration: float, tick_rate: float) -> None:
+        if not hasattr(self, "_poison_stacks"):
+            self._poison_stacks = 0
+            self._poison_damage = 0
+            self._poison_timer = 0.0
+            self._poison_tick_timer = 0.0
+            self._poison_tick_rate = tick_rate
+
+        self._poison_stacks += stacks
+        self._poison_damage = damage  # damage per tick per stack
+        self._poison_timer = max(self._poison_timer, duration)  # refresh duration
+        self._poison_tick_timer = 0.0        
+
+
+    def _update_poison(self, dt: float) -> None:
+        if not hasattr(self, "_poison_stacks") or self._poison_stacks <= 0 or self.dead:
+            return
+
+        self._poison_timer -= dt
+        if self._poison_timer <= 0:
+            self._poison_stacks = 0
+            return
+
+        self._poison_tick_timer += dt
+        if self._poison_tick_timer >= self._poison_tick_rate:
+            self._poison_tick_timer = 0.0
+            tick_damage = self._poison_damage * self._poison_stacks
+            self.hp -= tick_damage
+            random.choice(self.hurt_sound).play()
+            popup_pos = pygame.Vector2(self.position.x, self.position.y - (self.sprite_height * 0.45))
+            self.damage_indicator.add(int(tick_damage), popup_pos)
+            if self.hp <= 0:
+                self.die()
 
 
     def update_animation(self, dt: float) -> None:
@@ -249,6 +281,7 @@ class Enemy(pygame.sprite.Sprite):
         
         self.hit_flash.update(dt)
         self.damage_indicator.update(dt)
+        self._update_poison(dt)
         self.update_animation(dt)
 
         #Collision with other enemies

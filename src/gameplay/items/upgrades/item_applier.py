@@ -100,6 +100,7 @@ def _apply_blood_glyph(player: "Player") -> None:
     player.max_health  = max(10, player.max_health)   # safety floor
     player.current_health = min(player.current_health, player.max_health)
     player.dmg_mult *= 1.10
+    player.damage += 1
 
 
 # ── Heavy Armor ──────────────────────────────────────────────────────────────

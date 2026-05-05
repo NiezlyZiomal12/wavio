@@ -3,3 +3,6 @@ __pycache__/
 venv/
 .env
 TODO.txt
+characters_ideas.txt
+items_ideas.txt
+weapons_ideas.txt

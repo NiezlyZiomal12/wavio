@@ -345,4 +345,3 @@ class Level_select_scene:
         self.window.fill((26, 37, 37))
         self.manager.draw_ui(self.window)
         self._draw_preview_image()
-        pygame.display.update()

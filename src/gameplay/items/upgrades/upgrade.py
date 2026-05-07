@@ -42,14 +42,14 @@ class Upgrade(pygame.sprite.Sprite):
 
         elif self.name == "Armor":
             delta = self.effect['armor'] * player.armor_mult
-            player.armor = max(0.0, min(0.8, player.armor + delta))
+            player.armor = max(0.0, min(90 , player.armor + delta))
 
         elif self.name == "Pearl":
             player.projectile_count = int(player.projectile_count + self.effect['projectile_count'])
 
         elif self.name == "Scroll":
             delta = self.effect['reduce_cooldown'] * player.cd_mult
-            player.reduce_cooldown = max(0.0, min(0.8, player.reduce_cooldown + delta))
+            player.reduce_cooldown = max(0.0, min(90, player.reduce_cooldown + delta))
 
         elif self.name == "Nightstar":
             delta = self.effect['xp_gain'] * player.xp_gain

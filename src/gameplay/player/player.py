@@ -42,6 +42,10 @@ class Player(pygame.sprite.Sprite):
         self.speed_mult = 1
         self.crit_mult = 1
 
+        #max_stats
+        self.max_armor = 90
+        self.max_cd = 90
+        self.max_speed = 20
 
         self.level = 1
         self.xp = 0
@@ -181,7 +185,7 @@ class Player(pygame.sprite.Sprite):
         #Invisibility frames
         if not self.invicible:
             self.hurt_sound.play()
-            self.current_health -= (amount - amount * self.armor)
+            self.current_health -= (amount - amount * (self.armor / 100))
             self.current_health = max(0, self.current_health)
             self.invicible = True
             self.invicibility_timer = 0.0
@@ -335,9 +339,7 @@ class Player(pygame.sprite.Sprite):
 
         #Weapon update
         self.shoot(dt, targets)
-
         self.update_weapons(dt)
-
         #Knockback
         if self.knockback_velocity.length() > 0:
             self.movement_with_collisions(self.knockback_velocity, collision_rects)

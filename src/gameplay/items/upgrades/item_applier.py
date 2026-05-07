@@ -88,7 +88,7 @@ def _apply_assasins_robe(player: "Player") -> None:
 # returns if damage hasn't grown.
 
 def _apply_bloodbath(player: "Player") -> None:
-    bonus = (player.damage // 5) * 1.0          # 1 % per 5 dmg
+    bonus = (player.damage // 5) * 1.0
     player.lifesteal += bonus
 
 
@@ -97,23 +97,23 @@ def _apply_bloodbath(player: "Player") -> None:
 
 def _apply_blood_glyph(player: "Player") -> None:
     player.max_health -= 10
-    player.max_health  = max(10, player.max_health)   # safety floor
+    player.max_health  = max(10, player.max_health)
     player.current_health = min(player.current_health, player.max_health)
-    player.dmg_mult *= 1.10
-    player.damage += 1
+    player.dmg_mult += 0.10
 
 
 # ── Heavy Armor ──────────────────────────────────────────────────────────────
-# +10 % armor, -5 % speed.
+# +10 armor, -5 speed.
 # Bonus damage = 1 for every full percent of speed that's been sacrificed
-# (tracked via player.heavy_armor_levels so stacking works correctly).
 
 def _apply_heavy_armor(player: "Player") -> None:
     if not hasattr(player, "heavy_armor_levels"):
         player.heavy_armor_levels = 0
 
-    player.armor_mult  *= 1.10
-    player.speed_mult  *= 0.95
+    player.armor  +=  10 * player.armor_mult
+    player.armor = min(player.max_armor, player.armor)
+    player.speed  -= 5 * player.speed_mult
+    player.speed = max(1, player.speed)
 
     player.heavy_armor_levels += 1
     # Each level: the 5 % speed penalty translates into +1 flat damage.
@@ -130,11 +130,10 @@ def _base_stat(player: "Player", stat: str) -> int:
 # +3 luck.  Crit chance = base_crit + luck * 0.5  (recomputed after every buy).
 
 def _apply_lucky_coin(player: "Player") -> None:
-    if not hasattr(player, "_base_crit_chance"):
-        player._base_crit_chance = player.crit_chance
 
     player.luck += 3
-    player.crit_chance = player._base_crit_chance + player.luck * 0.5
+    player.crit_chance += player.luck / 2 * player.crit_mult
+    player.crit_chance = min(100, player.crit_chance)
 
 
 # ── Spider's Venom ───────────────────────────────────────────────────────────
@@ -153,25 +152,14 @@ def _apply_spiders_venom(player: "Player") -> None:
 
 
 # ── Time Amulet ──────────────────────────────────────────────────────────────
-# +10 % CDR per level.  +5 % movement speed for each 5 % CDR accumulated.
+# +10 CDR per level.  +5 % movement speed for each 5 % CDR accumulated.
 
 def _apply_time_amulet(player: "Player") -> None:
-    if not hasattr(player, "_time_amulet_cdr_total"):
-        player._time_amulet_cdr_total = 0.0
-
-    cdr_gain = 10.0   # % per level
-    player.reduce_cooldown        += cdr_gain
-    player._time_amulet_cdr_total += cdr_gain
-
-    # +5 % speed per 5 % CDR accumulated
-    speed_bonus_pct = (player._time_amulet_cdr_total // 5) * 5.0
-    # Store previous bonus so we can add only the delta
-    prev_bonus = getattr(player, "_time_amulet_speed_bonus", 0.0)
-    delta = speed_bonus_pct - prev_bonus
-    if delta > 0:
-        player.speed_mult *= (1 + delta / 100)
-        player._time_amulet_speed_bonus = speed_bonus_pct
-
+    added_cdr = 10 * player.cd_mult
+    player.reduce_cooldown += added_cdr
+    player.reduce_cooldown = min(player.max_cd, player.reduce_cooldown)
+    player.speed += added_cdr * player.speed_mult / 20
+    player.speed = min(player.max_speed, player.speed)
 
 # ---------------------------------------------------------------------------
 # Runtime HOOKS  (call these from combat / pickup code, not from buy logic)

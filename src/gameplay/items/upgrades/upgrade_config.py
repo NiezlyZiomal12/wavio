@@ -23,9 +23,9 @@ UPGRADE_CONFIG = {
     },
     "Armor": {
         "name" : "Armor",
-        "description": "+5% armor",
+        "description": "+5 armor",
         "image" : "src/assets/items/upgrades/armor.png",
-        "effect" : {"armor" : 0.05},
+        "effect" : {"armor" : 5},
         "max_level": 5,
     },
     "Pearl": {
@@ -37,9 +37,9 @@ UPGRADE_CONFIG = {
     },
     "Scroll": {
         "name" : "Scroll",
-        "description": "+5% cooldown reduction",
+        "description": "+5 cooldown reduction",
         "image" : "src/assets/items/upgrades/scroll.png",
-        "effect" : {"reduce_cooldown" : 0.05},
+        "effect" : {"reduce_cooldown" : 5},
         "max_level": 5,
     },
     "Nightstar": {

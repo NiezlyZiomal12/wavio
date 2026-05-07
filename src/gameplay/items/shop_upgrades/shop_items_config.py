@@ -5,7 +5,7 @@ SHOP_ITEMS_CONFIG = {
 
     "Assasins_robe": {
         "name": "Assassin's Robe",
-        "description": "+20% damage, -10% max HP",
+        "description": "+20% damage multiplayer, -10% max HP",
         "image": "src/assets/items/upgrades/shop_items/assasins_robe.png",
         "effect": {"damage_pct": 20, "hp_pct": -10},
         "cost": 40,
@@ -25,7 +25,7 @@ SHOP_ITEMS_CONFIG = {
     },
     "Blood_glyph": {
         "name": "Blood Glyph",
-        "description": "-10 max HP → +10% damage",
+        "description": "-10 max HP for +10% damage mult",
         "image": "src/assets/items/upgrades/shop_items/blood_glyph.png",
         "effect": {},
         "cost": 40,
@@ -33,7 +33,7 @@ SHOP_ITEMS_CONFIG = {
     },
     "Heavy_armor": {
         "name": "Heavy Armor",
-        "description": "+10% armor, -5% speed; bonus damage scales with speed lost",
+        "description": "+10 armor, -5 speed; bonus damage scales with speed lost",
         "image": "src/assets/items/upgrades/shop_items/heavy_armor.png",
         "effect": {},
         "cost": 40,
@@ -57,7 +57,7 @@ SHOP_ITEMS_CONFIG = {
     },
     "Time_amulet": {
         "name": "Time Amulet",
-        "description": "+10% CDR; +5% move speed per 5% CDR accumulated",
+        "description": "+10 CDR; +5% move speed per 5% CDR accumulated",
         "image": "src/assets/items/upgrades/shop_items/time_amulet.png",
         "effect": {},
         "cost": 40,

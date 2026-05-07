@@ -18,7 +18,7 @@ CHARACTERS = {
         "Starting_weapon" : "Fireball",
         "Stats" : {
             "max_health" : 80,
-            "reduce_cooldown" : 0.2,
+            "reduce_cooldown" : 20,
             "projectile_count": 2
         },
         "Passive": {

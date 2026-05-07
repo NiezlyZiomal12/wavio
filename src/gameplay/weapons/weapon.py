@@ -14,7 +14,7 @@ class Weapon(pygame.sprite.Sprite):
         self.speed = config['speed']
         self.sprite_width = config['animation']['sprite_width']
         self.sprite_height = config['animation']['sprite_height']
-        self.cooldown = config['cooldown'] - (config['cooldown'] *self.player.reduce_cooldown)
+        self.cooldown = config['cooldown'] - (config['cooldown'] * self.player.reduce_cooldown / 100)
         self.damage = config['damage'] * self.player.damage
         self.sprite_sheet = pygame.image.load(config['sprite_path']).convert_alpha()
 

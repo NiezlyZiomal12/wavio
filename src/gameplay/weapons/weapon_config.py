@@ -1,7 +1,7 @@
 WEAPON_CONFIG = {
     "Fireball" : {
         "type" : "ranged",
-        "damage" : 5,
+        "damage" : 4,
         "speed" : 300,
         "cooldown" : 1.0,
         "projectile_count" : 2,
@@ -24,7 +24,7 @@ WEAPON_CONFIG = {
     },
     "Sword" : {
         "type" : "mele",
-        "damage" : 3,
+        "damage" : 5,
         "cooldown" : 1,
         "speed" : 0,
         "projectile_count" : 3,

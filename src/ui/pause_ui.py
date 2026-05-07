@@ -146,7 +146,7 @@ class PauseMenuUi:
         return str(value)
 
     def _format_stat_value(self, label: str, value) -> str:
-        if label in ("Armor", "Cooldown Reduction", "Life Steal"):
+        if label in ("Life Steal"):
             try:
                 return f"{float(value) * 100:.0f}%"
             except (TypeError, ValueError):
@@ -169,15 +169,21 @@ class PauseMenuUi:
             ("Max HP", self._format_stat_value("Max HP", getattr(player, "max_health", 0))),
             ("Speed", self._format_stat_value("Speed", getattr(player, "speed", 0))),
             ("Damage", self._format_stat_value("Damage", getattr(player, "damage", 0))),
-            ("Armor", self._format_stat_value("Armor", getattr(player, "armor", 0))),
+            ("Armor", self._format_stat_value("Armor", getattr(player, "armor", 0)) + "%"),
             ("Crit Chance", self._format_stat_value("Crit Chance", getattr(player, "crit_chance", 0))),
             ("Projectile Count", self._format_stat_value("Projectile Count", getattr(player, "projectile_count", 0))),
-            ("Cooldown Reduction", self._format_stat_value("Cooldown Reduction", getattr(player, "reduce_cooldown", 0))),
+            ("Cooldown Reduction", self._format_stat_value("Cooldown Reduction", getattr(player, "reduce_cooldown", 0))+ "%"),
             ("Pickup Range", self._format_stat_value("Pickup Range", getattr(player, "pickup_range", 0))),
             ("Life Steal", self._format_stat_value("Life Steal", getattr(player, "lifesteal", 0))),
             ("Luck", self._format_stat_value("Luck", getattr(player, "luck", 0))),
             ("XP Gain", self._format_stat_value("XP Gain", getattr(player, "xp_gain", 0))),
             ("Coin Gain", self._format_stat_value("Coin Gain", getattr(player, "coin_gain", 0))),
+            ("Hp mult", self._format_stat_value("Hp mult", getattr(player, "hp_mult", 0))),
+            ("Armor mult", self._format_stat_value("Armor mult", getattr(player, "armor_mult", 0))),
+            ("Cd mult", self._format_stat_value("Cd mult", getattr(player, "cd_mult", 0))),
+            ("Dmg mult", self._format_stat_value("Dmg mult", getattr(player, "dmg_mult", 0))),
+            ("Speed mult", self._format_stat_value("Speed mult", getattr(player, "speed_mult", 0))),
+            ("Crit mult", self._format_stat_value("Crit mult", getattr(player, "crit_mult", 0))),
         ]
 
 
@@ -200,6 +206,12 @@ class PauseMenuUi:
             "Luck":'<img src="src/assets/ui/icons/luck.png">',
             "XP Gain": '<img src="src/assets/ui/icons/xp_gain.png">',
             "Coin Gain": '<img src="src/assets/ui/icons/coin_gain.png">',
+            "Hp mult":'<img src="src/assets/ui/icons/max_hp.png">',
+            "Armor mult": '<img src="src/assets/ui/icons/shield.png">',
+            "Cd mult": '<img src="src/assets/ui/icons/cdr.png">',
+            "Dmg mult": '<img src="src/assets/ui/icons/sword.png">',
+            "Speed mult": '<img src="src/assets/ui/icons/speed.png">',
+            "Crit mult": '<img src="src/assets/ui/icons/crit_chance.png">',
         }
 
 

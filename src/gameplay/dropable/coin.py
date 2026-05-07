@@ -8,7 +8,7 @@ class Coin(pygame.sprite.Sprite):
     def __init__(self, sprite_sheet: pygame.sprite.Sprite, x:int, y:int, amount: int, player: object):
         super().__init__()
         self.player = player
-        self.gold_amount = amount * self.player.coin_gain
+        self.gold_amount = max(1, int(round(amount * self.player.coin_gain)))
         self.animation = Animation(
             sprite_sheet, 32,32, 0, 15, 0.08
         )
@@ -64,7 +64,7 @@ class Coin(pygame.sprite.Sprite):
         if distance_to_player < 15:
             random.choice(self.pickup_sounds).play()
             self.collected = True
-            player.gold += self.gold_amount
+            player.add_gold(self.gold_amount)
             self.kill()
 
         

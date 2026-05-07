@@ -3,6 +3,8 @@ import random
 import math
 from src.core import Animation
 from src.gameplay.weapons import WEAPON_CONFIG, Fireball, Boomerang, Sword, Spear, Typhoon, Meteor
+from src.gameplay.items.shop_upgrades.shop_items_config import SHOP_ITEMS_CONFIG
+from src.gameplay.items.upgrades import apply_shop_item_effects
 from .weapon_slots import WeaponSlots
 from .equippedWeapon import EquippedWeapon
 from config import FONT, LVL_TEXT_COLOR, GOLD_TEXT_COLOR
@@ -27,7 +29,7 @@ class Player(pygame.sprite.Sprite):
         self.projectile_count = 1
         self.luck = 1
         self.armor = 0.0
-        self.crit_chance = 0.0
+        self.crit_chance = 10.0
         self.reduce_cooldown = 0.0
         self.pickup_range = 0.0
         self.lifesteal = 0.0
@@ -40,6 +42,10 @@ class Player(pygame.sprite.Sprite):
         self.speed_mult = 1
         self.crit_mult = 1
 
+        #max_stats
+        self.max_armor = 90
+        self.max_cd = 90
+        self.max_speed = 20
 
         self.level = 1
         self.xp = 0
@@ -48,7 +54,7 @@ class Player(pygame.sprite.Sprite):
         self.frame_width, self.frame_height = self.animation_config.get("frame_size", (64, 64))
         self.sprite_size = self.frame_width
         self.just_leveled_up = False
-        self.gold = 200
+        self.gold = 200000
 
         #Animations
         default_animations = {
@@ -108,6 +114,7 @@ class Player(pygame.sprite.Sprite):
         self.equipped_weapons: dict[str, EquippedWeapon] = {}
 
         self.upgrade_levels = {}
+        self.shop_item_levels = {}
 
         #Pickups
         self.prismat_active = False
@@ -178,7 +185,7 @@ class Player(pygame.sprite.Sprite):
         #Invisibility frames
         if not self.invicible:
             self.hurt_sound.play()
-            self.current_health -= (amount - amount * self.armor)
+            self.current_health -= (amount - amount * (self.armor / 100))
             self.current_health = max(0, self.current_health)
             self.invicible = True
             self.invicibility_timer = 0.0
@@ -216,7 +223,7 @@ class Player(pygame.sprite.Sprite):
 
 
     def add_gold(self, amount: int) -> None:
-        self.gold += amount
+        self.gold += int(round(amount))
 
 
     def spend_gold(self, cost: int) -> bool:
@@ -245,6 +252,22 @@ class Player(pygame.sprite.Sprite):
             self.add_gold(price)
             return False, "slots_full"
         
+        return True, "bought"
+
+
+    def buy_shop_item(self, item_id: str, price: int = 0) -> tuple[bool, str]:
+        if not self.spend_gold(price):
+            return False, "not_enough_gold"
+
+        current_level = self.shop_item_levels.get(item_id, 0)
+        max_level = int(SHOP_ITEMS_CONFIG.get(item_id, {}).get("max_level", 1))
+
+        if current_level >= max_level:
+            self.add_gold(price)
+            return False, "max_level"
+
+        self.shop_item_levels[item_id] = current_level + 1
+        apply_shop_item_effects(self, item_id, 1)
         return True, "bought"
 
     
@@ -316,9 +339,7 @@ class Player(pygame.sprite.Sprite):
 
         #Weapon update
         self.shoot(dt, targets)
-
         self.update_weapons(dt)
-
         #Knockback
         if self.knockback_velocity.length() > 0:
             self.movement_with_collisions(self.knockback_velocity, collision_rects)

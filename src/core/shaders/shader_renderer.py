@@ -35,7 +35,6 @@ uniform sampler2D uTex;
 uniform float     uTime;
 uniform vec2      uRes;
 
-// ── Cheap 9-tap box blur for the bloom source ─────────────────────────────
 vec3 blurSample(sampler2D tex, vec2 uv, float radius) {
     vec2 px = radius / uRes;
     vec3 acc = vec3(0.0);
@@ -54,10 +53,10 @@ vec3 blurSample(sampler2D tex, vec2 uv, float radius) {
 void main() {
     vec2 uv = vUV;
 
-    // ── very gentle barrel warp (reduced from 0.035 → 0.010) ─────────────
+    // ── barrel warp ───────────────────────────────────────────────────────
     vec2 c = uv * 2.0 - 1.0;
     float d = dot(c, c);
-    c *= 1.0 + d * 0.010;
+    c *= 1.0 + d * 0.005;
     uv = c * 0.5 + 0.5;
 
     if (uv.x < 0.0 || uv.x > 1.0 || uv.y < 0.0 || uv.y > 1.0) {
@@ -65,43 +64,50 @@ void main() {
         return;
     }
 
-    // ── base colour ───────────────────────────────────────────────────────
     vec4 col = texture(uTex, uv);
 
-    // ── bloom ─────────────────────────────────────────────────────────────
-    // Extract bright areas, blur them, and add back on top.
-    // Three passes at increasing radii give a soft halo.
+    // ── desaturate slightly so bright biomes don't blow out ───────────────
+    float luma = dot(col.rgb, vec3(0.299, 0.587, 0.114));
+    col.rgb = mix(vec3(luma), col.rgb, 0.82);
+
+    // ── bloom — only very bright pixels bleed now (threshold 0.72+) ───────
     vec3 b1 = blurSample(uTex, uv,  2.5);
-    vec3 b2 = blurSample(uTex, uv,  6.0);
-    vec3 b3 = blurSample(uTex, uv, 12.0);
+    vec3 b2 = blurSample(uTex, uv,  8.0);
 
-    // Only the bright parts bleed (anything above ~0.5 luminance)
-    float lum1 = dot(b1, vec3(0.299, 0.587, 0.114));
-    float lum2 = dot(b2, vec3(0.299, 0.587, 0.114));
-    float lum3 = dot(b3, vec3(0.299, 0.587, 0.114));
+    float l1 = dot(b1, vec3(0.299, 0.587, 0.114));
+    float l2 = dot(b2, vec3(0.299, 0.587, 0.114));
 
-    vec3 bloom = b1 * max(0.0, lum1 - 0.45) * 1.6
-               + b2 * max(0.0, lum2 - 0.40) * 1.2
-               + b3 * max(0.0, lum3 - 0.35) * 0.8;
+    // Tight threshold + weak multipliers = glow only on true highlights
+    vec3 bloom = b1 * max(0.0, l1 - 0.72) * 0.7
+               + b2 * max(0.0, l2 - 0.68) * 0.4;
 
     col.rgb += bloom;
 
-    // ── subtle colour fringing on bright edges (replaces hard chroma ab.) ─
-    float r = texture(uTex, uv + vec2( 0.0008, 0.0)).r;
-    float b = texture(uTex, uv + vec2(-0.0008, 0.0)).b;
-    col.r = mix(col.r, r, 0.5);
-    col.b = mix(col.b, b, 0.5);
+    // ── chromatic fringe (kept subtle) ────────────────────────────────────
+    float r = texture(uTex, uv + vec2( 0.0006, 0.0)).r;
+    float b = texture(uTex, uv + vec2(-0.0006, 0.0)).b;
+    col.r = mix(col.r, r, 0.35);
+    col.b = mix(col.b, b, 0.35);
 
-    // ── very faint scanlines — just a texture hint, not a CRT grid ────────
-    float scan = sin(uv.y * uRes.y * 3.14159) * 0.5 + 0.5;
-    col.rgb *= 0.96 + 0.04 * scan;
+    // ── phosphor scanlines — slightly green-tinted darks, CRT feel ────────
+    float line   = mod(floor(uv.y * uRes.y), 2.0);
+    float scan   = mix(0.78, 1.0, line);          // dark line / bright line
+    col.rgb     *= scan;
+    // tint the dark scanline gaps slightly green like a phosphor screen
+    col.g += (1.0 - scan) * 0.018;
 
-    // ── soft vignette ─────────────────────────────────────────────────────
-    col.rgb *= 1.0 - d * 0.38;
+    // ── shadow crush — lift blacks just a hair, grey-green tint ──────────
+    // Makes dark areas feel like an old phosphor monitor with ambient glow
+    col.rgb  = col.rgb * 0.91 + vec3(0.012, 0.018, 0.010);
 
-    // ── gentle warm/cool grade — makes glows feel more filmic ────────────
-    col.r *= 1.04;
-    col.b *= 1.06;
+    // ── vignette (stronger than before to frame the action) ───────────────
+    float vig = 1.0 - d * 0.28;
+    vig = clamp(vig, 0.0, 1.0);
+    col.rgb *= vig;
+
+    // ── very subtle cool grade (CRTs ran slightly cool) ───────────────────
+    col.r *= 0.97;
+    col.b *= 1.03;
 
     FragColor = vec4(col.rgb, 1.0);
 }

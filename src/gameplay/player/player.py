@@ -390,6 +390,9 @@ class Player(pygame.sprite.Sprite):
 
         font = pygame.font.Font(FONT, 24)
         level_text = font.render(f"Lvl: {self.level}", True, LVL_TEXT_COLOR)
+        level_bg = pygame.Surface((level_text.get_width() + 10, level_text.get_height() + 6), pygame.SRCALPHA)
+        level_bg.fill((0, 0, 0, 140))
+        surface.blit(level_bg, (8, 8))
         surface.blit(level_text, (10,8) )
 
 

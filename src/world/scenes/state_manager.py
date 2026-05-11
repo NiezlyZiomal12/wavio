@@ -6,6 +6,7 @@ from .game_scene import GameScene
 from .character_select_scene import Character_select_scene
 from .levels.level_select_scene import Level_select_scene
 from src.core.shaders import ShaderRenderer
+from src.core.audio import SoundtrackManager
 
 
 class StateManager:
@@ -26,6 +27,8 @@ class StateManager:
         # Post-processing renderer
         self.shader = ShaderRenderer(self.scr_w, self.scr_h)
         # ─────────────────────────────────────────────────────────────────
+        self.audio = SoundtrackManager()
+        self.audio.start_playlist("menu")
 
         pygame.display.set_caption("Wavio")
         self.clock = pygame.time.Clock()
@@ -50,6 +53,15 @@ class StateManager:
             self.elapsed += dt
             events = pygame.event.get()
 
+            filtered_events = []
+            for e in events:
+                if hasattr(self.audio, "MUSIC_END") and e.type == self.audio.MUSIC_END:
+                    self.audio.handle_music_end_event(e)
+                else:
+                    filtered_events.append(e)
+
+            events = filtered_events
+
             if self.state == "menu":
                 self.menu.handle_events(events)
                 if not self.menu.running:
@@ -58,10 +70,11 @@ class StateManager:
 
                 self.menu.update(dt)
                 self.menu.render()
-                self._present()                 # ← replaces pygame.display.update()
+                self._present()
 
                 if self.menu.start_requested:
                     self.state = "character_select_scene"
+                    self.audio.start_playlist("menu")
                 continue
 
             if self.state == "character_select_scene":
@@ -76,6 +89,7 @@ class StateManager:
 
                 if self.character_select_scene.start_game:
                     self.state = "level_select_scene"
+                    self.audio.start_playlist("menu")
                 continue
 
             if self.state == "level_select_scene":
@@ -90,22 +104,29 @@ class StateManager:
 
                 if self.level_select_scene.start_game:
                     self.game = GameScene(
-                        self.screen,                                          # ← screen, not window
+                        self.screen,
                         self.character_select_scene.get_selected_character(),
                         self.level_select_scene.get_selected_level(),
                         self.level_select_scene.get_selected_difficulty(),
                     )
                     self.state = "game"
+                    self.audio.start_playlist("game")
                 continue
 
             if self.state == "game":
                 if self.game is None:
                     self.game = GameScene(
-                        self.screen,                                          # ← screen, not window
+                        self.screen,
                         self.character_select_scene.get_selected_character(),
                         self.level_select_scene.get_selected_level(),
                         self.level_select_scene.get_selected_difficulty(),
                     )
+
+                # # ensure game soundtrack is playing when entering game
+                # try:
+                #     self.audio.start_playlist("game")
+                # except Exception:
+                #     pass
 
                 self.game.handle_events(events)
                 if not self.game.running:

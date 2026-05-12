@@ -5,7 +5,7 @@ from config import WIDTH, HEIGHT, BG_COLOR
 from src.core import Camera, Timer
 from src.gameplay.player.player_classes import Warrior, Mage, Rogue
 from src.game_logic import EnemySpawner
-from src.ui import LevelUpUi, PauseMenuUi, ShopUi
+from src.ui import LevelUpUi, PauseMenuUi, ShopUi, WinUi, LostUi
 from ..Map import World
 from src.gameplay.pickables import spawn_random_presents, trigger_bomb
 
@@ -76,7 +76,7 @@ class GameScene:
         self.present_spawn_interval = 60.0
 
         # Timer
-        self.level_timer = Timer(20 * 60)
+        self.level_timer = Timer(6 * 60)
 
         # World
         map_world_width = self.level.width * self.level.tilewidth
@@ -120,7 +120,10 @@ class GameScene:
             price_multiplier=self.difficulty["shop_price_mult"],
         )
         self.pause_ui = PauseMenuUi(self.window, self.player)
-        self.shop_timer = 1
+        self.win_ui = WinUi(self.window, WIDTH, HEIGHT, self.player, 0)
+        self.lost_ui = LostUi(self.window, WIDTH, HEIGHT, self.player, 0)
+        self.shop_timer = 30
+        self.won = False
 
         # FPS overlay
         self.fps_font = pygame.font.Font(None, 24)
@@ -137,6 +140,18 @@ class GameScene:
                 if event.type == pygame.QUIT:
                     self.running = False
                     return
+
+                # Lost UI
+                if self.lost_ui.active:
+                    if self.lost_ui.handle_event(event):
+                        self.running = False
+                    continue
+
+                # Win UI
+                if self.win_ui.active:
+                    if self.win_ui.handle_event(event):
+                        self.running = False
+                    continue
 
                 # Pausing the game
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
@@ -170,6 +185,14 @@ class GameScene:
                 self.fps_smoothed = current_fps
             else:
                 self.fps_smoothed = (self.fps_smoothed * 0.9) + (current_fps * 0.1)
+
+        self.lost_ui.update(dt)
+        if self.lost_ui.active:
+            return
+
+        self.win_ui.update(dt)
+        if self.win_ui.active:
+            return
 
         self.pause_ui.update(dt)
         if self.pause_ui.active:
@@ -226,13 +249,20 @@ class GameScene:
         self.presents.update(dt, self.player.active_projectiles)
 
         # Timer finished
-        if self.level_timer.finished:
-            self.running = False
+        if self.level_timer.finished and not self.won:
+            self.won = True
+            self.win_ui.elapsed_time = self.level_timer.elapsed
+            self.win_ui.show()
 
         # Bomb pickup
         if self.player.pending_effect == "bomb":
             trigger_bomb(self.spawner, self.camera)
             self.player.pending_effect = None
+
+        # Player died
+        if self.player.died:
+            self.player.died = False
+            self.lost_ui.show()
 
         # Level up
         if self.player.just_leveled_up:
@@ -283,6 +313,12 @@ class GameScene:
         self.spawner.draw(self.window, self.camera)
         self.player.draw(self.window, self.camera)
         self.level_timer.draw(self.window)
+
+        if self.lost_ui.active:
+            self.lost_ui.draw()
+
+        if self.win_ui.active:
+            self.win_ui.draw()
 
         if self.level_up_ui.active:
             self.level_up_ui.draw()

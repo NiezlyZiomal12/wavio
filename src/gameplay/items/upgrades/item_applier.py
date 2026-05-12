@@ -112,7 +112,7 @@ def _apply_heavy_armor(player: "Player") -> None:
 
     player.armor  +=  10 * player.armor_mult
     player.armor = min(player.max_armor, player.armor)
-    player.speed  -= 5 * player.speed_mult
+    player.speed  -= 1 * player.speed_mult
     player.speed = max(1, player.speed)
 
     player.heavy_armor_levels += 1

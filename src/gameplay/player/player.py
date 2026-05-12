@@ -104,6 +104,7 @@ class Player(pygame.sprite.Sprite):
         self.hurt = False        
         self.knockback_velocity = pygame.Vector2(0, 0)
         self.knockback_decay = 0.9
+        self.died = False
 
         #Shooting
         self.shoot_timer = 0.0
@@ -192,6 +193,9 @@ class Player(pygame.sprite.Sprite):
             self.hurt = True
             self.hurt_animation.reset()
             self.current_animation = self.hurt_animation
+
+            if self.current_health <= 0 :
+                self.died = True
 
             #Knockback
             direction = self.position - enemy_pos

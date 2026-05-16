@@ -1,5 +1,7 @@
 import pygame
 
+from src.core.audio import apply_sfx_volume
+
 class Pickable(pygame.sprite.Sprite):
     def __init__(self, image: pygame.Surface, pos : pygame.Vector2, effect, player:object):
         super().__init__()
@@ -13,12 +15,15 @@ class Pickable(pygame.sprite.Sprite):
         self.collect_radius = 100
         self.collected = False
 
-        self.explosion_sound = pygame.mixer.Sound("src/assets/sounds/game/weapons/explosion.wav")
-        self.explosion_sound.set_volume(0.2)
-        self.heal_sound = pygame.mixer.Sound("src/assets/sounds/game/heal.wav")
-        self.heal_sound.set_volume(0.2)
-        self.magnet_sound = pygame.mixer.Sound("src/assets/sounds/game/magnet.wav")
-        self.magnet_sound.set_volume(0.2)
+        self.explosion_sound = apply_sfx_volume(
+            pygame.mixer.Sound("src/assets/sounds/game/weapons/explosion.wav"),
+        )
+        self.heal_sound = apply_sfx_volume(
+            pygame.mixer.Sound("src/assets/sounds/game/heal.wav"),
+        )
+        self.magnet_sound = apply_sfx_volume(
+            pygame.mixer.Sound("src/assets/sounds/game/magnet.wav"),
+        )
 
 
     def apply_effect(self):

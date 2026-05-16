@@ -2,6 +2,7 @@ import pygame
 import pygame_gui
 from pygame_gui.elements import UIButton, UIPanel, UILabel
 from .level_config import LEVELS
+from src.core.audio import apply_sfx_volume
 
 DIFFICULTIES = ["Normal", "Hard", "Nightmare"]
 
@@ -13,7 +14,9 @@ class Level_select_scene:
         self.start_game = False
         self.current_size = self.window.get_size()
 
-        self.click_sound = pygame.mixer.Sound("src/assets/sounds/gui/click.wav")
+        self.click_sound = apply_sfx_volume(
+            pygame.mixer.Sound("src/assets/sounds/gui/click.wav")
+        )
 
         self.selected_level = LEVELS[0]
         self.selected_difficulty = "Normal"

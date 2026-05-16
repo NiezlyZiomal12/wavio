@@ -126,6 +126,26 @@
       "normal_text": "#C2C7AC"
     }
   },
+  "#options_slider": {
+    "colours": {
+      "normal_text": "#C2C7AC",
+      "dark_bg": "#1E2A26",
+      "normal_bg": "#323D39",
+      "hovered_bg": "#474F36",
+      "active_bg": "#636B52",
+      "normal_border": "#666F50",
+      "hovered_border": "#838C6D",
+      "active_border": "#959372",
+      "selected_bg": "#959372"
+    },
+    "misc": {
+      "shape": "rounded_rectangle",
+      "shape_corner_radius": "6",
+      "border_width": "1",
+      "slider_width": "12",
+      "shadow_width": "0"
+    }
+  },
   "#rerollButton" : {
     "misc": {
       "border_width": "2",

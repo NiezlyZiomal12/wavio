@@ -18,7 +18,7 @@ class Spear(Weapon):
         self.hitbox_width = int(config["special"]["hitbox_width"])
         self.hitbox_length = int(config["special"]["hitbox_length"])
 
-        Spear._shoot_sounds = build_random_pitch_sounds("src/assets/sounds/game/weapons/spear.wav", volume=0.10)
+        Spear._shoot_sounds = build_random_pitch_sounds("src/assets/sounds/game/weapons/spear.wav")
         self.shoot_sound = Spear._shoot_sounds
 
         self.direction = target_pos - pygame.Vector2(player.rect.center)

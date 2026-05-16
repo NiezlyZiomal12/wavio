@@ -1,6 +1,8 @@
 import audioop
 import pygame
 
+from src.core.audio import apply_sfx_volume
+
 
 def build_random_pitch_sounds(
     path: str,
@@ -10,7 +12,7 @@ def build_random_pitch_sounds(
     """Build a small list of pitch-varied sounds from one source file."""
     base = pygame.mixer.Sound(path)
     clamped_volume = max(0.0, min(1.0, volume))
-    base.set_volume(clamped_volume)
+    apply_sfx_volume(base, clamped_volume)
 
     mixer_info = pygame.mixer.get_init()
     if mixer_info is None:
@@ -26,7 +28,7 @@ def build_random_pitch_sounds(
             target_rate = max(1000, int(frequency / pitch))
             shifted_raw, _ = audioop.ratecv(raw, sample_width, channels, frequency, target_rate, None)
             shifted = pygame.mixer.Sound(buffer=shifted_raw)
-            shifted.set_volume(clamped_volume)
+            apply_sfx_volume(shifted, clamped_volume)
             sounds.append(shifted)
         except (pygame.error, audioop.error, ValueError, ZeroDivisionError):
             continue

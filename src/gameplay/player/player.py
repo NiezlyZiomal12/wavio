@@ -1,4 +1,6 @@
 import pygame
+
+from src.core.audio import apply_sfx_volume
 import random
 import math
 from src.core import Animation
@@ -125,8 +127,10 @@ class Player(pygame.sprite.Sprite):
         self.starting_weapon_name = None
 
         #sounds
-        self.hurt_sound = pygame.mixer.Sound("src/assets/sounds/game/hurt.wav")
-        self.hurt_sound.set_volume(0.2)
+        self.hurt_sound = apply_sfx_volume(
+            pygame.mixer.Sound("src/assets/sounds/game/hurt.wav"),
+            0.2,
+        )
 
 
     def move(self, keys: pygame.key.ScancodeWrapper, collision_rects= None) -> None:

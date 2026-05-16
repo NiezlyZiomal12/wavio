@@ -3,6 +3,7 @@ import pygame_gui
 from pygame_gui.elements import UIButton
 from src.core.utils import Animation
 from config import FONT, NAME_TEXT_COLOR, DESC_TEXT_COLOR
+from src.core.audio import apply_sfx_volume
 
 class LostUi:
     def __init__(self, window, width, height, player, elapsed_time):
@@ -21,9 +22,13 @@ class LostUi:
         self.small_font_size = 18
         self.small_font = pygame.font.Font(FONT, self.small_font_size)
 
-        self.click_sound = pygame.mixer.Sound("src/assets/sounds/gui/click.wav")
-        self.victory_sound = pygame.mixer.Sound("src/assets/sounds/game/power_up.wav")
-        self.victory_sound.set_volume(0.2)
+        self.click_sound = apply_sfx_volume(
+            pygame.mixer.Sound("src/assets/sounds/gui/click.wav")
+        )
+        self.victory_sound = apply_sfx_volume(
+            pygame.mixer.Sound("src/assets/sounds/game/power_up.wav"),
+            0.2,
+        )
 
         self.manager = pygame_gui.UIManager(self.current_size, theme_path="src/assets/pygame_gui_styles/pause_theme.json")
         self.popup_rect = self._compute_popup_rect()

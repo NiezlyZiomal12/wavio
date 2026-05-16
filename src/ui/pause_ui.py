@@ -2,6 +2,8 @@ import pygame
 import pygame_gui
 from html import escape
 from pygame_gui.elements import UIButton, UILabel, UIPanel, UITextBox
+from src.core.audio import apply_sfx_volume
+from src.ui.options_ui import OptionsMenuUi
 
 
 class PauseMenuUi:
@@ -14,8 +16,12 @@ class PauseMenuUi:
         self._last_stats_text = ""
         layout = self._compute_layout()
         self.popup_rect = layout["popup"]
-        self.click_sound = pygame.mixer.Sound("src/assets/sounds/gui/click.wav")
-        self.open_sound = pygame.mixer.Sound("src/assets/sounds/gui/open.wav")
+        self.click_sound = apply_sfx_volume(
+            pygame.mixer.Sound("src/assets/sounds/gui/click.wav")
+        )
+        self.open_sound = apply_sfx_volume(
+            pygame.mixer.Sound("src/assets/sounds/gui/open.wav")
+        )
 
         self.popup_panel = UIPanel(
             relative_rect=self.popup_rect,
@@ -83,6 +89,8 @@ class PauseMenuUi:
             object_id="#textBox",
         )
 
+        self.options_ui = OptionsMenuUi(self.window)
+
         self.ui_elements = [
             self.popup_panel,
             self.left_panel,
@@ -100,12 +108,14 @@ class PauseMenuUi:
         self.active = True
         self.open_sound.play()
         self._set_visible(True)
+        self.options_ui.hide()
         self._refresh_stats_text(force=True)
 
     def hide(self) -> None:
         self.open_sound.play()
         self.active = False
         self._set_visible(False)
+        self.options_ui.hide()
 
     def toggle(self) -> None:
         if self.active:
@@ -124,17 +134,30 @@ class PauseMenuUi:
         if not self.active:
             return
 
+        if self.options_ui.active:
+            self.options_ui.handle_event(event)
+            if not self.options_ui.active:
+                self._set_visible(True)
+            return
+
         self.manager.process_events(event)
 
         if event.type == pygame_gui.UI_BUTTON_PRESSED:
             self.click_sound.play()
             if event.ui_element == self.resume_button:
                 self.hide()
+            elif event.ui_element == self.options_button:
+                self._set_visible(False)
+                self.options_ui.show()
 
     def update(self, dt: float) -> None:
         self._sync_to_window_size()
 
         if not self.active:
+            return
+
+        if self.options_ui.active:
+            self.options_ui.update(dt)
             return
 
         self._refresh_stats_text()
@@ -234,6 +257,10 @@ class PauseMenuUi:
 
     def draw(self) -> None:
         if not self.active:
+            return
+
+        if self.options_ui.active:
+            self.options_ui.draw()
             return
 
         overlay = pygame.Surface(self.current_size, pygame.SRCALPHA)

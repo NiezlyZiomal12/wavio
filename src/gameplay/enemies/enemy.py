@@ -72,7 +72,7 @@ class Enemy(pygame.sprite.Sprite):
         self.damage_indicator = dmgIndicator(font_size=24, lifetime=0.65)
 
         if Enemy._hurt_sounds is None:
-            Enemy._pickup_sounds = build_random_pitch_sounds("src/assets/sounds/game/hurt.wav", volume=0.22)
+            Enemy._pickup_sounds = build_random_pitch_sounds("src/assets/sounds/game/hurt.wav")
 
         self.hurt_sound = Enemy._pickup_sounds
 

@@ -2,11 +2,13 @@ import os
 import random
 import pygame
 
+from .audio_settings import apply_all, set_music_volume
+
 
 class SoundtrackManager:
     SUPPORTED_EXT = (".mp3")
 
-    def __init__(self, menu_dir="src/assets/soundtracks/menu", game_dir="src/assets/soundtracks/game", volume=1):
+    def __init__(self, menu_dir="src/assets/soundtracks/menu", game_dir="src/assets/soundtracks/game", volume=None):
         self.menu_dir = menu_dir
         self.game_dir = game_dir
         self.volume = volume
@@ -16,7 +18,9 @@ class SoundtrackManager:
         self.disabled = False
         self.MUSIC_END = pygame.event.custom_type()
         pygame.mixer.music.set_endevent(self.MUSIC_END)
-        pygame.mixer.music.set_volume(self.volume)
+        if self.volume is not None:
+            set_music_volume(self.volume)
+        apply_all()
 
         self.playlists = {
             "menu": self._scan_dir(self.menu_dir),

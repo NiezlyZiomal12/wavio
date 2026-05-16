@@ -1,6 +1,7 @@
 import pygame
 import pygame_gui
 from pygame_gui.elements import UIButton
+from src.core.audio import apply_sfx_volume
 
 
 class StartMenuScene:
@@ -17,7 +18,9 @@ class StartMenuScene:
         self.current_size = self.window.get_size()
         self.manager = pygame_gui.UIManager(self.current_size, theme_path="src/assets/pygame_gui_styles/pause_theme.json")
 
-        self.click_sound = pygame.mixer.Sound("src/assets/sounds/gui/click.wav")
+        self.click_sound = apply_sfx_volume(
+            pygame.mixer.Sound("src/assets/sounds/gui/click.wav")
+        )
 
         self.background = pygame.image.load("src/assets/ui/mainBackground.png").convert()
         self.background_image = pygame.transform.scale(self.background, self.current_size)

@@ -16,7 +16,7 @@ class Meteor(Weapon):
         self.min_scatter = config["special"]["min_scatter"]
         self.max_scatter = config["special"]["max_scatter"]
 
-        Meteor._shoot_sounds = build_random_pitch_sounds("src/assets/sounds/game/weapons/explosion.wav", volume=0.05)
+        Meteor._shoot_sounds = build_random_pitch_sounds("src/assets/sounds/game/weapons/explosion.wav")
         self.shoot_sound = Meteor._shoot_sounds
 
         if self.max_spawn_range < 0:

@@ -2,6 +2,7 @@ import pygame
 import pygame_gui
 from pygame_gui.elements import UIButton, UIPanel, UILabel
 from src.gameplay.player.characters_config import CHARACTERS
+from src.core.audio import apply_sfx_volume
 
 
 class Character_select_scene:
@@ -10,7 +11,9 @@ class Character_select_scene:
         self.running = True
         self.start_game = False
         self.selected_character = "Mage"
-        self.click_sound = pygame.mixer.Sound("src/assets/sounds/gui/click.wav")
+        self.click_sound = apply_sfx_volume(
+            pygame.mixer.Sound("src/assets/sounds/gui/click.wav")
+        )
 
         self.current_size = self.window.get_size()
         self.manager = pygame_gui.UIManager(self.current_size, theme_path="src/assets/pygame_gui_styles/pause_theme.json")

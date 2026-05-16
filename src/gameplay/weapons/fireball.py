@@ -18,7 +18,7 @@ class Fireball(Weapon):
         self.lifetime = config['special']['lifetime']
         self.time_alive = 0.0
 
-        Fireball._shoot_sounds = build_random_pitch_sounds("src/assets/sounds/game/weapons/fireball.wav", volume=0.05)
+        Fireball._shoot_sounds = build_random_pitch_sounds("src/assets/sounds/game/weapons/fireball.wav")
         self.shoot_sound = Fireball._shoot_sounds
 
     def update(self, dt:float):

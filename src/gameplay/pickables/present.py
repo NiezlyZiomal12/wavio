@@ -28,9 +28,9 @@ class Present(pygame.sprite.Sprite):
         self.damage_indicator = dmgIndicator(font_size=24, lifetime=0.65)
 
         if Present._hurt_sounds is None:
-            Present._pickup_sounds = build_random_pitch_sounds("src/assets/sounds/game/hurt.wav", volume=0.22)
+            Present._hurt_sounds = build_random_pitch_sounds("src/assets/sounds/game/hurt.wav")
 
-        self.hurt_sound = Present._pickup_sounds
+        self.hurt_sound = Present._hurt_sounds
     
     def take_damage(self, weapon: object) -> None:
         if self.spawning:

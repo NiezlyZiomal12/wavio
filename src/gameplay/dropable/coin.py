@@ -16,7 +16,7 @@ class Coin(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center=(x,y))
 
         if Coin._pickup_sounds is None:
-            Coin._pickup_sounds = build_random_pitch_sounds("src/assets/sounds/game/pickupCoin.wav", volume=0.10)
+            Coin._pickup_sounds = build_random_pitch_sounds("src/assets/sounds/game/pickupCoin.wav")
 
         self.pickup_sounds = Coin._pickup_sounds
 

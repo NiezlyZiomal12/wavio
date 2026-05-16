@@ -5,6 +5,7 @@ from src.core.utils import Animation, wrap_text, build_random_pitch_sounds
 from src.gameplay.items.upgrades import loadUpgrades
 import random
 from config import FONT, NAME_TEXT_COLOR, LVL_TEXT_COLOR, DESC_TEXT_COLOR
+from src.core.audio import apply_sfx_volume
 
 class LevelUpUi:
     def __init__(self, window, width, height, player):
@@ -25,10 +26,14 @@ class LevelUpUi:
         self.option_levels = {}
         self.selected = None
 
-        self.click_sound = pygame.mixer.Sound("src/assets/sounds/gui/click.wav")
-        self.power_up_sound = pygame.mixer.Sound("src/assets/sounds/game/power_up.wav")
-        self.power_up_sound.set_volume(0.1)
-        _roll_sounds = build_random_pitch_sounds("src/assets/sounds/gui/roll.wav", volume=0.10)
+        self.click_sound = apply_sfx_volume(
+            pygame.mixer.Sound("src/assets/sounds/gui/click.wav")
+        )
+        self.power_up_sound = apply_sfx_volume(
+            pygame.mixer.Sound("src/assets/sounds/game/power_up.wav"),
+            0.1,
+        )
+        _roll_sounds = build_random_pitch_sounds("src/assets/sounds/gui/roll.wav")
         self.roll_sound = _roll_sounds
 
         self.manager = pygame_gui.UIManager(self.current_size, theme_path="src/assets/pygame_gui_styles/pause_theme.json")

@@ -31,7 +31,7 @@ class Boomerang(Weapon):
         self.life = 0
         self.lifetime = config['special']['lifetime']
 
-        Boomerang._shoot_sounds = build_random_pitch_sounds("src/assets/sounds/game/weapons/boomerang.wav", volume=0.10)
+        Boomerang._shoot_sounds = build_random_pitch_sounds("src/assets/sounds/game/weapons/boomerang.wav")
         self.shoot_sound = Boomerang._shoot_sounds
 
 

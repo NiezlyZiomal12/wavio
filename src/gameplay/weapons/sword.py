@@ -19,7 +19,7 @@ class Sword(Weapon):
 
         self.offset_distance = self.attack_radius * 0.5
 
-        Sword._shoot_sounds = build_random_pitch_sounds("src/assets/sounds/game/weapons/slash.wav", volume=0.10)
+        Sword._shoot_sounds = build_random_pitch_sounds("src/assets/sounds/game/weapons/slash.wav")
         self.shoot_sound = Sword._shoot_sounds
 
     

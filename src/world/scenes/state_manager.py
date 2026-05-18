@@ -6,6 +6,7 @@ from .game_scene import GameScene
 from .character_select_scene import Character_select_scene
 from .levels.level_select_scene import Level_select_scene
 from src.core.shaders import ShaderRenderer
+from src.core.save_data import SaveDataStore
 from src.core.audio import SoundtrackManager
 
 
@@ -36,9 +37,10 @@ class StateManager:
         self.state = "menu"
         self.elapsed = 0.0
 
+        self.save_data = SaveDataStore()
         self.menu = StartMenuScene(self.screen)
         self.character_select_scene = Character_select_scene(self.screen)
-        self.level_select_scene = Level_select_scene(self.screen)
+        self.level_select_scene = Level_select_scene(self.screen, save_data=self.save_data)
         self.game = None
 
     def _present(self) -> None:
@@ -73,6 +75,7 @@ class StateManager:
                 self._present()
 
                 if self.menu.start_requested:
+                    self.menu.start_requested = False
                     self.state = "character_select_scene"
                     self.audio.start_playlist("menu")
                 continue
@@ -87,7 +90,17 @@ class StateManager:
                 self.character_select_scene.render()
                 self._present()
 
+                if self.character_select_scene.back_requested:
+                    self.character_select_scene.start_game = False
+                    self.character_select_scene.back_requested = False
+                    self.state = "menu"
+                    continue
+
                 if self.character_select_scene.start_game:
+                    self.character_select_scene.start_game = False
+                    self.level_select_scene.set_selected_character(
+                        self.character_select_scene.get_selected_character()
+                    )
                     self.state = "level_select_scene"
                     self.audio.start_playlist("menu")
                 continue
@@ -102,12 +115,19 @@ class StateManager:
                 self.level_select_scene.render()
                 self._present()
 
+                if self.level_select_scene.back_requested :
+                    self.level_select_scene.start_game = False
+                    self.level_select_scene.back_requested = False
+                    self.state = "character_select_scene"
+                    continue
+
                 if self.level_select_scene.start_game:
                     self.game = GameScene(
                         self.screen,
                         self.character_select_scene.get_selected_character(),
                         self.level_select_scene.get_selected_level(),
                         self.level_select_scene.get_selected_difficulty(),
+                        save_data=self.save_data,
                     )
                     self.state = "game"
                     self.audio.start_playlist("game")
@@ -120,6 +140,7 @@ class StateManager:
                         self.character_select_scene.get_selected_character(),
                         self.level_select_scene.get_selected_level(),
                         self.level_select_scene.get_selected_difficulty(),
+                        save_data=self.save_data,
                     )
 
                 # # ensure game soundtrack is playing when entering game

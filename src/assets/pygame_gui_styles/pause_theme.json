@@ -96,6 +96,22 @@
     }
   },
 
+  "#difficulty_done": {
+    "font": {
+      "name": "fira_code",
+      "size": "24"
+    },
+    "colours": {
+      "normal_text": "#E2E7C9",
+      "normal_bg": "#0eeb33",
+      "hovered_bg": "#2edb4b",
+      "active_bg": "#2edb4b",
+      "normal_border": "#7A9A6A",
+      "hovered_border": "#8FB07C",
+      "active_border": "#9FC18A"
+    }
+  },
+
   "#shop_item_button": {
     "font": {
       "name": "fira_code",

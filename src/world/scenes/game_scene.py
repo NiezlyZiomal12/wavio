@@ -44,14 +44,25 @@ DIFFICULTY_SETTINGS = {
 }
 
 class GameScene:
-    def __init__(self, window: pygame.Surface, selected_character: str, selected_level:str, selected_difficulty: str = "Normal"):
+    def __init__(
+        self,
+        window: pygame.Surface,
+        selected_character: str,
+        selected_level: dict,
+        selected_difficulty: str = "Normal",
+        save_data=None,
+    ):
         self.window = window
         self.running = True
         self.paused = False
         self.current_size = self.window.get_size()
         self.width, self.height = self.current_size
+        self.selected_character = selected_character
+        self.selected_level = selected_level
+        self.level_id = selected_level.get("id", "")
         self.selected_difficulty = selected_difficulty
         self.difficulty = DIFFICULTY_SETTINGS[self.selected_difficulty]
+        self.save_data = save_data
 
         bomb_image = pygame.image.load("src/assets/items/pickable/bomb.png").convert_alpha()
         prismat_image = pygame.image.load("src/assets/items/pickable/prismat.png").convert_alpha()
@@ -76,7 +87,7 @@ class GameScene:
         self.present_spawn_interval = 60.0
 
         # Timer
-        self.level_timer = Timer(15 * 60)
+        self.level_timer = Timer(1 * 20)
 
         # World
         map_world_width = self.level.width * self.level.tilewidth
@@ -250,6 +261,12 @@ class GameScene:
 
         # Timer finished
         if self.level_timer.finished and not self.won:
+            if self.save_data is not None:
+                self.save_data.mark_completion(
+                    self.level_id,
+                    self.selected_difficulty,
+                    self.selected_character,
+                )
             self.won = True
             self.win_ui.elapsed_time = self.level_timer.elapsed
             self.win_ui.show()

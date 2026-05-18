@@ -8,11 +8,14 @@ DIFFICULTIES = ["Normal", "Hard", "Nightmare"]
 
 
 class Level_select_scene:
-    def __init__(self, window: pygame.Surface):
+    def __init__(self, window: pygame.Surface, save_data=None):
         self.window = window
         self.running = True
         self.start_game = False
+        self.back_requested = False
         self.current_size = self.window.get_size()
+        self.save_data = save_data
+        self.selected_character: str | None = None
 
         self.click_sound = apply_sfx_volume(
             pygame.mixer.Sound("src/assets/sounds/gui/click.wav")
@@ -120,15 +123,7 @@ class Level_select_scene:
         )
 
         self.difficulty_buttons: dict[str, UIButton] = {}
-        for difficulty in DIFFICULTIES:
-            button = UIButton(
-                relative_rect=pygame.Rect(0, 0, 160, 56),
-                text=difficulty,
-                manager=self.manager,
-                container=self.difficulty_panel,
-                object_id="#button",
-            )
-            self.difficulty_buttons[difficulty] = button
+        self._build_difficulty_buttons()
 
         self.start_button = UIButton(
             relative_rect=pygame.Rect(0, 0, 170, 58),
@@ -136,10 +131,22 @@ class Level_select_scene:
             manager=self.manager,
             object_id="#button",
         )
+        
+        self.back_button = UIButton(
+            relative_rect=pygame.Rect(0, 0, 160, 56),
+            text="Back",
+            manager=self.manager,
+            object_id="#button"
+        )
 
         self._layout_ui()
         self._refresh_level_buttons()
         self._refresh_difficulty_buttons()
+
+
+    def set_selected_character(self, character: str) -> None:
+        self.selected_character = character
+        self._refresh_level_buttons()
 
 
     def get_selected_level(self) -> dict:
@@ -234,6 +241,8 @@ class Level_select_scene:
         start_button_height = max(50, min(64, int(height * 0.08)))
         self.start_button.set_dimensions((start_button_width, start_button_height))
         self.start_button.set_relative_position((width - start_button_width - 28, height - start_button_height - 24))
+        self.back_button.set_dimensions((start_button_width, start_button_height))
+        self.back_button.set_relative_position((start_button_width - 164, height - start_button_height - 24))
 
 
     def _refresh_level_buttons(self) -> None:
@@ -246,7 +255,34 @@ class Level_select_scene:
             if level["id"] == self.selected_level["id"]:
                 button.set_text(f"> {level['title']} <")
             else:
-                button.set_text(level["title"])
+                button.set_text(f"{level['title']}")
+
+        self._refresh_difficulty_buttons()
+
+
+    def _build_difficulty_buttons(self) -> None:
+        for button in self.difficulty_buttons.values():
+            button.kill()
+
+        self.difficulty_buttons = {}
+        for difficulty in DIFFICULTIES:
+            object_id = "#button"
+            if self.save_data is not None and self.selected_character:
+                if self.save_data.is_completed(
+                    self.selected_level["id"],
+                    difficulty,
+                    self.selected_character,
+                ):
+                    object_id = "#difficulty_done"
+
+            button = UIButton(
+                relative_rect=pygame.Rect(0, 0, 160, 56),
+                text=difficulty,
+                manager=self.manager,
+                container=self.difficulty_panel,
+                object_id=object_id,
+            )
+            self.difficulty_buttons[difficulty] = button
 
 
     def _update_preview_image(self) -> None:
@@ -295,12 +331,14 @@ class Level_select_scene:
 
 
     def _refresh_difficulty_buttons(self) -> None:
+        self._build_difficulty_buttons()
         for difficulty in DIFFICULTIES:
             button = self.difficulty_buttons[difficulty]
             if difficulty == self.selected_difficulty:
                 button.set_text(f"> {difficulty} <")
             else:
                 button.set_text(difficulty)
+        self._layout_ui()
 
 
     def handle_events(self, events: list[pygame.event.Event]) -> None:
@@ -319,6 +357,9 @@ class Level_select_scene:
                 self.click_sound.play()
                 if event.ui_element == self.start_button:
                     self.start_game = True
+                    continue
+                elif event.ui_element == self.back_button:
+                    self.back_requested = True
                     continue
 
                 for level in LEVELS:

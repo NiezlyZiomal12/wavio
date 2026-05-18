@@ -76,7 +76,7 @@ class GameScene:
         self.present_spawn_interval = 60.0
 
         # Timer
-        self.level_timer = Timer(6 * 60)
+        self.level_timer = Timer(15 * 60)
 
         # World
         map_world_width = self.level.width * self.level.tilewidth
@@ -100,7 +100,7 @@ class GameScene:
         )
         self.presents = pygame.sprite.Group()
         spawn_random_presents(
-            50,
+            5,
             self.presents,
             self.pickables,
             self.world.width,
@@ -262,6 +262,7 @@ class GameScene:
         # Player died
         if self.player.died:
             self.player.died = False
+            self.lost_ui.elapsed_time = self.level_timer.elapsed
             self.lost_ui.show()
 
         # Level up

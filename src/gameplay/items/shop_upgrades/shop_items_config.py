@@ -33,7 +33,7 @@ SHOP_ITEMS_CONFIG = {
     },
     "Heavy_armor": {
         "name": "Heavy Armor",
-        "description": "+10 armor, -5 speed; bonus damage scales with speed lost",
+        "description": "+10 armor, -5 speed;",
         "image": "src/assets/items/upgrades/shop_items/heavy_armor.png",
         "effect": {},
         "cost": 40,

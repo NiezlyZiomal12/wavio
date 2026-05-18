@@ -3,7 +3,7 @@ BOSS_CONFIG = {
         "class": "Golem",
         "speed": 60,
         "hp": 10000,
-        "damage": 50,
+        "damage": 10,
         "Dropable" : {
             "xp": 100,
             "coin": 50,

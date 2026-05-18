@@ -31,7 +31,6 @@ class LevelUpUi:
         )
         self.power_up_sound = apply_sfx_volume(
             pygame.mixer.Sound("src/assets/sounds/game/power_up.wav"),
-            0.1,
         )
         _roll_sounds = build_random_pitch_sounds("src/assets/sounds/gui/roll.wav")
         self.roll_sound = _roll_sounds
@@ -158,6 +157,7 @@ class LevelUpUi:
                 return None
             if event.ui_element == self.reroll_button:
                 random.choice(self.roll_sound).play()
+                # self.power_up_sound.play()
                 self.reroll_items()
                 return None
         

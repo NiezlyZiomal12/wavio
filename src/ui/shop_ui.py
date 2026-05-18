@@ -28,7 +28,6 @@ class ShopUi:
         )
         self.power_up_sound = apply_sfx_volume(
             pygame.mixer.Sound("src/assets/sounds/game/power_up.wav"),
-            0.1,
         )
         _roll_sounds = build_random_pitch_sounds("src/assets/sounds/gui/roll.wav")
         self.roll_sound = _roll_sounds

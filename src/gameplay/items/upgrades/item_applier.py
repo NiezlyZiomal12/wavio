@@ -115,11 +115,6 @@ def _apply_heavy_armor(player: "Player") -> None:
     player.speed  -= 1 * player.speed_mult
     player.speed = max(1, player.speed)
 
-    player.heavy_armor_levels += 1
-    # Each level: the 5 % speed penalty translates into +1 flat damage.
-    # Recalculate from scratch to avoid drift.
-    player.damage = _base_stat(player, "damage") + player.heavy_armor_levels
-
 
 def _base_stat(player: "Player", stat: str) -> int:
     """Return the base value of a stat before heavy_armor stacking."""

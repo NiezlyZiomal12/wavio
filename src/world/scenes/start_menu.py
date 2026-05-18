@@ -2,6 +2,7 @@ import pygame
 import pygame_gui
 from pygame_gui.elements import UIButton
 from src.core.audio import apply_sfx_volume
+from src.ui.options_ui import OptionsMenuUi
 
 
 class StartMenuScene:
@@ -31,7 +32,27 @@ class StartMenuScene:
             manager=self.manager,
             object_id="#button",
         )
+
+        self.options_button = UIButton(
+            relative_rect=pygame.Rect(0, 0, 260, 64),
+            text="Options",
+            manager=self.manager,
+            object_id="#button",
+        )
+        
+        self.quit_button = UIButton(
+            relative_rect=pygame.Rect(0, 0, 260, 64),
+            text="Quit",
+            manager=self.manager,
+            object_id="#button",
+        )
+
+        self.options_ui = OptionsMenuUi(self.window)
+        self.options_ui.hide()
+
         self.start_button.hide()
+        self.options_button.hide()
+        self.quit_button.hide()
         self._responsive_ui()
 
 
@@ -45,6 +66,13 @@ class StartMenuScene:
 
         self.start_button.set_dimensions((button_width, button_height))
         self.start_button.set_relative_position((x, y))
+        
+        self.options_button.set_dimensions((button_width, button_height))
+        self.options_button.set_relative_position((x, y + 100))
+
+        self.quit_button.set_dimensions((button_width, button_height))
+        self.quit_button.set_relative_position((x, y + 200))
+        
         self.background_image = pygame.transform.scale(self.background, self.current_size)
 
 
@@ -91,9 +119,19 @@ class StartMenuScene:
             if not self.ui_revealed:
                 continue
 
-            if event.type == pygame_gui.UI_BUTTON_PRESSED and event.ui_element == self.start_button:
-                self.click_sound.play()
-                self.start_requested = True
+            if event.type == pygame_gui.UI_BUTTON_PRESSED:
+                if event.ui_element == self.start_button:
+                    self.click_sound.play()
+                    self.start_requested = True
+                elif event.ui_element == self.options_button:
+                    self.click_sound.play()
+                    self.options_ui.show()
+                elif event.ui_element == self.quit_button:
+                    self.running = False
+            
+            if self.options_ui.active:
+                self.options_ui.handle_event(event)
+
 
 
     def update(self, dt: float) -> None:
@@ -107,6 +145,12 @@ class StartMenuScene:
         if not self.ui_revealed and self.fade_time >= self.fade_duration:
             self.ui_revealed = True
             self.start_button.show()
+            self.options_button.show()
+            self.quit_button.show()
+
+        if self.options_ui.active:
+            self.options_ui.update(dt)
+            return
 
         self.manager.update(dt)
 
@@ -114,4 +158,9 @@ class StartMenuScene:
     def render(self) -> None:
         self.window.blit(self.background_image, (0,0))
         self._draw_pixel_fade_overlay()
+        
+        if self.options_ui.active:
+            self.options_ui.draw()
+            return
+
         self.manager.draw_ui(self.window)

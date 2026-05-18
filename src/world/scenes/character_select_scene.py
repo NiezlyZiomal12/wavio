@@ -10,6 +10,7 @@ class Character_select_scene:
         self.window = window
         self.running = True
         self.start_game = False
+        self.back_requested = False
         self.selected_character = "Mage"
         self.click_sound = apply_sfx_volume(
             pygame.mixer.Sound("src/assets/sounds/gui/click.wav")
@@ -53,6 +54,13 @@ class Character_select_scene:
         self.start_button = UIButton(
             relative_rect=pygame.Rect(0, 0, 160, 56),
             text="Battle",
+            manager=self.manager,
+            object_id="#button"
+        )
+
+        self.back_button = UIButton(
+            relative_rect=pygame.Rect(0, 0, 160, 56),
+            text="Back",
             manager=self.manager,
             object_id="#button"
         )
@@ -103,6 +111,8 @@ class Character_select_scene:
         start_button_height = max(50, min(64, int(height * 0.08)))
         self.start_button.set_dimensions((start_button_width, start_button_height))
         self.start_button.set_relative_position((width - start_button_width - 32, height - start_button_height - 28))
+        self.back_button.set_dimensions((start_button_width , start_button_height))
+        self.back_button.set_relative_position((start_button_width - 164, height - start_button_height - 28))
 
 
     def _refresh_character_button_texts(self) -> None:
@@ -131,6 +141,8 @@ class Character_select_scene:
                 self.click_sound.play()
                 if event.ui_element == self.start_button:
                     self.start_game = True
+                elif event.ui_element == self.back_button:
+                    self.back_requested = True
 
                 for name, button in self.character_buttons.items():
                     if event.ui_element == button:

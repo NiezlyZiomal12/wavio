@@ -86,8 +86,14 @@ class GameScene:
         self.present_spawn_timer = 0.0
         self.present_spawn_interval = 60.0
 
+        # Active items
+        self.active_items = pygame.sprite.Group()
+        
+        #pozniej z konfiga sie wszystie zaciagnie
+        self.active_item_drop_table = ["fancy_boots", "lantern"]
+
         # Timer
-        self.level_timer = Timer(1 * 20)
+        self.level_timer = Timer(5 * 20)
 
         # World
         map_world_width = self.level.width * self.level.tilewidth
@@ -108,6 +114,8 @@ class GameScene:
             enemy_hp_multiplier=self.difficulty["enemy_hp_mult"],
             enemy_damage_multiplier=self.difficulty["enemy_damage_mult"],
             enemy_speed_multiplier=self.difficulty["enemy_speed_mult"],
+            active_item_group=self.active_items,
+            active_item_drop_table=self.active_item_drop_table,
         )
         self.presents = pygame.sprite.Group()
         spawn_random_presents(
@@ -242,7 +250,7 @@ class GameScene:
         shoot_targets = list(self.spawner.enemies)
         shoot_targets.extend(present for present in self.presents if not present.spawning)
 
-        self.player.update(dt, keys, shoot_targets, self.world.collision_rects)
+        self.player.update(dt, keys, shoot_targets, self.world.collision_rects, self.spawner.enemies)
         self.camera.follow(self.player)
         self.camera.update(dt)
 
@@ -257,6 +265,7 @@ class GameScene:
         self.xp_group.update(dt, self.player)
         self.coin_group.update(dt, self.player)
         self.pickables.update(dt, self.player)
+        self.active_items.update(dt, self.player)
         self.presents.update(dt, self.player.active_projectiles)
 
         # Timer finished
@@ -302,6 +311,9 @@ class GameScene:
         for pick in self.pickables:
             pick.position = self.world.clamp_pos(pick.position)
             pick.rect.center = pick.position
+        for drop in self.active_items:
+            drop.position = self.world.clamp_pos(drop.position)
+            drop.rect.center = drop.position
         for present in self.presents:
             present.position = self.world.clamp_pos(present.position)
             present.rect.center = present.position
@@ -324,6 +336,9 @@ class GameScene:
 
         for pickable in self.pickables:
             pickable.draw(self.window, self.camera)
+
+        for drop in self.active_items:
+            drop.draw(self.window, self.camera)
 
         for present in self.presents:
             present.draw(self.window, self.camera)

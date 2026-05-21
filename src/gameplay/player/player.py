@@ -126,6 +126,17 @@ class Player(pygame.sprite.Sprite):
         self.pending_effect = None
         self.starting_weapon_name = None
 
+        #Active items
+        self.active_item = None
+        self.active_item_key = pygame.K_SPACE
+        self._active_item_pressed = False
+
+        #Dash
+        self.dash_timer = 0.0
+        self.dash_speed_multiplier = 1.0
+        self.dash_direction = pygame.Vector2(0, 0)
+        self.last_move_dir = pygame.Vector2(1, 0)
+
         #sounds
         self.hurt_sound = apply_sfx_volume(
             pygame.mixer.Sound("src/assets/sounds/game/hurt.wav"),
@@ -135,6 +146,12 @@ class Player(pygame.sprite.Sprite):
 
     def move(self, keys: pygame.key.ScancodeWrapper, collision_rects= None) -> None:
         # Create movement vector
+        if self.dash_timer > 0:
+            movement = self.dash_direction * self.speed * self.dash_speed_multiplier
+            self.facing_left = movement.x < 0
+            self.movement_with_collisions(movement, collision_rects)
+            return
+
         movement = pygame.math.Vector2(0, 0)
         
         if keys[pygame.K_w]: movement.y -= 1
@@ -148,6 +165,7 @@ class Player(pygame.sprite.Sprite):
         
         if movement.length() > 0:
             movement = movement.normalize() * self.speed
+            self.last_move_dir = movement.normalize()
 
             if not self.hurt:
                 if self.current_animation != self.walk_animation:
@@ -341,8 +359,10 @@ class Player(pygame.sprite.Sprite):
             self.just_leveled_up = True
 
 
-    def update(self,dt:float, keys:pygame.key.ScancodeWrapper, targets:list, collision_rects):
+    def update(self,dt:float, keys:pygame.key.ScancodeWrapper, targets:list, collision_rects, enemies: list | None = None):
         self.move(keys, collision_rects)
+        if self.dash_timer > 0:
+            self.dash_timer = max(0.0, self.dash_timer - dt)
         self.update_lvl()
 
         #Weapon update
@@ -371,6 +391,39 @@ class Player(pygame.sprite.Sprite):
             if self.prismat_timer <= 0:
                 self.prismat_active = False
                 self.prismat_timer = 3.0
+
+        self._update_active_item(dt, keys, enemies)
+
+
+    def set_active_item(self, active_item: object) -> None:
+        self.active_item = active_item
+        if hasattr(active_item, "on_equip"):
+            active_item.on_equip(self)
+
+
+    def start_dash(self, duration: float, speed_multiplier: float) -> bool:
+        if duration <= 0:
+            return False
+        if self.dash_timer > 0:
+            return False
+        if self.last_move_dir.length_squared() == 0:
+            return False
+        self.dash_timer = duration
+        self.dash_speed_multiplier = speed_multiplier
+        self.dash_direction = self.last_move_dir.normalize()
+        return True
+
+
+    def _update_active_item(self, dt: float, keys: pygame.key.ScancodeWrapper, enemies: list) -> None:
+        pressed = keys[self.active_item_key]
+        if self.active_item is None:
+            self._active_item_pressed = pressed
+            return
+
+        self.active_item.update(dt, self, enemies)
+        if pressed and not self._active_item_pressed:
+            self.active_item.activate(self, enemies)
+        self._active_item_pressed = pressed
 
 
     #Ui (might move it to another file)
@@ -411,6 +464,8 @@ class Player(pygame.sprite.Sprite):
 
 
     def draw(self, surface:pygame.Surface, camera: object):
+        if self.active_item is not None:
+            self.active_item.draw(surface, camera, self.position)
         for projectile in self.active_projectiles:
             projectile.draw(surface, camera)
 
@@ -418,4 +473,5 @@ class Player(pygame.sprite.Sprite):
         self.draw_health_bar(surface)
         self.draw_xp_bar(surface)
         self.draw_coins(surface)
-        self.weapon_slots.draw(surface)
+        active_label = pygame.key.name(self.active_item_key).upper()
+        self.weapon_slots.draw(surface, self.active_item, active_label)

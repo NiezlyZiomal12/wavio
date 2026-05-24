@@ -1,3 +1,4 @@
+from .active_item_swap_ui import ActiveItemSwapUi
 from .lvl_up_ui import LevelUpUi
 from .pause_ui import PauseMenuUi
 from .options_ui import OptionsMenuUi
@@ -6,6 +7,7 @@ from .win_ui import WinUi
 from .lost_ui import LostUi
 
 __all__ = [
+    "ActiveItemSwapUi",
     "LevelUpUi",
     "PauseMenuUi",
     "OptionsMenuUi",

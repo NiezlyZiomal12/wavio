@@ -2,6 +2,7 @@ import pygame
 import random
 from src.core import Animation, Flash, dmgIndicator, build_random_pitch_sounds
 from src.gameplay.dropable import Xp, Coin
+from src.gameplay.items.active_items.active_item import ActiveItemDrop, random_active_item_id
 from src.gameplay.items.upgrades.item_applier import on_hit
 
 class Enemy(pygame.sprite.Sprite):
@@ -69,6 +70,8 @@ class Enemy(pygame.sprite.Sprite):
         self.xp_group = None
         self.coin_sprite = None
         self.coin_group = None
+        self.active_item_group = None
+        self.active_item_drop_table = None
         self.damage_indicator = dmgIndicator(font_size=24, lifetime=0.65)
 
         if Enemy._hurt_sounds is None:
@@ -208,6 +211,13 @@ class Enemy(pygame.sprite.Sprite):
         self.dead = True
         self.current_animation = self.dead_animation
         self.death_timer = 0.0
+
+        if self.config.get("is_boss") and self.active_item_group is not None:
+            if self.active_item_drop_table:
+                item_id = random.choice(self.active_item_drop_table)
+            else:
+                item_id = random_active_item_id()
+            self.active_item_group.add(ActiveItemDrop(self.position, item_id, self.player))
 
         xp_orb = Xp(self.xp_sprite, int(self.position.x), int(self.position.y), self.xp_value, self.player)
         self.xp_group.add(xp_orb)

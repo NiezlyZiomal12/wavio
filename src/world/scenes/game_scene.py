@@ -5,7 +5,7 @@ from config import WIDTH, HEIGHT, BG_COLOR
 from src.core import Camera, Timer
 from src.gameplay.player.player_classes import Warrior, Mage, Rogue
 from src.game_logic import EnemySpawner
-from src.ui import LevelUpUi, PauseMenuUi, ShopUi, WinUi, LostUi
+from src.ui import ActiveItemSwapUi, LevelUpUi, PauseMenuUi, ShopUi, WinUi, LostUi
 from ..Map import World
 from src.gameplay.pickables import spawn_random_presents, trigger_bomb
 
@@ -86,8 +86,14 @@ class GameScene:
         self.present_spawn_timer = 0.0
         self.present_spawn_interval = 60.0
 
+        # Active items
+        self.active_items = pygame.sprite.Group()
+        
+        #pozniej z konfiga sie wszystie zaciagnie
+        self.active_item_drop_table = ["fancy_boots", "lantern"]
+
         # Timer
-        self.level_timer = Timer(1 * 20)
+        self.level_timer = Timer(5 * 20)
 
         # World
         map_world_width = self.level.width * self.level.tilewidth
@@ -108,6 +114,8 @@ class GameScene:
             enemy_hp_multiplier=self.difficulty["enemy_hp_mult"],
             enemy_damage_multiplier=self.difficulty["enemy_damage_mult"],
             enemy_speed_multiplier=self.difficulty["enemy_speed_mult"],
+            active_item_group=self.active_items,
+            active_item_drop_table=self.active_item_drop_table,
         )
         self.presents = pygame.sprite.Group()
         spawn_random_presents(
@@ -123,6 +131,7 @@ class GameScene:
 
         # UI
         self.level_up_ui = LevelUpUi(self.window, WIDTH, HEIGHT, self.player)
+        self.active_item_swap_ui = ActiveItemSwapUi(self.window, WIDTH, HEIGHT, self.player)
         self.shop_ui = ShopUi(
             self.window,
             WIDTH,
@@ -135,6 +144,7 @@ class GameScene:
         self.lost_ui = LostUi(self.window, WIDTH, HEIGHT, self.player, 0)
         self.shop_timer = 30
         self.won = False
+        self.player.active_item_swap_ui = self.active_item_swap_ui
 
         # FPS overlay
         self.fps_font = pygame.font.Font(None, 24)
@@ -162,6 +172,10 @@ class GameScene:
                 if self.win_ui.active:
                     if self.win_ui.handle_event(event):
                         self.running = False
+                    continue
+
+                if self.active_item_swap_ui.active:
+                    self.active_item_swap_ui.handle_event(event)
                     continue
 
                 # Pausing the game
@@ -210,6 +224,10 @@ class GameScene:
             self.paused = True
             return
 
+        self.active_item_swap_ui.update(dt)
+        if self.active_item_swap_ui.active:
+            return
+
         # Shop timer
         if self.level_timer.elapsed >= self.shop_timer:
             self.shop_ui.show()
@@ -242,7 +260,7 @@ class GameScene:
         shoot_targets = list(self.spawner.enemies)
         shoot_targets.extend(present for present in self.presents if not present.spawning)
 
-        self.player.update(dt, keys, shoot_targets, self.world.collision_rects)
+        self.player.update(dt, keys, shoot_targets, self.world.collision_rects, self.spawner.enemies)
         self.camera.follow(self.player)
         self.camera.update(dt)
 
@@ -257,6 +275,7 @@ class GameScene:
         self.xp_group.update(dt, self.player)
         self.coin_group.update(dt, self.player)
         self.pickables.update(dt, self.player)
+        self.active_items.update(dt, self.player)
         self.presents.update(dt, self.player.active_projectiles)
 
         # Timer finished
@@ -302,6 +321,9 @@ class GameScene:
         for pick in self.pickables:
             pick.position = self.world.clamp_pos(pick.position)
             pick.rect.center = pick.position
+        for drop in self.active_items:
+            drop.position = self.world.clamp_pos(drop.position)
+            drop.rect.center = drop.position
         for present in self.presents:
             present.position = self.world.clamp_pos(present.position)
             present.rect.center = present.position
@@ -325,6 +347,9 @@ class GameScene:
         for pickable in self.pickables:
             pickable.draw(self.window, self.camera)
 
+        for drop in self.active_items:
+            drop.draw(self.window, self.camera)
+
         for present in self.presents:
             present.draw(self.window, self.camera)
 
@@ -343,6 +368,9 @@ class GameScene:
 
         if self.shop_ui.active:
             self.shop_ui.draw()
+
+        if self.active_item_swap_ui.active:
+            self.active_item_swap_ui.draw()
 
         if self.pause_ui.active:
             self.pause_ui.draw()

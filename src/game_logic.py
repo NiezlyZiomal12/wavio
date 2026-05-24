@@ -14,6 +14,8 @@ class EnemySpawner:
         enemy_hp_multiplier: float,
         enemy_damage_multiplier: float,
         enemy_speed_multiplier: float,
+        active_item_group: pygame.sprite.Group,
+        active_item_drop_table: list[str],
     ) -> None:
         self.spawn_sprite = pygame.image.load("src/assets/entities/enemies/spawn_animation_sheet.png").convert_alpha()
         self.xp_sprite = pygame.image.load("src/assets/items/dropable/xp.png").convert_alpha()
@@ -30,6 +32,8 @@ class EnemySpawner:
         self.enemy_hp_multiplier = enemy_hp_multiplier
         self.enemy_damage_multiplier = enemy_damage_multiplier
         self.enemy_speed_multiplier = enemy_speed_multiplier
+        self.active_item_group = active_item_group
+        self.active_item_drop_table = active_item_drop_table
 
         #loading enemy sprites
         self.enemy_sprites = {}
@@ -108,6 +112,8 @@ class EnemySpawner:
             enemy.xp_sprite = self.xp_sprite
             enemy.coin_group = self.coin_group
             enemy.coin_sprite = self.coin_sprite
+            enemy.active_item_group = self.active_item_group
+            enemy.active_item_drop_table = self.active_item_drop_table
             self.enemies.append(enemy)
 
 
@@ -132,6 +138,8 @@ class EnemySpawner:
             boss.xp_sprite = self.xp_sprite
             boss.coin_group = self.coin_group
             boss.coin_sprite = self.coin_sprite
+            boss.active_item_group = self.active_item_group
+            boss.active_item_drop_table = self.active_item_drop_table
             self.enemies.append(boss)
 
 

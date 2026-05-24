@@ -145,6 +145,8 @@ class GameScene:
         self.shop_timer = 30
         self.won = False
         self.player.active_item_swap_ui = self.active_item_swap_ui
+        self.request_menu = False
+        self.request_restart = False
 
         # FPS overlay
         self.fps_font = pygame.font.Font(None, 24)
@@ -185,7 +187,11 @@ class GameScene:
                     continue
 
                 if self.pause_ui.active:
-                    self.pause_ui.handle_event(event)
+                    action = self.pause_ui.handle_event(event)
+                    if action == "menu":
+                        self.request_menu = True
+                    elif action == "restart":
+                        self.request_restart = True
                     continue
 
                 # Level up mechanics

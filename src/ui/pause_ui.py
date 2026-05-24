@@ -146,9 +146,18 @@ class PauseMenuUi:
             self.click_sound.play()
             if event.ui_element == self.resume_button:
                 self.hide()
+                return "resume"
+            if event.ui_element == self.restart_button:
+                self.hide()
+                return "restart"
             elif event.ui_element == self.options_button:
                 self._set_visible(False)
                 self.options_ui.show()
+            elif event.ui_element == self.menu_button:
+                self.hide()
+                return "menu"
+
+        return None
 
     def update(self, dt: float) -> None:
         self._sync_to_window_size()

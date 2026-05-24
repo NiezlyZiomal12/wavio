@@ -122,6 +122,7 @@ class StateManager:
                     continue
 
                 if self.level_select_scene.start_game:
+                    self.level_select_scene.start_game = False
                     self.game = GameScene(
                         self.screen,
                         self.character_select_scene.get_selected_character(),
@@ -143,16 +144,27 @@ class StateManager:
                         save_data=self.save_data,
                     )
 
-                # # ensure game soundtrack is playing when entering game
-                # try:
-                #     self.audio.start_playlist("game")
-                # except Exception:
-                #     pass
-
                 self.game.handle_events(events)
                 if not self.game.running:
                     self.running = False
                     break
+
+                if self.game.request_menu:
+                    self.game = None
+                    self.state = "menu"
+                    self.audio.start_playlist("menu")
+                    continue
+
+                if self.game.request_restart:
+                    self.game = GameScene(
+                        self.screen,
+                        self.character_select_scene.get_selected_character(),
+                        self.level_select_scene.get_selected_level(),
+                        self.level_select_scene.get_selected_difficulty(),
+                        save_data=self.save_data,
+                    )
+                    self.audio.start_playlist("game")
+                    continue
 
                 self.game.update(dt)
                 self.game.render()

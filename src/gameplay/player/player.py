@@ -130,6 +130,7 @@ class Player(pygame.sprite.Sprite):
         self.active_item = None
         self.active_item_key = pygame.K_SPACE
         self._active_item_pressed = False
+        self.active_item_swap_ui = None
 
         #Dash
         self.dash_timer = 0.0

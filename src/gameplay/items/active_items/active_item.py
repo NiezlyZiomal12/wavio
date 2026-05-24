@@ -123,6 +123,7 @@ class ActiveItemDrop(pygame.sprite.Sprite):
 		self.reveal_timer = 0.0
 		self.reveal_duration = 0.2
 		self.revealed = False
+		self.pending_swap = False
 
 	def _reveal_item(self) -> None:
 		item_icon = pygame.image.load(ACTIVE_ITEM_CONFIG[self.item_id]["icon"]).convert_alpha()
@@ -132,6 +133,13 @@ class ActiveItemDrop(pygame.sprite.Sprite):
 		self.revealed = True
 
 	def _equip_player(self) -> None:
+		if getattr(self.player, "active_item", None) is not None:
+			swap_ui = getattr(self.player, "active_item_swap_ui", None)
+			if swap_ui is not None:
+				if not swap_ui.active:
+					swap_ui.show(self.item_id, self)
+				self.pending_swap = True
+				return
 		self.player.set_active_item(create_active_item(self.item_id))
 		self.kill()
 
@@ -145,6 +153,8 @@ class ActiveItemDrop(pygame.sprite.Sprite):
 
 		self.reveal_timer -= dt
 		if self.reveal_timer <= 0:
+			if self.pending_swap:
+				return
 			self._equip_player()
 
 	def draw(self, surface: pygame.Surface, camera: object) -> None:

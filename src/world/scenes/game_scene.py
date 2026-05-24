@@ -5,7 +5,7 @@ from config import WIDTH, HEIGHT, BG_COLOR
 from src.core import Camera, Timer
 from src.gameplay.player.player_classes import Warrior, Mage, Rogue
 from src.game_logic import EnemySpawner
-from src.ui import LevelUpUi, PauseMenuUi, ShopUi, WinUi, LostUi
+from src.ui import ActiveItemSwapUi, LevelUpUi, PauseMenuUi, ShopUi, WinUi, LostUi
 from ..Map import World
 from src.gameplay.pickables import spawn_random_presents, trigger_bomb
 
@@ -131,6 +131,7 @@ class GameScene:
 
         # UI
         self.level_up_ui = LevelUpUi(self.window, WIDTH, HEIGHT, self.player)
+        self.active_item_swap_ui = ActiveItemSwapUi(self.window, WIDTH, HEIGHT, self.player)
         self.shop_ui = ShopUi(
             self.window,
             WIDTH,
@@ -143,6 +144,7 @@ class GameScene:
         self.lost_ui = LostUi(self.window, WIDTH, HEIGHT, self.player, 0)
         self.shop_timer = 30
         self.won = False
+        self.player.active_item_swap_ui = self.active_item_swap_ui
 
         # FPS overlay
         self.fps_font = pygame.font.Font(None, 24)
@@ -170,6 +172,10 @@ class GameScene:
                 if self.win_ui.active:
                     if self.win_ui.handle_event(event):
                         self.running = False
+                    continue
+
+                if self.active_item_swap_ui.active:
+                    self.active_item_swap_ui.handle_event(event)
                     continue
 
                 # Pausing the game
@@ -216,6 +222,10 @@ class GameScene:
         self.pause_ui.update(dt)
         if self.pause_ui.active:
             self.paused = True
+            return
+
+        self.active_item_swap_ui.update(dt)
+        if self.active_item_swap_ui.active:
             return
 
         # Shop timer
@@ -358,6 +368,9 @@ class GameScene:
 
         if self.shop_ui.active:
             self.shop_ui.draw()
+
+        if self.active_item_swap_ui.active:
+            self.active_item_swap_ui.draw()
 
         if self.pause_ui.active:
             self.pause_ui.draw()

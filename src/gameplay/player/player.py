@@ -253,6 +253,13 @@ class Player(pygame.sprite.Sprite):
         self.gold += int(round(amount))
 
 
+    def add_xp(self, amount: int) -> None:
+        self.xp += amount
+        on_xp_collected = getattr(self, "on_xp_collected", None)
+        if callable(on_xp_collected):
+            on_xp_collected(amount)
+
+
     def spend_gold(self, cost: int) -> bool:
         if cost > self.gold:
             return False

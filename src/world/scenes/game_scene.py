@@ -3,7 +3,7 @@ import pytmx
 
 from config import WIDTH, HEIGHT, BG_COLOR
 from src.core import Camera, Timer
-from src.gameplay.player.player_classes import Warrior, Mage, Rogue
+from src.gameplay.player.player_classes import *
 from src.game_logic import EnemySpawner
 from src.ui import ActiveItemSwapUi, LevelUpUi, PauseMenuUi, ShopUi, WinUi, LostUi
 from ..Map import World
@@ -14,6 +14,7 @@ CHARACTER_CLASSES = {
     "Warrior": Warrior,
     "Mage": Mage,
     "Rogue": Rogue,
+    "SoulCollector" : SoulCollector
 }
 
 DIFFICULTY_SETTINGS = {

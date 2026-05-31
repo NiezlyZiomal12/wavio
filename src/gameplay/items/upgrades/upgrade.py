@@ -26,52 +26,54 @@ class Upgrade(pygame.sprite.Sprite):
         if current_level >= self.max_level:
             return False
 
+        stat_mult = getattr(player, "item_stat_mult", 1)
+
         if self.name == "Order":
-            delta = self.effect["damage"] * player.dmg_mult
-            player.damage = max(1, int(round(player.damage + delta)))
+            delta = self.effect["damage"] * player.dmg_mult * stat_mult
+            player.damage = max(1, player.damage + delta)
 
         elif self.name == "Boots":
-            delta = self.effect['speed'] * player.speed_mult
-            player.speed = max(1, int(round(player.speed + delta)))
+            delta = self.effect['speed'] * player.speed_mult * stat_mult
+            player.speed = max(1, int(player.speed + delta))
 
         elif self.name == "Heart":
-            delta = int(round(self.effect["max_health"] * player.hp_mult))
+            delta = int(self.effect["max_health"] * player.hp_mult * stat_mult)
             player.max_health = max(1, int(player.max_health + delta))
             # Keep current hp in step with max hp growth for better game feel.
             player.current_health = min(player.max_health, player.current_health + delta)
 
         elif self.name == "Armor":
-            delta = self.effect['armor'] * player.armor_mult
+            delta = self.effect['armor'] * player.armor_mult * stat_mult
             player.armor = max(0.0, min(90 , player.armor + delta))
 
         elif self.name == "Pearl":
             player.projectile_count = int(player.projectile_count + self.effect['projectile_count'])
 
         elif self.name == "Scroll":
-            delta = self.effect['reduce_cooldown'] * player.cd_mult
+            delta = self.effect['reduce_cooldown'] * player.cd_mult * stat_mult
             player.reduce_cooldown = max(0.0, min(90, player.reduce_cooldown + delta))
 
         elif self.name == "Nightstar":
-            delta = self.effect['xp_gain'] * player.xp_gain
+            delta = self.effect['xp_gain'] * player.xp_gain * stat_mult
             player.xp_gain +=  delta
         
         elif self.name == "Greed's eye":
-            delta = self.effect['coin_gain']
+            delta = self.effect['coin_gain'] * stat_mult
             player.coin_gain = max(0.0, player.coin_gain + delta)
         
         elif self.name == "Sharpener":
-            delta = self.effect['crit_chance']
+            delta = self.effect['crit_chance'] * stat_mult
             if isinstance(delta, (int, float)) and 0 <= delta <= 1:
                 delta *= 100
             player.crit_chance = max(0.0, min(100.0, player.crit_chance + delta))
 
         elif self.name == "Bloody sword":
-            delta = self.effect['lifesteal']
+            delta = self.effect['lifesteal'] * stat_mult
             player.lifesteal +=  delta
 
         elif self.name == "Goldfish":
-            delta = self.effect['luck']
-            player.luck = max(1, int(round(player.luck + delta)))
+            delta = self.effect['luck'] * stat_mult
+            player.luck = max(1, int(player.luck + delta))
 
         player.upgrade_levels[self.name] = current_level + 1
         return True

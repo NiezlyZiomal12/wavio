@@ -63,11 +63,14 @@ def _apply_stat_effect(player: "Player", effect: dict) -> None:
     """Apply a flat effect dict to the player using STAT_MAP rules."""
     for key, value in effect.items():
         mapping = STAT_MAP.get(key)
+        if mapping is None:
+            continue
         attr, mode = mapping
+        scaled_value = value * getattr(player, "item_stat_mult", 1)
         if mode == "add":
-            setattr(player, attr, getattr(player, attr) + value)
+            setattr(player, attr, getattr(player, attr) + scaled_value)
         elif mode == "mult":
-            setattr(player, attr, getattr(player, attr) * (1 + value / 100))
+            setattr(player, attr, getattr(player, attr) * (1 + scaled_value / 100))
             
 # ---------------------------------------------------------------------------
 # Per-item handlers

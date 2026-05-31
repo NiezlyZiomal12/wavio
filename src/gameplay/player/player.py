@@ -4,7 +4,7 @@ from src.core.audio import apply_sfx_volume
 import random
 import math
 from src.core import Animation
-from src.gameplay.weapons import WEAPON_CONFIG, Fireball, Boomerang, Sword, Spear, Typhoon, Meteor
+from src.gameplay.weapons import WEAPON_CONFIG, Fireball, Boomerang, Sword, Spear, Typhoon, Meteor, Lightning
 from src.gameplay.items.shop_upgrades.shop_items_config import SHOP_ITEMS_CONFIG
 from src.gameplay.items.upgrades import apply_shop_item_effects
 from .weapon_slots import WeaponSlots
@@ -368,6 +368,8 @@ class Player(pygame.sprite.Sprite):
 
 
     def update(self,dt:float, keys:pygame.key.ScancodeWrapper, targets:list, collision_rects, enemies: list | None = None):
+        # remember most recent targets list so weapons can reference nearby enemies
+        self._last_shoot_targets = targets
         self.move(keys, collision_rects)
         if self.dash_timer > 0:
             self.dash_timer = max(0.0, self.dash_timer - dt)

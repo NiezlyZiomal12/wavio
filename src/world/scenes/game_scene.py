@@ -91,7 +91,7 @@ class GameScene:
         self.active_items = pygame.sprite.Group()
         
         #pozniej z konfiga sie wszystie zaciagnie
-        self.active_item_drop_table = ["fancy_boots", "lantern"]
+        self.active_item_drop_table = ["fancy_boots", "lantern", "ambrosia", "taste_of_blood"]
 
         # Timer
         self.level_timer = Timer(5 * 20)

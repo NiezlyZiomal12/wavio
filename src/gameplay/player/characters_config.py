@@ -15,7 +15,7 @@ CHARACTERS = {
 
     },
     "Mage" : {
-        "Starting_weapon" : "Lightning",
+        "Starting_weapon" : "Fireball",
         "Stats" : {
             "max_health" : 80,
             "reduce_cooldown" : 20,

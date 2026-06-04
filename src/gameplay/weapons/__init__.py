@@ -1,4 +1,5 @@
 from .fireball import Fireball
+from .lightning import Lightning
 from .weapon_config import WEAPON_CONFIG
 from .sword import Sword
 from .weapon import Weapon
@@ -15,5 +16,6 @@ __all__ = [
             "Boomerang",
             "Spear",
             "Typhoon",
-            "Meteor"
+            "Meteor",
+            "Lightning"
            ]

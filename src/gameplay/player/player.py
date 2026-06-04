@@ -4,7 +4,7 @@ from src.core.audio import apply_sfx_volume
 import random
 import math
 from src.core import Animation
-from src.gameplay.weapons import WEAPON_CONFIG, Fireball, Boomerang, Sword, Spear, Typhoon, Meteor
+from src.gameplay.weapons import WEAPON_CONFIG, Fireball, Boomerang, Sword, Spear, Typhoon, Meteor, Lightning
 from src.gameplay.items.shop_upgrades.shop_items_config import SHOP_ITEMS_CONFIG
 from src.gameplay.items.upgrades import apply_shop_item_effects
 from .weapon_slots import WeaponSlots
@@ -107,6 +107,7 @@ class Player(pygame.sprite.Sprite):
         self.knockback_velocity = pygame.Vector2(0, 0)
         self.knockback_decay = 0.9
         self.died = False
+        self.invulnerability_duration = 0.0
 
         #Shooting
         self.shoot_timer = 0.0
@@ -138,11 +139,30 @@ class Player(pygame.sprite.Sprite):
         self.dash_direction = pygame.Vector2(0, 0)
         self.last_move_dir = pygame.Vector2(1, 0)
 
+        # Rage
+        self.rage_timer = 0.0
+        self.rage_active = False
+        self.rage_cost_hp = 10
+        self.actual_cdr = 0
+
         #sounds
         self.hurt_sound = apply_sfx_volume(
             pygame.mixer.Sound("src/assets/sounds/game/hurt.wav"),
             0.2,
         )
+        self.dash_sound = apply_sfx_volume(
+            pygame.mixer.Sound("src/assets/sounds/game/dash.wav"),
+            0.2,
+        )
+        self.rage_sound = apply_sfx_volume(
+            pygame.mixer.Sound("src/assets/sounds/game/rage.wav"),
+            0.2,
+        )
+        self.ambrosia_sound = apply_sfx_volume(
+            pygame.mixer.Sound("src/assets/sounds/game/rage.wav"),
+            0.2,
+        )
+
 
 
     def move(self, keys: pygame.key.ScancodeWrapper, collision_rects= None) -> None:
@@ -227,6 +247,29 @@ class Player(pygame.sprite.Sprite):
             self.knockback_velocity = direction * 10
 
 
+    def start_invulnerability(self, duration: float) -> bool:
+        if duration <= 0:
+            return False
+        self.invicible = True
+        self.invicibility_timer = 0.0
+        self.invulnerability_duration = duration
+        self.hurt = False
+        self.ambrosia_sound.play()
+        return True
+
+    def start_rage(self, duration: float) -> bool:
+        if duration <= 0:
+            return False
+        if self.current_health <= self.rage_cost_hp:
+            return False
+        self.current_health -= self.rage_cost_hp
+        self.rage_active = True
+        self.rage_timer = duration
+        self.actual_cdr = self.reduce_cooldown
+        self.reduce_cooldown = 100.0
+        self.rage_sound.play()
+        return True
+
     def add_weapon(self, weapon_name: str) -> bool:
 
         added = self.weapon_slots.add_weapon(
@@ -251,6 +294,13 @@ class Player(pygame.sprite.Sprite):
 
     def add_gold(self, amount: int) -> None:
         self.gold += int(round(amount))
+
+
+    def add_xp(self, amount: int) -> None:
+        self.xp += amount
+        on_xp_collected = getattr(self, "on_xp_collected", None)
+        if callable(on_xp_collected):
+            on_xp_collected(amount)
 
 
     def spend_gold(self, cost: int) -> bool:
@@ -361,6 +411,8 @@ class Player(pygame.sprite.Sprite):
 
 
     def update(self,dt:float, keys:pygame.key.ScancodeWrapper, targets:list, collision_rects, enemies: list | None = None):
+        # remember most recent targets list so weapons can reference nearby enemies
+        self._last_shoot_targets = targets
         self.move(keys, collision_rects)
         if self.dash_timer > 0:
             self.dash_timer = max(0.0, self.dash_timer - dt)
@@ -376,10 +428,19 @@ class Player(pygame.sprite.Sprite):
 
         if self.invicible:
             self.invicibility_timer += dt
-            if self.invicibility_timer >= self.invicibility_duriation:
+            invulnerability_duration = self.invulnerability_duration or self.invicibility_duriation
+            if self.invicibility_timer >= invulnerability_duration:
                 self.invicible = False
+                self.invulnerability_duration = 0.0
                 self.hurt = False
         
+        #rage
+        if self.rage_active:
+            self.rage_timer = max(0.0, self.rage_timer - dt)
+            if self.rage_timer <= 0:
+                self.rage_active = False
+                self.reduce_cooldown = self.actual_cdr
+
         if not self.hurt:
             self.update_animation(dt)
         else:
@@ -412,6 +473,7 @@ class Player(pygame.sprite.Sprite):
         self.dash_timer = duration
         self.dash_speed_multiplier = speed_multiplier
         self.dash_direction = self.last_move_dir.normalize()
+        self.dash_sound.play()
         return True
 
 
@@ -470,7 +532,30 @@ class Player(pygame.sprite.Sprite):
         for projectile in self.active_projectiles:
             projectile.draw(surface, camera)
 
-        surface.blit(self.image, camera.apply(self.rect))
+        draw_rect = camera.apply(self.rect)
+        if self.invicible:
+            blue_layer = self.image.copy()
+            blue_layer.fill((90, 160, 255, 120), special_flags=pygame.BLEND_RGBA_MULT)
+            shadow_rect = draw_rect.copy()
+            shadow_rect.x += 3
+            shadow_rect.y += 3
+            surface.blit(blue_layer, shadow_rect)
+            faded_image = self.image.copy()
+            faded_image.set_alpha(170)
+            surface.blit(faded_image, draw_rect)
+        else:
+            if self.rage_active:
+                red_shadow = self.image.copy()
+                red_shadow.fill((255, 60, 60, 180), special_flags=pygame.BLEND_RGBA_MULT)
+                shadow_rect = draw_rect.copy()
+                shadow_rect.x += 3
+                shadow_rect.y += 3
+                surface.blit(red_shadow, shadow_rect)
+                faded_image = self.image.copy()
+                faded_image.set_alpha(170)
+                surface.blit(faded_image, draw_rect)
+            
+            surface.blit(self.image, draw_rect)
         self.draw_health_bar(surface)
         self.draw_xp_bar(surface)
         self.draw_coins(surface)

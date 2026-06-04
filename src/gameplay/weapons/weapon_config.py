@@ -150,4 +150,29 @@ WEAPON_CONFIG = {
             "evolution_to": None,
         },
     },
+    "Lightning" : {
+        "type" : "ranged",
+        "damage" : 3,
+        "speed" : 600,
+        "cooldown" : 1.2,
+        "projectile_count" : 1,
+        "sprite_path" : "src/assets/items/weapons/lightning.png",
+        "animation" : {
+            "sprite_width" : 32,
+            "sprite_height": 30,
+            "start_row" : 0,
+            "start_frames": 4,
+            "animation_speed" : 0.1,
+        },
+        "special" : {
+            "lifetime" : 1.5,
+            "chain_amount": 4,
+            "chain_range": 300,
+        },
+        "shop": {
+            "price": 20,
+            "max_level": 5,
+            "evolution_to": None,
+        },
+    },
 }

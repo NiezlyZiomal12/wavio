@@ -8,7 +8,7 @@ class Xp(pygame.sprite.Sprite):
     def __init__(self, image: pygame.Surface, x:int, y:int, amount: int, player: object):
         super().__init__()
         self.player = player
-        self.xp_amount = max(1, int(round(amount * self.player.xp_gain)))
+        self.xp_amount = max(1, int(amount * self.player.xp_gain))
         self.image = image
         self.rect = self.image.get_rect(center=(x,y))
 
@@ -52,7 +52,10 @@ class Xp(pygame.sprite.Sprite):
         if distance_to_player < 15:
             random.choice(self.pickup_sounds).play()
             self.collected = True
-            player.xp += self.xp_amount
+            if hasattr(player, "add_xp"):
+                player.add_xp(self.xp_amount)
+            else:
+                player.xp += self.xp_amount
             self.kill()
 
         

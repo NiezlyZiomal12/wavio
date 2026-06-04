@@ -38,6 +38,20 @@ CHARACTERS = {
             "speed_mult" : 1.5,
             "crit_mult" : 1.5
         }
+    },
+    "SoulCollector" : {
+        "Starting_weapon" : "Typhoon",
+        "Stats" : {
+            "max_health" : 80,
+            "speed" : 5,
+            "pickup_range" : 2,
+            "damage" : 0.5,
+        },
+        "Passive" : {
+            "xp_gain_mult" : 1.5,
+            "xp_damage_per_point" : 0.001,
+            "item_stat_mult" : 0.5,
+        }
     }
 
 }

@@ -13,8 +13,22 @@ ACTIVE_ITEM_CONFIG = {
 		"name": "Lantern",
 		"description" : "Creates a light that damages the enemies",
 		"icon": "src/assets/items/upgrades/active_items/lantern.png",
-		"cooldown": 0.0,
+		"cooldown": 1.0,
 	},
+	"ambrosia" : {
+		"name" : "Ambrosia",
+		"description" : "after drink you are invulnerable for 5 sec",
+		"icon" : "src/assets/items/upgrades/active_items/ambrosia.png",
+		"cooldown" : 30.0,
+		"invurnability" : 5.0
+	},
+	"taste_of_blood": {
+		"name" : "Taste of blood",
+		"description" : "take 30hp but get 80% cdr for 3 sec",
+		"icon" : "src/assets/items/upgrades/active_items/taste_of_blood.png",
+		"cooldown" : 30.0,
+		"rage" : 3.0
+	}
 }
 
 def create_active_item(item_id: str) -> "ActiveItem":
@@ -23,6 +37,10 @@ def create_active_item(item_id: str) -> "ActiveItem":
 		return FancyBoots()
 	if item_id == "lantern":
 		return Lantern()
+	if item_id == "ambrosia":
+		return Ambrosia()
+	if item_id == "taste_of_blood":
+		return TasteOfBlood()
 
 
 class ActiveItem:
@@ -52,9 +70,10 @@ class ActiveItem:
 	def activate(self, player: object, enemies: list) -> bool:
 		if not self.ready():
 			return False
+		effective_cooldown = self.get_cooldown(player) 
 		if self.on_activate(player, enemies):
-			self.cooldown_timer = self.get_cooldown(player)
-			self.cooldown_total = self.cooldown_timer
+			self.cooldown_timer = effective_cooldown
+			self.cooldown_total = effective_cooldown
 			return True
 		return False
 
@@ -107,6 +126,26 @@ class Lantern(ActiveItem):
 		draw_pos = (screen_pos.centerx - radius, screen_pos.centery - radius)
 		surface.blit(effect_surface, draw_pos)
 
+class Ambrosia(ActiveItem):
+	def __init__(self) -> None:
+		config = ACTIVE_ITEM_CONFIG["ambrosia"]
+		icon = pygame.image.load(config["icon"]).convert_alpha()
+		super().__init__("ambrosia", icon, config["cooldown"])
+		self.invulnerability = config["invurnability"]
+
+	def on_activate(self, player: object, enemies: list) -> bool:
+		return player.start_invulnerability(self.invulnerability)
+
+
+class TasteOfBlood(ActiveItem):
+	def __init__(self) -> None:
+		config = ACTIVE_ITEM_CONFIG["taste_of_blood"]
+		icon = pygame.image.load(config["icon"]).convert_alpha()
+		super().__init__("taste_of_blood", icon, config["cooldown"])
+		self.rage = config["rage"]
+
+	def on_activate(self, player: object, enemies: list) -> bool:
+		return player.start_rage(self.rage)
 
 class ActiveItemDrop(pygame.sprite.Sprite):
 

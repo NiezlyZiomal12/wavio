@@ -21,6 +21,10 @@ WEAPON_CONFIG = {
             "max_level": 5,
             "evolution_to": None,
         },
+        "level_scaling": {
+            "damage":   [0, 1, 2, 3, 4],
+            "cooldown": [0, -0.05, -0.10, -0.15, -0.20],
+        },
     },
     "Sword" : {
         "type" : "mele",
@@ -44,6 +48,10 @@ WEAPON_CONFIG = {
             "price": 10,
             "max_level": 5,
             "evolution_to": None,
+        },
+        "level_scaling": {
+            "damage":   [0, 0.25, 0.50, 0.80, 1.20],
+            "cooldown": [0, -0.05, -0.10, -0.15, -0.20],
         },
     },
     "Boomerang" : {
@@ -69,6 +77,10 @@ WEAPON_CONFIG = {
             "price": 10,
             "max_level": 5,
             "evolution_to": None,
+        },
+        "level_scaling": {
+            "damage":   [0, 0.25, 0.50, 0.80, 1.20],
+            "cooldown": [0, -0.05, -0.10, -0.15, -0.20],
         },
     },
     "Spear" : {
@@ -97,6 +109,10 @@ WEAPON_CONFIG = {
             "max_level": 5,
             "evolution_to": None,
         },
+        "level_scaling": {
+            "damage":   [0, 0.25, 0.50, 0.80, 1.20],
+            "cooldown": [0, -0.05, -0.10, -0.15, -0.20],
+        },
     },
     "Typhoon" : {
         "type" : "mele",
@@ -120,6 +136,10 @@ WEAPON_CONFIG = {
             "price": 10,
             "max_level": 5,
             "evolution_to": None,
+        },
+        "level_scaling": {
+            "damage":   [0, 0.25, 0.50, 0.80, 1.20],
+            "cooldown": [0, -0.05, -0.10, -0.15, -0.20],
         },
     },
     "Meteor" : {
@@ -149,6 +169,10 @@ WEAPON_CONFIG = {
             "max_level": 5,
             "evolution_to": None,
         },
+        "level_scaling": {
+            "damage":   [0, 0.25, 0.50, 0.80, 1.20],
+            "cooldown": [0, -0.05, -0.10, -0.15, -0.20],
+        },
     },
     "Lightning" : {
         "type" : "ranged",
@@ -173,6 +197,10 @@ WEAPON_CONFIG = {
             "price": 20,
             "max_level": 5,
             "evolution_to": None,
+        },
+        "level_scaling": {
+            "damage":   [0, 0.25, 0.50, 0.80, 1.20],
+            "cooldown": [0, -0.05, -0.10, -0.15, -0.20],
         },
     },
 }

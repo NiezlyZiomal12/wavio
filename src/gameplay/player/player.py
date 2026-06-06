@@ -358,10 +358,11 @@ class Player(pygame.sprite.Sprite):
                 continue
 
             weapon_state.tick(dt)
-            config = WEAPON_CONFIG[weapon_name]
+            base_config = WEAPON_CONFIG[weapon_name]
             if weapon_state.ready():
                 nearest_target = min(targets, key=lambda e: (e.position - self.position).length())
                 weapon_class = weapon_state.weapon_class
+                config = weapon_state.get_scaled_config(base_config)
 
                 total_projectiles = self.projectile_count
                 volley_rotation = random.uniform(0, math.tau)

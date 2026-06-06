@@ -196,6 +196,7 @@ class PauseMenuUi:
     def _build_stats_rows(self) -> list[tuple[str, str]]:
         player = self.player
         rows = [
+            ("Corruption", self._format_stat_value("Corruption", getattr(player, "corruption", 0))),
             ("Level", self._format_stat_value("Level", getattr(player, "level", 0))),
             ("Gold", self._format_stat_value("Gold", getattr(player, "gold", 0))),
             ("Max HP", self._format_stat_value("Max HP", getattr(player, "max_health", 0))),
@@ -224,6 +225,7 @@ class PauseMenuUi:
     def _get_icon(self, label: str) -> str:
         default_icon = '<img src="src/assets/ui/icons/sword.png">'
         icon_map = {
+            "Corruption": '<img src="src/assets/ui/icons/corruption.png">',
             "Level": '<img src="src/assets/ui/icons/level.png">',
             "Gold": '<img src="src/assets/ui/icons/gold.png">',
             "Max HP":'<img src="src/assets/ui/icons/max_hp.png">',

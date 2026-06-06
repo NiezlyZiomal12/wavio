@@ -114,6 +114,7 @@ class EnemySpawner:
             enemy.coin_sprite = self.coin_sprite
             enemy.active_item_group = self.active_item_group
             enemy.active_item_drop_table = self.active_item_drop_table
+            self._try_corrupt_enemy(enemy)
             self.enemies.append(enemy)
 
 
@@ -216,4 +217,10 @@ class EnemySpawner:
             max(half_h, min(world_h - half_h, int(self.player.position.y + random.randint(-120, 120)))),
         )
 
+
+    def _try_corrupt_enemy(self, enemy: object) -> None:
+        corruption = self.player.corruption
+        chance = min(0.90, corruption * 0.01)
+        if random.random() < chance:
+            enemy.apply_corruption(corruption)
 

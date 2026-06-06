@@ -35,6 +35,7 @@ class Player(pygame.sprite.Sprite):
         self.reduce_cooldown = 0.0
         self.pickup_range = 0.0
         self.lifesteal = 0.0
+        self.corruption = 1.0
 
         #mults
         self.hp_mult = 1

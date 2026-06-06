@@ -1,13 +1,7 @@
 import pygame
 import pygame_gui
 from pygame_gui.elements import UIButton, UILabel, UIPanel, UIHorizontalSlider
-from src.core.audio import (
-    apply_sfx_volume,
-    get_music_volume,
-    get_sfx_volume,
-    set_music_volume,
-    set_sfx_volume,
-)
+from src.core.audio import *
 
 
 class OptionsMenuUi:
@@ -274,10 +268,12 @@ class OptionsMenuUi:
                 new_value = int(event.value)
                 self.music_value_label.set_text(f"{new_value}%")
                 set_music_volume(new_value / 100)
+                save_settings()
             elif event.ui_element == self.sfx_slider:
                 new_value = int(event.value)
                 self.sfx_value_label.set_text(f"{new_value}%")
                 set_sfx_volume(new_value / 100)
+                save_settings()
 
     def update(self, dt: float) -> None:
         self._sync_to_window_size()

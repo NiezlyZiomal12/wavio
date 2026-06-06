@@ -7,7 +7,7 @@ from .character_select_scene import Character_select_scene
 from .levels.level_select_scene import Level_select_scene
 from src.core.shaders import ShaderRenderer
 from src.core.save_data import SaveDataStore
-from src.core.audio import SoundtrackManager
+from src.core.audio import SoundtrackManager, load_settings, apply_all
 
 
 class StateManager:
@@ -28,7 +28,9 @@ class StateManager:
         # Post-processing renderer
         self.shader = ShaderRenderer(self.scr_w, self.scr_h)
         # ─────────────────────────────────────────────────────────────────
+        load_settings()
         self.audio = SoundtrackManager()
+        apply_all()
         self.audio.start_playlist("menu")
 
         pygame.display.set_caption("Wavio")

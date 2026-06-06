@@ -1,3 +1,5 @@
+import json
+import os
 import pygame
 import weakref
 
@@ -8,6 +10,11 @@ _DEFAULT_SFX_VOLUME = 0.8
 _music_volume = _DEFAULT_MUSIC_VOLUME
 _sfx_volume = _DEFAULT_SFX_VOLUME
 _sfx_registry: list[tuple[object, float]] = []
+
+
+def _default_settings_path() -> str:
+    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+    return os.path.join(base_dir, "settings_data.json")
 
 
 def _clamp(value: float) -> float:
@@ -43,6 +50,41 @@ def set_sfx_volume(value: float) -> None:
 def apply_all() -> None:
     set_music_volume(_music_volume)
     set_sfx_volume(_sfx_volume)
+
+
+def load_settings(path: str | None = None) -> None:
+    global _music_volume, _sfx_volume
+    settings_path = path or _default_settings_path()
+    if not os.path.exists(settings_path):
+        return
+
+    try:
+        with open(settings_path, "r", encoding="utf-8") as handle:
+            parsed = json.load(handle)
+    except (OSError, json.JSONDecodeError):
+        return
+
+    if not isinstance(parsed, dict):
+        return
+
+    music_value = parsed.get("music_volume")
+    sfx_value = parsed.get("sfx_volume")
+
+    if isinstance(music_value, (int, float)):
+        _music_volume = _clamp(music_value)
+    if isinstance(sfx_value, (int, float)):
+        _sfx_volume = _clamp(sfx_value)
+
+
+def save_settings(path: str | None = None) -> None:
+    settings_path = path or _default_settings_path()
+    os.makedirs(os.path.dirname(settings_path), exist_ok=True)
+    payload = {
+        "music_volume": _music_volume,
+        "sfx_volume": _sfx_volume,
+    }
+    with open(settings_path, "w", encoding="utf-8") as handle:
+        json.dump(payload, handle, indent=2)
 
 
 def apply_sfx_volume(sound: pygame.mixer.Sound, base_volume: float = 1.0) -> pygame.mixer.Sound:

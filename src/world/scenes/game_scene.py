@@ -143,7 +143,7 @@ class GameScene:
         self.pause_ui = PauseMenuUi(self.window, self.player)
         self.win_ui = WinUi(self.window, WIDTH, HEIGHT, self.player, 0)
         self.lost_ui = LostUi(self.window, WIDTH, HEIGHT, self.player, 0)
-        self.shop_timer = 30
+        self.shop_timer = 7
         self.won = False
         self.player.active_item_swap_ui = self.active_item_swap_ui
         self.request_menu = False

@@ -21,3 +21,14 @@ class EquippedWeapon:
 
     def upgrade(self) -> None:
         self.level += 1
+
+    def get_scaled_config(self, base_config: dict) -> dict:
+        config = base_config.copy()
+        scaling = base_config["level_scaling"]
+        level_index = self.level - 1
+
+        for stat, bonuses in scaling.items():
+            if level_index < len(bonuses) and stat in config:
+                config[stat] = config[stat] + bonuses[level_index]
+
+        return config

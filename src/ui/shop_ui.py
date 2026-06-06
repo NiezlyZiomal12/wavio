@@ -183,9 +183,11 @@ class ShopUi:
             success, reason = self.player.buy_shop_item(item.item_id, item_price)
 
 
-
     def _get_item_price(self, item) -> int:
-        return max(1, int(round(item.price * self.price_multiplier)))
+        level = self._get_item_level(item)
+        base = item.price
+        price = base * (3 ** level)  # 10 → 10, 30, 90, 270, 810
+        return max(1, int(round(price * self.price_multiplier)))
 
 
     def update_animation(self, dt:float) -> None:
@@ -258,6 +260,30 @@ class ShopUi:
         if item.category == "weapon":
             return self.player.weapon_levels.get(item.item_id, 0)
         return self.player.shop_item_levels.get(item.item_id, 0)
+    
+
+    def _get_scaled_stats_text(self, item) -> str:
+        level = self._get_item_level(item)
+        if item.category != "weapon":
+            return item.description
+
+        base_config = WEAPON_CONFIG.get(item.item_id, {})
+        # Symuluj get_scaled_config dla następnego poziomu (co gracz kupuje)
+        next_level = level + 1
+        level_index = next_level - 1
+        scaling = base_config["level_scaling"]
+
+        weapon_type = base_config["type"]
+        base_dmg = base_config["damage"]
+        base_cd = base_config["cooldown"]
+
+        dmg_bonus = scaling.get("damage", [0] * 5)
+        cd_bonus = scaling.get("cooldown", [0] * 5)
+
+        dmg = base_dmg + (dmg_bonus[level_index] if level_index < len(dmg_bonus) else 0)
+        cd = base_cd + (cd_bonus[level_index] if level_index < len(cd_bonus) else 0)
+
+        return f"{weapon_type} | dmg {dmg} | cd {cd:.2f}s"
 
 
     def draw(self):
@@ -335,9 +361,8 @@ class ShopUi:
             price_y = name_y + level_surface.get_height()
             self.window.blit(price_surface, (price_x, price_y))
 
-            desc_lines = wrap_text(
-                item.description,
-                self.font,
+            stats_text = self._get_scaled_stats_text(item)
+            desc_lines = wrap_text(stats_text, self.font,
                 max(80, rect.width - (icon.get_width() + int(rect.width * 0.24)))
             )
             desc_y = name_y + name_surface.get_height()

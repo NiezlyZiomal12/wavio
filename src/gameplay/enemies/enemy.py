@@ -237,8 +237,8 @@ class Enemy(pygame.sprite.Sprite):
         mult = 1.0 + (corruption * 0.02)
         self.max_hp = max(1, self.max_hp * mult)
         self.hp = self.max_hp
-        self.damage = max(1, self.damage * mult)
-        self.speed = max(1, self.speed * mult * 0.1)
+        self.damage = max(self.max_hp, self.damage * mult)
+        self.speed = max(self.speed, self.speed * mult)
 
 
     def apply_poison(self, stacks: int, damage: float, duration: float, tick_rate: float) -> None:

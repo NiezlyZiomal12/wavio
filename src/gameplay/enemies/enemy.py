@@ -98,6 +98,7 @@ class Enemy(pygame.sprite.Sprite):
         scaled_damage = max(1, int(round(self.initial_damage * time_damage_multiplier * max(0.1, damage_multiplier))))
         scaled_speed = max(1, int(round(self.initial_speed * time_speed_multiplier * max(0.1, speed_multiplier))))
 
+        #stats
         self.max_hp = scaled_max_hp
         self.hp = max(1, int(round(self.max_hp * hp_ratio)))
         self.base_speed = scaled_speed
@@ -105,6 +106,9 @@ class Enemy(pygame.sprite.Sprite):
         self.base_hp = self.max_hp
         self.base_damage = scaled_damage
         self.damage = scaled_damage
+
+        #corruption
+        self.is_corrupted = False
 
         # Keep boss-specific combat logic in sync with scaled base damage.
         if hasattr(self, "shot_damage"):
@@ -228,6 +232,15 @@ class Enemy(pygame.sprite.Sprite):
             self.coin_group.add(coin)
             
 
+    def apply_corruption(self, corruption: int) -> None:
+        self.is_corrupted = True
+        mult = 1.0 + (corruption * 0.02)
+        self.max_hp = max(1, self.max_hp * mult)
+        self.hp = self.max_hp
+        self.damage = max(self.max_hp, self.damage * mult)
+        self.speed = max(self.speed, self.speed * mult)
+
+
     def apply_poison(self, stacks: int, damage: float, duration: float, tick_rate: float) -> None:
         if not hasattr(self, "_poison_stacks"):
             self._poison_stacks = 0
@@ -300,5 +313,13 @@ class Enemy(pygame.sprite.Sprite):
 
 
     def draw(self, surface: pygame.Surface, camera: object):
+        if getattr(self, "is_corrupted", False):
+            glow_size = 10
+            glow = pygame.transform.scale(self.image, (self.image.get_width() + glow_size * 2, self.image.get_height() + glow_size * 2))
+            glow = glow.copy()
+            glow.fill((120, 0, 180, 255), special_flags=pygame.BLEND_RGBA_MULT)
+            glow_rect = camera.apply(self.rect).inflate(glow_size * 2, glow_size * 2)
+            surface.blit(glow, glow_rect)
+
         surface.blit(self.image, camera.apply(self.rect))
         self.damage_indicator.draw(surface, camera)

@@ -22,6 +22,13 @@ class StateManager:
             (self.scr_w, self.scr_h),
             pygame.FULLSCREEN | pygame.OPENGL | pygame.DOUBLEBUF,
         )
+        # self.scr_w = 720
+        # self.scr_h = 600
+
+        # self.window = pygame.display.set_mode(
+        #     (self.scr_w, self.scr_h),
+        #     pygame.RESIZABLE | pygame.OPENGL | pygame.DOUBLEBUF,
+        # )
 
         self.screen = pygame.Surface((self.scr_w, self.scr_h))
 

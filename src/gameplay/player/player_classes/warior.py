@@ -7,9 +7,9 @@ from ..characters_config import CHARACTERS
 character_config = CHARACTERS["Warrior"]
 class Warrior(Player):
 	def __init__(self, start_x: int, start_y: int) -> None:
-		sprite_sheet = pygame.image.load("src/assets/player/knightSpriteSheet.png").convert_alpha()
+		sprite_sheet = pygame.image.load(character_config["Image_path"]).convert_alpha()
 		animation_config = {
-			"frame_size": (50, 64),
+			"frame_size": character_config["animation_config"]["frame_size"],
 			"animations": {
 				"idle": {"row": 0, "frame_count": 4, "speed": 0.1},
 				"walk": {"row": 1, "frame_count": 4, "speed": 0.1},

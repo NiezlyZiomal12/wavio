@@ -3,12 +3,12 @@ import pygame
 from ..player import Player
 from ..characters_config import CHARACTERS
 
-
+character_config = CHARACTERS["Mage"]
 class Mage(Player):
 	def __init__(self, start_x: int, start_y: int) -> None:
-		sprite_sheet = pygame.image.load("src/assets/player/mageSpriteSheet.png").convert_alpha()
+		sprite_sheet = pygame.image.load(character_config["Image_path"]).convert_alpha()
 		animation_config = {
-			"frame_size": (64, 64),
+			"frame_size": character_config["animation_config"]["frame_size"],
 			"animations": {
 				"idle": {"row": 1, "frame_count": 4, "speed": 0.2},
 				"walk": {"row": 0, "frame_count": 6, "speed": 0.1},
@@ -16,7 +16,6 @@ class Mage(Player):
 			},
 		}
 		super().__init__(sprite_sheet, start_x, start_y, animation_config=animation_config)
-		character_config = CHARACTERS["Mage"]
 		self.class_name = "Mage"
 		self.unlocked = True
 		

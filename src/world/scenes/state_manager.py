@@ -8,6 +8,7 @@ from .levels.level_select_scene import Level_select_scene
 from src.core.shaders import ShaderRenderer
 from src.core.save_data import SaveDataStore
 from src.core.audio import SoundtrackManager, load_settings, apply_all
+from src.core.achievement_system import AchievementManager, AchievementToastUi
 
 
 class StateManager:
@@ -52,8 +53,15 @@ class StateManager:
         self.level_select_scene = Level_select_scene(self.screen, save_data=self.save_data)
         self.game = None
 
+        #Achievement system
+        self.achievements = AchievementManager()
+        self.achievement_toast = AchievementToastUi(self.screen)
+        self.achievements.on_unlock(lambda aid, meta: self.achievement_toast.push({"id": aid, **meta}))
+
     def _present(self) -> None:
         """Upload the software surface through the shader and flip."""
+        self.achievement_toast.update(self.clock.get_time() / 1000.0)
+        self.achievement_toast.draw()
         self.shader.blit(self.screen, self.elapsed)
         pygame.display.flip()
 
@@ -138,6 +146,7 @@ class StateManager:
                         self.level_select_scene.get_selected_level(),
                         self.level_select_scene.get_selected_difficulty(),
                         save_data=self.save_data,
+                        achievements= self.achievements
                     )
                     self.state = "game"
                     self.audio.start_playlist("game")
@@ -171,6 +180,7 @@ class StateManager:
                         self.level_select_scene.get_selected_level(),
                         self.level_select_scene.get_selected_difficulty(),
                         save_data=self.save_data,
+                        achievements= self.achievements
                     )
                     self.audio.start_playlist("game")
                     continue

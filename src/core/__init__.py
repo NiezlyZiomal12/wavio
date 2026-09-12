@@ -3,6 +3,7 @@ from .timer import Timer
 from .shaders import ShaderRenderer
 from .utils import Animation, Flash, wrap_text, Button, dmgIndicator, build_random_pitch_sounds
 from .audio import SoundtrackManager
+from .achievement_system import AchievementToastUi, AchievementManager
 __all__ = [
             "Camera", 
             "Timer", 
@@ -13,5 +14,7 @@ __all__ = [
             "dmgIndicator", 
             "build_random_pitch_sounds", 
             "ShaderRenderer",
-            "SoundtrackManager"
+            "SoundtrackManager",
+            "AchievementToastUi",
+            "AchievementManager"
             ]

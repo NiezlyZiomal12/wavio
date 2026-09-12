@@ -52,6 +52,7 @@ class GameScene:
         selected_level: dict,
         selected_difficulty: str = "Normal",
         save_data=None,
+        achievements= None,
     ):
         self.window = window
         self.running = True
@@ -64,6 +65,7 @@ class GameScene:
         self.selected_difficulty = selected_difficulty
         self.difficulty = DIFFICULTY_SETTINGS[self.selected_difficulty]
         self.save_data = save_data
+        self.achievements = achievements
 
         bomb_image = pygame.image.load("src/assets/items/pickable/bomb.png").convert_alpha()
         prismat_image = pygame.image.load("src/assets/items/pickable/prismat.png").convert_alpha()
@@ -94,7 +96,7 @@ class GameScene:
         self.active_item_drop_table = ["fancy_boots", "lantern", "ambrosia", "taste_of_blood"]
 
         # Timer
-        self.level_timer = Timer(5 * 20)
+        self.level_timer = Timer(20)
 
         # World
         map_world_width = self.level.width * self.level.tilewidth
@@ -289,9 +291,14 @@ class GameScene:
         if self.level_timer.finished and not self.won:
             if self.save_data is not None:
                 self.save_data.mark_completion(
+                    self.level_id, self.selected_difficulty, self.selected_character,
+                )
+            if self.achievements is not None:
+                self.achievements.check_level_completion(
                     self.level_id,
                     self.selected_difficulty,
                     self.selected_character,
+                    save_data=self.save_data,
                 )
             self.won = True
             self.win_ui.elapsed_time = self.level_timer.elapsed
